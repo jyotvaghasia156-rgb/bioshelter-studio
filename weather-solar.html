@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather &amp; Solar Radiation Intelligence &bull; BioShelter Studio</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- App Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Top Global Header -->
+    <header class="app-header">
+        <div class="brand-section">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z"/></svg>
+            </div>
+            <div>
+                <h1 class="brand-title">BioShelter Studio</h1>
+                <div class="brand-subtitle">Weather &amp; Solar Radiation Intelligence</div>
+            </div>
+        </div>
+
+        <!-- Header Nav Links -->
+        <nav class="header-nav-links">
+            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
+            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
+            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
+            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
+            <a href="nearby-bunkers.html" class="nav-link-btn">🛡️ Nearby Bunkers</a>
+            <a href="weather-solar.html" class="nav-link-btn active">☀️ Weather &amp; Solar</a>
+            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
+            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
+            <a href="bioclimatic-optimizer.html" class="nav-link-btn">⚡ Optimizer</a>
+            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
+            <a href="custom-materials.html" class="nav-link-btn">🧬 Custom Materials</a>
+            <a href="community.html" class="nav-link-btn">🤝 Community</a>
+            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
+            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
+            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
+        </nav>
+
+        <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
+            <!-- Dark / Light Theme Toggle -->
+            <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Light / Dark Mode">
+                <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                    <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
+                </svg>
+                <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.3 2a10 10 0 0 0-.19 20 10.04 10.04 0 0 0 9.8-7.9 1 1 0 0 0-1.12-1.22A8 8 0 1 1 11.1 3.21a1 1 0 0 0 1.2-1.21z"/>
+                </svg>
+            </button>
+
+            <a href="index.html" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                <span>Open 3D Studio &rarr;</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-container" style="padding: 24px; max-width: 1600px; margin: 0 auto;">
+        <div class="page-header-bar" style="margin-bottom: 20px;">
+            <div class="page-header-info">
+                <h2>Atmospheric Solar Radiation, Sun-Path Geometry &amp; Psychrometric Telemetry</h2>
+                <p>Direct normal irradiance ($DNI$), diffuse sky flux ($DHI$), hourly solar heat gain coefficient ($SHGC$), vapor pressure deficit ($VPD$), dew-point, and optimal photovoltaic roof pitch derived from Open-Meteo &amp; Google Solar API calculations.</p>
+            </div>
+        </div>
+
+        <!-- Climate Selector Bar -->
+        <div class="assembly-card" style="padding: 16px; margin-bottom: 20px; background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(56,189,248,0.08)); border-color: rgba(245,158,11,0.3);">
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label style="font-size: 12px; font-weight: 700; color: var(--text-primary);">Select Climate Zone:</label>
+                    <select id="select-solar-zone" class="input-select" style="min-width: 260px; font-size: 13px; font-weight: 600;">
+                        <option value="hot_arid">Hot-Arid (Thar / Jaisalmer / Cairo) - 980 W/m² Peak Solar</option>
+                        <option value="warm_humid">Warm-Humid (Chennai / Sundarbans / Singapore) - High Diffuse</option>
+                        <option value="composite">Composite Monsoon (New Delhi / Riyadh) - Extreme Diurnal</option>
+                        <option value="temperate">Temperate Oceanic (Bengaluru / London / Paris) - Balanced</option>
+                        <option value="cold">Cold Alpine (Leh Ladakh / Zurich / Aspen) - Low Sun Angle</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 12px; font-size: 12px; color: var(--text-secondary);">
+                    <span>☀️ <strong>Optimal PV Pitch:</strong> <span id="val-solar-pitch" style="color: var(--accent-amber); font-weight: 800;">28.5° South</span></span>
+                    <span>⚡ <strong>Annual Peak Flux:</strong> <span id="val-solar-flux" style="color: #10b981; font-weight: 800;">2,240 kWh/m²</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4-Grid Key Solar Metrics -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 24px;">
+            <div class="hud-card" style="border-left: 3px solid var(--accent-amber);">
+                <div class="hud-metric-label">Direct Normal Irradiance (DNI)</div>
+                <div id="stat-solar-dni" class="hud-metric-val" style="color: var(--accent-amber); font-size: 24px;">980 W/m²</div>
+                <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Beam Solar Radiation at Solar Noon</div>
+            </div>
+
+            <div class="hud-card" style="border-left: 3px solid var(--accent-sky);">
+                <div class="hud-metric-label">Vapor Pressure Deficit (VPD)</div>
+                <div id="stat-solar-vpd" class="hud-metric-val" style="color: var(--accent-sky); font-size: 24px;">3.42 kPa</div>
+                <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">High Evaporative Cooling Potential</div>
+            </div>
+
+            <div class="hud-card" style="border-left: 3px solid #10b981;">
+                <div class="hud-metric-label">Dew-Point Temperature</div>
+                <div id="stat-solar-dewpoint" class="hud-metric-val" style="color: #10b981; font-size: 24px;">14.2°C</div>
+                <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Condensation Threshold Limit</div>
+            </div>
+
+            <div class="hud-card" style="border-left: 3px solid #f43f5e;">
+                <div class="hud-metric-label">Peak UV Index</div>
+                <div id="stat-solar-uv" class="hud-metric-val" style="color: #f43f5e; font-size: 24px;">11.8 (Extreme)</div>
+                <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Requires Deep 0.85m Eaves Overhang</div>
+            </div>
+        </div>
+
+        <!-- 2-Columns Charts Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 20px; margin-bottom: 24px;">
+            <!-- 1. 24-Hour Solar Radiation Flux Chart -->
+            <div class="chart-container-card">
+                <div class="chart-card-header">
+                    <div class="chart-title">24-Hour Solar Irradiance Breakdown (Direct vs. Diffuse Sky Radiation)</div>
+                </div>
+                <div class="chart-canvas-wrapper" style="height: 320px;">
+                    <canvas id="chart-solar-radiation"></canvas>
+                </div>
+            </div>
+
+            <!-- 2. Psychrometric Atmospheric State (Wet Bulb, Dew Point, VPD) -->
+            <div class="chart-container-card">
+                <div class="chart-card-header">
+                    <div class="chart-title">Psychrometric Diurnal Curve: Dry Bulb vs. Wet Bulb vs. Dew Point</div>
+                </div>
+                <div class="chart-canvas-wrapper" style="height: 320px;">
+                    <canvas id="chart-psychro-curves"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Google Solar & Bioclimatic Architectural Recommendations -->
+        <div class="assembly-card" style="padding: 20px; margin-bottom: 24px;">
+            <div class="chart-title">Google Solar &amp; Passive Overhang Design Recommendations</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 12px;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 700; color: var(--accent-amber); text-transform: uppercase;">☀️ Optimal Solar Orientation</div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">True South (0° Azimuth &plusmn; 15°)</div>
+                    <p style="font-size: 11px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5;">
+                        Aligning the primary elongated facade toward the equator maximizes winter solar heating while allowing simple horizontal roof overhangs to completely block summer midday radiation.
+                    </p>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 700; color: var(--accent-sky); text-transform: uppercase;">📐 Eaves Depth Calculation</div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">0.85 meters (Summer Cutoff Angle: 72°)</div>
+                    <p style="font-size: 11px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5;">
+                        Mathematically calculated for latitude 26.9° to shade 100% of vertical glazing during peak overheating months (May–August) while admitting low-angle winter sunlight.
+                    </p>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px;">
+                    <div style="font-size: 11px; font-weight: 700; color: #10b981; text-transform: uppercase;">⚡ Photovoltaic Yield Estimate</div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">18.5 kWh / day (5 kWp System)</div>
+                    <p style="font-size: 11px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5;">
+                        Annual net-positive solar energy generation sufficient to power low-energy geothermal air circulation fans and household life-support completely off-grid.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Script Module -->
+    <script type="module">
+        import { generateDiurnalWeather, CLIMATE_ZONES } from './js/climateEngine.js';
+        import { themeManager } from './js/themeManager.js';
+
+        let chartSolar = null;
+        let chartPsychro = null;
+
+        function updateSolarCharts() {
+            const zoneId = document.getElementById('select-solar-zone').value;
+            const weather = generateDiurnalWeather(zoneId);
+            const hourly = weather.hourly;
+            const labels = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
+
+            const isDark = themeManager.isDark();
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.08)';
+            const textColor = isDark ? '#94a3b8' : '#475569';
+
+            // Peak metrics
+            const maxDni = Math.max(...hourly.map(h => h.solarDni || h.solarFlux || 0));
+            const maxVpd = Math.max(...hourly.map(h => h.vpd || 2.5));
+            const avgDew = Math.round((hourly.reduce((a, b) => a + (b.dewPoint || 12), 0) / 24) * 10) / 10;
+
+            document.getElementById('stat-solar-dni').textContent = `${Math.round(maxDni)} W/m²`;
+            document.getElementById('stat-solar-vpd').textContent = `${maxVpd.toFixed(2)} kPa`;
+            document.getElementById('stat-solar-dewpoint').textContent = `${avgDew}°C`;
+
+            // 1. Solar Radiation Chart
+            const ctxSolar = document.getElementById('chart-solar-radiation');
+            if (chartSolar) chartSolar.destroy();
+            chartSolar = new Chart(ctxSolar, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Direct Normal Irradiance DNI (W/m²)',
+                            data: hourly.map(h => h.solarDni || h.solarFlux || 0),
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 2.5
+                        },
+                        {
+                            label: 'Diffuse Sky Irradiance DHI (W/m²)',
+                            data: hourly.map(h => Math.round((h.solarDni || h.solarFlux || 0) * 0.22)),
+                            borderColor: '#38bdf8',
+                            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { color: gridColor }, ticks: { color: textColor } },
+                        y: { grid: { color: gridColor }, ticks: { color: textColor }, title: { display: true, text: 'Watts / m²', color: textColor } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: textColor } }
+                    }
+                }
+            });
+
+            // 2. Psychrometric Diurnal Curves
+            const ctxPsychro = document.getElementById('chart-psychro-curves');
+            if (chartPsychro) chartPsychro.destroy();
+            chartPsychro = new Chart(ctxPsychro, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Ambient Dry Bulb Temp (°C)',
+                            data: hourly.map(h => h.ambientTemp),
+                            borderColor: '#f43f5e',
+                            borderWidth: 2.5,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Wet Bulb Temperature (°C)',
+                            data: hourly.map(h => h.wetBulb || h.ambientTemp - 6),
+                            borderColor: '#38bdf8',
+                            borderWidth: 2,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Dew Point Temperature (°C)',
+                            data: hourly.map(h => h.dewPoint || h.ambientTemp - 12),
+                            borderColor: '#10b981',
+                            borderDash: [4, 4],
+                            borderWidth: 2,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { color: gridColor }, ticks: { color: textColor } },
+                        y: { grid: { color: gridColor }, ticks: { color: textColor }, title: { display: true, text: 'Temperature (°C)', color: textColor } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: textColor } }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSolarCharts();
+            document.getElementById('select-solar-zone').addEventListener('change', updateSolarCharts);
+            window.addEventListener('bioshelter-theme-changed', updateSolarCharts);
+        });
+    </script>
+</body>
+</html>

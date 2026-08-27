@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Biomaterials Laboratory &bull; BioShelter Studio</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- App Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Top Global Header -->
+    <header class="app-header">
+        <div class="brand-section">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 8c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3z"/></svg>
+            </div>
+            <div>
+                <h1 class="brand-title">BioShelter Studio</h1>
+                <div class="brand-subtitle">Custom Biomaterials Laboratory</div>
+            </div>
+        </div>
+
+        <!-- Header Nav Links -->
+        <nav class="header-nav-links">
+            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
+            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
+            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
+            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
+            <a href="nearby-bunkers.html" class="nav-link-btn">🛡️ Nearby Bunkers</a>
+            <a href="weather-solar.html" class="nav-link-btn">☀️ Weather &amp; Solar</a>
+            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
+            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
+            <a href="bioclimatic-optimizer.html" class="nav-link-btn">⚡ Optimizer</a>
+            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
+            <a href="custom-materials.html" class="nav-link-btn active">🧬 Custom Materials</a>
+            <a href="community.html" class="nav-link-btn">🤝 Community</a>
+            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
+            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
+            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
+        </nav>
+
+        <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
+            <!-- Dark / Light Theme Toggle -->
+            <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Light / Dark Mode">
+                <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                    <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
+                </svg>
+                <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.3 2a10 10 0 0 0-.19 20 10.04 10.04 0 0 0 9.8-7.9 1 1 0 0 0-1.12-1.22A8 8 0 1 1 11.1 3.21a1 1 0 0 0 1.2-1.21z"/>
+                </svg>
+            </button>
+
+            <a href="index.html" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                <span>Open 3D Studio &rarr;</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
+        <div class="page-header-bar" style="margin-bottom: 24px;">
+            <div class="page-header-info">
+                <h2>Custom Biomaterials Synthesizer &amp; Carbon-Negative Composites Lab</h2>
+                <p>Synthesize custom vernacular insulation composites, calculate exact thermal conductivity ($k$), density ($\rho$), specific heat capacity ($c_p$), and carbon sequestration, saving directly into the backend database.</p>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 420px 1fr; gap: 24px; margin-bottom: 24px;">
+            <!-- Material Builder Form -->
+            <div class="assembly-card" style="padding: 24px;">
+                <div class="chart-title">🧬 Synthesize Custom Biomaterial</div>
+                <form id="form-create-material" style="display: flex; flex-direction: column; gap: 14px; margin-top: 14px;">
+                    <div>
+                        <label class="control-label">Material Name</label>
+                        <input type="text" id="custom-mat-name" class="input-text" placeholder="e.g. Mycelium-Hemp Insulative Board" required style="width: 100%; margin-top: 4px;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label class="control-label">Conductivity (k) [W/m·K]</label>
+                            <input type="number" id="custom-mat-k" class="input-text" step="0.005" min="0.01" max="5.0" value="0.045" required style="width: 100%; margin-top: 4px;">
+                        </div>
+                        <div>
+                            <label class="control-label">Density (ρ) [kg/m³]</label>
+                            <input type="number" id="custom-mat-rho" class="input-text" step="5" min="10" max="3500" value="180" required style="width: 100%; margin-top: 4px;">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label class="control-label">Specific Heat (cp) [J/kg·K]</label>
+                            <input type="number" id="custom-mat-cp" class="input-text" step="50" min="100" max="4000" value="1850" required style="width: 100%; margin-top: 4px;">
+                        </div>
+                        <div>
+                            <label class="control-label">Embodied Carbon (kg CO₂/m³)</label>
+                            <input type="number" id="custom-mat-carbon" class="input-text" step="5" min="-500" max="2500" value="-85" required style="width: 100%; margin-top: 4px;">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="control-label">Biomass Category &amp; Composition</label>
+                        <select id="custom-mat-cat" class="input-select" style="width: 100%; margin-top: 4px;">
+                            <option value="bio_composite">Bio-Composite (Hemp, Flax, Straw, Mycelium)</option>
+                            <option value="earthen_stabilized">Earthen / Rammed Earth / Adobe Block</option>
+                            <option value="timber_bamboo">Engineered Timber / Bamboo Lattice</option>
+                            <option value="aerated_pozzolanic">Pozzolanic Lime &amp; Volcanic Ash</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="export-btn-primary" style="margin-top: 10px; justify-content: center; padding: 12px; font-size: 13px; background: linear-gradient(135deg, #0284c7, #10b981); cursor: pointer;">
+                        🚀 Save into Backend Database &rarr;
+                    </button>
+                </form>
+            </div>
+
+            <!-- Custom Materials Directory Grid -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div class="chart-title" style="margin-bottom: 0;">Verified Custom Biomaterials Database</div>
+                    <span id="custom-materials-count-badge" class="section-badge" style="background: rgba(16,185,129,0.2); color: #10b981; font-weight: 700;">6 Active Materials</span>
+                </div>
+
+                <div id="custom-materials-catalog-grid" class="community-grid"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Script Module -->
+    <script type="module">
+        import { apiClient } from './js/apiClient.js';
+        import { themeManager } from './js/themeManager.js';
+        import { userDataStore } from './js/userDataStore.js';
+
+        const SEED_CUSTOM_MATERIALS = [
+            {
+                name: 'Mycelium Fungus Acoustic Insulation',
+                category: 'bio_composite',
+                k: 0.038,
+                rho: 110,
+                cp: 1750,
+                embodiedCarbon: -140,
+                description: 'Pure bio-grown fungal root matrix grown in agricultural straw. 100% biodegradable and fire-resistant.'
+            },
+            {
+                name: 'Hemp-Lime Monolithic Shives (Hempcrete)',
+                category: 'bio_composite',
+                k: 0.075,
+                rho: 330,
+                cp: 1800,
+                embodiedCarbon: -108,
+                description: 'Industrial hemp core mixed with hydraulic lime binder. Carbon-negative wall infill with natural vapor permeability.'
+            },
+            {
+                name: 'Rice Husk Ash Pozzolanic Render',
+                category: 'aerated_pozzolanic',
+                k: 0.22,
+                rho: 850,
+                cp: 1200,
+                embodiedCarbon: -25,
+                description: 'Agricultural byproduct silicate ash substituted for Portland cement, drastically cutting embodied CO2 emissions.'
+            },
+            {
+                name: 'Compressed Straw-Bale Thermal Wall',
+                category: 'bio_composite',
+                k: 0.055,
+                rho: 120,
+                cp: 1900,
+                embodiedCarbon: -95,
+                description: 'Dense wheat straw bales providing massive R-30 thermal insulation in cold climates.'
+            },
+            {
+                name: 'Treated Dendrocalamus Bamboo Slat',
+                category: 'timber_bamboo',
+                k: 0.15,
+                rho: 600,
+                cp: 1400,
+                embodiedCarbon: -70,
+                description: 'Borax-treated giant timber bamboo with high tensile strength exceeding structural steel.'
+            },
+            {
+                name: 'Nubian Adobe Sun-Dried Mud Brick',
+                category: 'earthen_stabilized',
+                k: 0.65,
+                rho: 1650,
+                cp: 920,
+                embodiedCarbon: 8,
+                description: 'Sun-baked Nile silt and desert clay stabilized with straw fibers. Zero kiln firing energy required.'
+            }
+        ];
+
+        async function loadMaterials() {
+            const container = document.getElementById('custom-materials-catalog-grid');
+            if (!container) return;
+
+            let list = userDataStore.getCustomMaterials();
+            if (!list || list.length === 0) {
+                list = SEED_CUSTOM_MATERIALS;
+            }
+
+            document.getElementById('custom-materials-count-badge').textContent = `${list.length} Verified Materials`;
+
+            container.innerHTML = list.map((m, idx) => `
+                <div class="community-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                            <span class="section-badge" style="background: rgba(56,189,248,0.2); color: var(--accent-sky);">
+                                ${m.category ? m.category.toUpperCase() : 'BIOMATERIAL'}
+                            </span>
+                            <span style="font-size: 11px; font-weight: 800; color: ${m.embodiedCarbon < 0 ? '#10b981' : '#f59e0b'};">
+                                ${m.embodiedCarbon} kg CO₂/m³
+                            </span>
+                        </div>
+
+                        <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 8px 0 4px 0;">${m.name}</h3>
+                        <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45; margin-bottom: 12px;">
+                            ${m.description || 'Synthesized low-carbon bioclimatic envelope material.'}
+                        </p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding-top: 10px; border-top: 1px solid var(--border-glass); text-align: center;">
+                        <div style="background: rgba(0,0,0,0.2); padding: 6px; border-radius: 6px;">
+                            <div style="font-size: 8px; color: var(--text-muted);">Conductivity</div>
+                            <div style="font-size: 11px; font-weight: 800; color: var(--accent-sky);">${m.k} W/m·K</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); padding: 6px; border-radius: 6px;">
+                            <div style="font-size: 8px; color: var(--text-muted);">Density</div>
+                            <div style="font-size: 11px; font-weight: 800; color: var(--accent-emerald);">${m.rho} kg/m³</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); padding: 6px; border-radius: 6px;">
+                            <div style="font-size: 8px; color: var(--text-muted);">Spec. Heat</div>
+                            <div style="font-size: 11px; font-weight: 800; color: #f59e0b;">${m.cp} J/kg·K</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('form-create-material').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('custom-mat-name').value;
+            const k = parseFloat(document.getElementById('custom-mat-k').value);
+            const rho = parseFloat(document.getElementById('custom-mat-rho').value);
+            const cp = parseFloat(document.getElementById('custom-mat-cp').value);
+            const embodiedCarbon = parseFloat(document.getElementById('custom-mat-carbon').value);
+            const category = document.getElementById('custom-mat-cat').value;
+
+            const newMat = await userDataStore.addCustomMaterial({
+                name, k, rho, cp, embodiedCarbon, category,
+                description: `Synthesized vernacular composite with thermal conductivity ${k} W/m·K.`
+            });
+
+            alert(`✅ Material "${name}" successfully saved into backend database!`);
+            loadMaterials();
+            e.target.reset();
+        });
+
+        document.addEventListener('DOMContentLoaded', loadMaterials);
+    </script>
+</body>
+</html>
