@@ -495,6 +495,15 @@ export class WorldMapEngine {
         });
     }
 
+    setTheme(isDark) {
+        this.isDark = isDark;
+        if (!isDark && this.currentLayerKey === 'carto_dark') {
+            this.setLayer('google_street');
+        }
+        this.renderStationMarkers();
+        this.renderStationTable();
+    }
+
     setFilter(category) {
         this.filterCategory = category;
         this.renderStationMarkers();

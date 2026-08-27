@@ -191,7 +191,8 @@ class BioShelterApp {
             this.pmvChart,
             this.comparisonChart,
             this.soilDepthChart,
-            this.weatherSolarChart
+            this.weatherSolarChart,
+            this.comfortRadarChart
         ];
 
         charts.forEach(chart => {
@@ -207,6 +208,16 @@ class BioShelterApp {
                 }
                 if (chart.options.scales.y1) {
                     chart.options.scales.y1.ticks.color = isDark ? '#38bdf8' : '#0284c7';
+                }
+                if (chart.options.scales.r) {
+                    chart.options.scales.r.angleLines = { color: gridColor };
+                    chart.options.scales.r.grid = { color: gridColor };
+                    if (chart.options.scales.r.pointLabels) {
+                        chart.options.scales.r.pointLabels.color = textColor;
+                    }
+                    if (chart.options.scales.r.ticks) {
+                        chart.options.scales.r.ticks.color = textColor;
+                    }
                 }
             }
             if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {

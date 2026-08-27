@@ -108,11 +108,13 @@ export class Shelter3DVisualizer {
         ground.rotation.x = -Math.PI / 2;
         ground.position.y = -0.01;
         ground.receiveShadow = true;
+        this.ground = ground;
         this.scene.add(ground);
 
         // Circular Grid helper
         const gridHelper = new THREE.GridHelper(30, 30, 0x38bdf8, 0x334155);
         gridHelper.position.y = 0;
+        this.gridHelper = gridHelper;
         this.scene.add(gridHelper);
 
         // Compass orientation markers
@@ -626,14 +628,23 @@ export class Shelter3DVisualizer {
 
     setTheme(isDark) {
         if (!this.scene) return;
-        const bgHex = isDark ? 0x0f172a : 0xe2e8f0;
+        const bgHex = isDark ? 0x070b14 : 0xf1f5f9;
         this.scene.background = new THREE.Color(bgHex);
         if (this.scene.fog) {
             this.scene.fog.color = new THREE.Color(bgHex);
         }
         if (this.ambientLight) {
             this.ambientLight.color = new THREE.Color(isDark ? 0xdbeafe : 0xffffff);
-            this.ambientLight.intensity = isDark ? 0.45 : 0.75;
+            this.ambientLight.intensity = isDark ? 0.45 : 0.85;
+        }
+        if (this.ground && this.ground.material) {
+            this.ground.material.color.setHex(isDark ? 0x1e293b : 0xe2e8f0);
+        }
+        if (this.gridHelper) {
+            this.scene.remove(this.gridHelper);
+            this.gridHelper = new THREE.GridHelper(30, 30, isDark ? 0x38bdf8 : 0x0284c7, isDark ? 0x334155 : 0xcbd5e1);
+            this.gridHelper.position.y = 0;
+            this.scene.add(this.gridHelper);
         }
     }
 

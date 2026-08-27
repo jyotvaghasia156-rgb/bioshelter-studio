@@ -725,3 +725,164 @@ body {
     filter: brightness(1.15);
 }
 
+/* ==========================================================================
+   Comprehensive Light Theme Overrides (High Contrast & Clean Aesthetics)
+   ========================================================================== */
+[data-theme="light"] body {
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+
+[data-theme="light"] .app-header {
+    background: rgba(255, 255, 255, 0.94);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .sidebar-panel {
+    background: rgba(248, 250, 252, 0.96);
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .param-section,
+[data-theme="light"] .assembly-card,
+[data-theme="light"] .chart-container-card,
+[data-theme="light"] .community-card,
+[data-theme="light"] .export-card,
+[data-theme="light"] .soil-props-card,
+[data-theme="light"] .comparison-container,
+[data-theme="light"] .hud-card {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.09);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    color: #0f172a;
+}
+
+[data-theme="light"] .tab-nav-bar {
+    background: rgba(255, 255, 255, 0.96);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .tab-btn {
+    color: #64748b;
+}
+
+[data-theme="light"] .tab-btn:hover {
+    color: #0f172a;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .tab-btn.active {
+    color: #0284c7;
+    background: rgba(2, 132, 199, 0.08);
+    border-bottom: 2px solid #0284c7;
+}
+
+[data-theme="light"] .dedicated-pages-nav-bar {
+    background: rgba(255, 255, 255, 0.92);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .input-text,
+[data-theme="light"] .input-select,
+[data-theme="light"] .custom-select,
+[data-theme="light"] .phone-country-code,
+[data-theme="light"] .phone-number-input,
+[data-theme="light"] input[type="text"],
+[data-theme="light"] input[type="email"],
+[data-theme="light"] input[type="tel"],
+[data-theme="light"] input[type="password"] {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.16);
+    color: #0f172a;
+}
+
+[data-theme="light"] .input-text::placeholder,
+[data-theme="light"] .phone-number-input::placeholder,
+[data-theme="light"] input::placeholder {
+    color: #94a3b8;
+}
+
+[data-theme="light"] .comparison-table {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .comparison-table th {
+    background: #f8fafc;
+    color: #334155;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .comparison-table td {
+    color: #0f172a;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .comparison-table tr:nth-child(even) {
+    background: rgba(248, 250, 252, 0.6);
+}
+
+[data-theme="light"] .layer-row {
+    background: #f8fafc;
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #0f172a;
+}
+
+[data-theme="light"] .stat-pill {
+    background: #f1f5f9;
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #0f172a;
+}
+
+[data-theme="light"] .stat-pill-value {
+    color: #0284c7;
+}
+
+[data-theme="light"] .time-scrubber-bar {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .scrubber-clock {
+    color: #0f172a;
+}
+
+[data-theme="light"] .modal-card {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    color: #0f172a;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .modal-backdrop {
+    background: rgba(15, 23, 42, 0.5);
+}
+
+[data-theme="light"] .btn-resend-otp {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.15);
+    color: #334155;
+}
+
+[data-theme="light"] .btn-resend-otp:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #0f172a;
+}
+
+[data-theme="light"] .nav-link-btn {
+    color: #475569;
+}
+
+[data-theme="light"] .nav-link-btn:hover {
+    color: #0f172a;
+    background: rgba(2, 132, 199, 0.08);
+}
+
+[data-theme="light"] .nav-link-btn.active {
+    color: #0284c7;
+    background: rgba(2, 132, 199, 0.12);
+    border-color: rgba(2, 132, 199, 0.3);
+}
+
+
