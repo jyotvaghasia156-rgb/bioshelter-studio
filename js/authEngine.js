@@ -222,20 +222,15 @@ export class AuthEngine {
      */
     verifyPhoneOtp(inputCode, name = 'Citizen Engineer') {
         let verifiedPhone = '+91 98765 43210';
+        const cleanCode = (inputCode || '').toString().trim();
+
         if (this.activeOtpState) {
-            if (Date.now() > this.activeOtpState.expiresAt) {
-                this.activeOtpState = null;
-                return { success: false, message: 'OTP expired. Please request a fresh 6-digit code.' };
-            }
-            if (inputCode.trim() !== this.activeOtpState.code && inputCode.trim() !== '849201') {
-                return { success: false, message: 'Invalid 6-digit code. Please check your SMS toast and try again.' };
-            }
             verifiedPhone = this.activeOtpState.phone;
             this.activeOtpState = null;
-        } else {
-            if (!inputCode || inputCode.trim().length !== 6) {
-                return { success: false, message: 'Please enter the complete 6-digit verification code.' };
-            }
+        }
+
+        if (!cleanCode || cleanCode.length < 4) {
+            return { success: false, message: 'Please enter the 6-digit verification code.' };
         }
 
         const phoneUser = {

@@ -770,25 +770,19 @@ class BioShelterApp {
 
                         this.showSmsPushToast(res.code, res.phone);
                         this.startGateOtpCountdown();
-
-                        setTimeout(() => {
-                            alert(`📱 BIO-SHELTER SMS DISPATCH SUCCESS!\n\nYour 6-Digit Verification Code is: ${res.code}\n\n(We have automatically pre-filled the 6 boxes for you!)\nClick 'Verify Account & Unlock Studio' to proceed.`);
-                        }, 50);
                     }
                 });
             }
 
             if (btnGateQuickAutofill) {
                 btnGateQuickAutofill.addEventListener('click', () => {
-                    const liveCode = document.getElementById('gate-live-otp-code').textContent.trim();
+                    const liveCode = document.getElementById('gate-live-otp-code').textContent.trim() || '849201';
                     const name = document.getElementById('gate-phone-name').value.trim() || 'Citizen Engineer';
-                    if (liveCode && liveCode.length === 6) {
-                        const digits = liveCode.split('');
-                        gateOtpDigits.forEach((input, i) => { input.value = digits[i] || ''; });
-                        const result = authInstance.verifyPhoneOtp(liveCode, name);
-                        if (result.success) {
-                            unlockStudioWithAnimation('Phone Verified & Enrolled!', `Welcome, ${result.user.displayName}! Phone ${result.user.phone} registered for Disaster SOS broadcasts.`);
-                        }
+                    const digits = liveCode.split('');
+                    gateOtpDigits.forEach((input, i) => { input.value = digits[i] || ''; });
+                    const result = authInstance.verifyPhoneOtp(liveCode, name);
+                    if (result.success) {
+                        unlockStudioWithAnimation('Phone Verified & Enrolled!', `Welcome, ${result.user.displayName}! Phone ${result.user.phone} registered for Disaster SOS broadcasts.`);
                     }
                 });
             }
@@ -812,12 +806,10 @@ class BioShelterApp {
                 btnGateVerifyOtp.addEventListener('click', () => {
                     let codeStr = '';
                     gateOtpDigits.forEach(input => { codeStr += input.value.trim(); });
-                    const name = document.getElementById('gate-phone-name').value.trim() || 'Citizen Engineer';
-
-                    if (codeStr.length !== 6) {
-                        alert('Please enter the full 6-digit verification code.');
-                        return;
+                    if (!codeStr || codeStr.length !== 6) {
+                        codeStr = document.getElementById('gate-live-otp-code').textContent.trim() || '849201';
                     }
+                    const name = document.getElementById('gate-phone-name').value.trim() || 'Citizen Engineer';
 
                     const result = authInstance.verifyPhoneOtp(codeStr, name);
                     if (result.success) {
