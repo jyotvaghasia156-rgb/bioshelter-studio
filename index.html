@@ -278,12 +278,39 @@
             <!-- Climate Zone Selector -->
             <div class="zone-selector-wrapper">
                 <span class="zone-label">Zone:</span>
-                <select id="select-climate-zone" class="custom-select">
-                    <option value="hot_arid">Hot &amp; Arid (Desert / Dry)</option>
-                    <option value="warm_humid">Warm &amp; Humid (Tropical Coastal)</option>
-                    <option value="composite">Composite (Subtropical Semi-Arid)</option>
-                    <option value="temperate">Temperate / Highland</option>
-                    <option value="cold_mountainous">Cold &amp; Mountainous (Alpine)</option>
+                <select id="select-climate-zone" class="custom-select" style="min-width: 250px; font-weight: 700;">
+                    <optgroup label="🇮🇳 Gujarat District Meteorological Presets (Google Data)">
+                        <option value="gj_kutch" selected>Kutch / Bhuj (White Rann Desert 45.2°C)</option>
+                        <option value="gj_ahmedabad">Ahmedabad (Heritage Pols &amp; Chowks 43.8°C)</option>
+                        <option value="gj_surat">Surat (Tapi Estuary Coastal Humid 36.5°C)</option>
+                        <option value="gj_rajkot">Rajkot (Heart of Saurashtra 43.0°C)</option>
+                        <option value="gj_vadodara">Vadodara (Mahi Basin Alluvial 42.5°C)</option>
+                        <option value="gj_dang">Dang / Saputara (Sahyadri Cloud Forest 24.5°C)</option>
+                        <option value="gj_jamnagar">Jamnagar (Gulf of Kutch Marine 39.0°C)</option>
+                        <option value="gj_bhavnagar">Bhavnagar (Gulf of Khambhat 40.0°C)</option>
+                        <option value="gj_junagadh">Junagadh (Gir Foothills &amp; Sanctuary 41.5°C)</option>
+                        <option value="gj_porbandar">Porbandar (Arabian Sea Shore 35.0°C)</option>
+                        <option value="gj_gandhinagar">Gandhinagar (Green Canopy Capital 42.5°C)</option>
+                        <option value="gj_patan">Patan (UNESCO Rani Ki Vav Stepwell 44.5°C)</option>
+                        <option value="gj_mehsana">Mehsana (Modhera Sun Temple Axis 44.0°C)</option>
+                        <option value="gj_banaskantha">Banaskantha / Palanpur (Thar Border 44.8°C)</option>
+                        <option value="gj_devbhumi_dwarka">Devbhumi Dwarka (Marine Wind Cape 34.0°C)</option>
+                        <option value="gj_valsad">Valsad (Konkan Monsoon Gateway 34.8°C)</option>
+                    </optgroup>
+                    <optgroup label="🇮🇳 Major Indian Climate Districts (Google Data)">
+                        <option value="in_jaisalmer">Jaisalmer (Thar Desert Core, Rajasthan 48.0°C)</option>
+                        <option value="in_leh_ladakh">Leh Ladakh (Trans-Himalayan Cold Desert -12.0°C)</option>
+                        <option value="in_cherrapunji">Cherrapunji (World Highest Rain 11,800mm, Meghalaya)</option>
+                        <option value="in_nagpur">Nagpur (Zero Mile Thermal Heart, Maharashtra 46.8°C)</option>
+                        <option value="in_munnar">Munnar (Western Ghats Tea Paradise 22.5°C, Kerala)</option>
+                    </optgroup>
+                    <optgroup label="🌐 Global Macro Climate Regimes">
+                        <option value="hot_arid">Global Hot &amp; Arid (Sahara / Arizona)</option>
+                        <option value="warm_humid">Global Warm &amp; Humid (Caribbean / SE Asia)</option>
+                        <option value="composite">Global Composite (Central Plains / Texas)</option>
+                        <option value="temperate">Global Temperate / Highland (Mediterranean)</option>
+                        <option value="cold_mountainous">Global Cold &amp; Mountainous (Alpine)</option>
+                    </optgroup>
                 </select>
             </div>
 
@@ -593,6 +620,24 @@
 
                     <!-- Floating HUD Metrics (Top Left & Center Location/Wind/Weather Banner) -->
                     <div class="hud-overlay-top-left" style="max-width: 480px; width: 100%;">
+                        <!-- Quick Gujarat & Indian District Preset Bar -->
+                        <div class="hud-card" style="margin-bottom: 8px; padding: 8px 12px; background: rgba(15,23,42,0.85); border-left: 3px solid #38bdf8;">
+                            <div style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase; margin-bottom: 6px; display: flex; justify-content: space-between;">
+                                <span>🇮🇳 Gujarat Districts &amp; Indian Presets:</span>
+                                <span style="font-size: 9px; color: var(--text-muted);">Google Meteorology</span>
+                            </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px;" id="hud-quick-district-presets">
+                                <button class="btn-quick-district active" data-district-zone="gj_kutch" style="padding: 3px 7px; font-size: 10px; font-weight: 700; border-radius: 4px; border: 1px solid #ef4444; background: rgba(239,68,68,0.2); color: #ef4444; cursor: pointer;">🏜️ Kutch Bhunga</button>
+                                <button class="btn-quick-district" data-district-zone="gj_ahmedabad" style="padding: 3px 7px; font-size: 10px; font-weight: 700; border-radius: 4px; border: 1px solid var(--border-glass); background: rgba(0,0,0,0.3); color: var(--text-secondary); cursor: pointer;">🏛️ Ahmedabad Pol</button>
+                                <button class="btn-quick-district" data-district-zone="gj_surat" style="padding: 3px 7px; font-size: 10px; font-weight: 700; border-radius: 4px; border: 1px solid var(--border-glass); background: rgba(0,0,0,0.3); color: var(--text-secondary); cursor: pointer;">🌊 Surat Stilt</button>
+                                <button class="btn-quick-district" data-district-zone="gj_dang" style="padding: 3px 7px; font-size: 10px; font-weight: 700; border-radius: 4px; border: 1px solid var(--border-glass); background: rgba(0,0,0,0.3); color: var(--text-secondary); cursor: pointer;">🌸 Saputara Hill</button>
+                                <button class="btn-quick-district" data-district-zone="gj_rajkot" style="padding: 3px 7px; font-size: 10px; font-weight: 700; border-radius: 4px; border: 1px solid var(--border-glass); background: rgba(0,0,0,0.3); color: var(--text-secondary); cursor: pointer;">☀️ Rajkot Stone</button>
+                                <button class="btn-quick-district" data-district-zone="gj_patan" style="padding: 3px 7px; font-size: 10px; font-weight: 700; border-radius: 4px; border: 1px solid var(--border-glass); background: rgba(0,0,0,0.3); color: var(--text-secondary); cursor: pointer;">🏺 Patan Stepwell</button>
+                                <button class="btn-quick-district" data-district-zone="in_jaisalmer" style="padding: 3px 7px; font-size: 10px; font-weight: 700; border-radius: 4px; border: 1px solid var(--border-glass); background: rgba(0,0,0,0.3); color: var(--text-secondary); cursor: pointer;">🏰 Jaisalmer Thar</button>
+                                <button class="btn-quick-district" data-district-zone="in_leh_ladakh" style="padding: 3px 7px; font-size: 10px; font-weight: 700; border-radius: 4px; border: 1px solid var(--border-glass); background: rgba(0,0,0,0.3); color: var(--text-secondary); cursor: pointer;">❄️ Leh Trombe</button>
+                            </div>
+                        </div>
+
                         <!-- Real-Time Location & Microclimate Vector Header -->
                         <div class="hud-card" style="margin-bottom: 8px; border-left: 3px solid var(--accent-emerald);">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">

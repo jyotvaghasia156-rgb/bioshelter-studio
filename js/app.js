@@ -578,15 +578,16 @@ class BioShelterApp {
             d.btnThemeToggle.addEventListener('click', () => this.toggleTheme());
         }
 
-        // Climate zone switch
-        d.zoneSelect.addEventListener('change', (e) => {
-            this.state.zoneId = e.target.value;
-            const zone = CLIMATE_ZONES[this.state.zoneId];
+        // Climate zone switch & Gujarat / Indian District Presets
+        const applyZone = (zoneId) => {
+            this.state.zoneId = zoneId;
+            if (d.zoneSelect) d.zoneSelect.value = zoneId;
+            const zone = CLIMATE_ZONES[zoneId];
             if (zone) {
                 this.state.config.typology = zone.recommendedTypology || 'gable';
-                d.typologySelect.value = this.state.config.typology;
+                if (d.typologySelect) d.typologySelect.value = this.state.config.typology;
                 this.state.config.ventMode = zone.recommendedVentMode || 'adaptive_diurnal';
-                d.ventModeSelect.value = this.state.config.ventMode;
+                if (d.ventModeSelect) d.ventModeSelect.value = this.state.config.ventMode;
                 if (ASSEMBLY_PRESETS.walls[zone.recommendedWalls]) {
                     this.state.config.wallAssembly = JSON.parse(JSON.stringify(ASSEMBLY_PRESETS.walls[zone.recommendedWalls]));
                 }
@@ -595,15 +596,46 @@ class BioShelterApp {
                 }
 
                 // Match soil type to climate zone
-                if (this.state.zoneId === 'hot_arid') this.state.soilId = 'desert_sand';
-                else if (this.state.zoneId === 'warm_humid') this.state.soilId = 'laterite_red_soil';
-                else if (this.state.zoneId === 'composite') this.state.soilId = 'black_cotton_clay';
-                else if (this.state.zoneId === 'cold_mountainous') this.state.soilId = 'alpine_permafrost_scree';
-                else this.state.soilId = 'alluvial_loam';
+                this.state.soilId = zone.soilType || (
+                    zoneId.includes('kutch') || zoneId === 'hot_arid' ? 'desert_sand' : (
+                    zoneId.includes('dang') || zoneId.includes('cherrapunji') ? 'laterite_red_soil' : (
+                    zoneId.includes('surat') || zoneId.includes('rajkot') || zoneId === 'composite' ? 'black_cotton_clay' : (
+                    zoneId.includes('ladakh') || zoneId === 'cold_mountainous' ? 'alpine_permafrost_scree' : 'alluvial_loam'
+                ))));
                 
                 if (d.selectSoilType) d.selectSoilType.value = this.state.soilId;
             }
+
+            // Sync quick pill buttons
+            document.querySelectorAll('.btn-quick-district').forEach(btn => {
+                if (btn.getAttribute('data-district-zone') === zoneId) {
+                    btn.classList.add('active');
+                    btn.style.borderColor = '#ef4444';
+                    btn.style.background = 'rgba(239,68,68,0.2)';
+                    btn.style.color = '#ef4444';
+                } else {
+                    btn.classList.remove('active');
+                    btn.style.borderColor = 'var(--border-glass)';
+                    btn.style.background = 'rgba(0,0,0,0.3)';
+                    btn.style.color = 'var(--text-secondary)';
+                }
+            });
+
+            this.selectedWorldStation = null;
             this.updateSimulation();
+        };
+
+        if (d.zoneSelect) {
+            d.zoneSelect.addEventListener('change', (e) => {
+                applyZone(e.target.value);
+            });
+        }
+
+        document.querySelectorAll('.btn-quick-district').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const zId = btn.getAttribute('data-district-zone');
+                applyZone(zId);
+            });
         });
 
         // Soil Controls
