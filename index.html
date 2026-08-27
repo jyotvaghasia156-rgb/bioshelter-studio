@@ -10,10 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     
-    <!-- External Libraries (Three.js, OrbitControls, Chart.js) -->
+    <!-- External Libraries (Three.js, OrbitControls, Chart.js, Leaflet Map) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <!-- App Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
@@ -733,7 +735,7 @@
                         <div class="page-header-bar">
                             <div class="page-header-info">
                                 <h2>Interactive Global Climate &amp; Surface Temperature Map</h2>
-                                <p>Planetary thermal radar and climate anomaly monitor. Color-coded heat signatures: <strong style="color: #ef4444;">🔴 Red for Extreme Heatwaves</strong>, <strong style="color: #10b981;">🟢 Green for Paradise Comfort Havens</strong>, and <strong style="color: #818cf8;">🟣 Purple for Cold Alpine</strong>. Click on any city or station across the globe to inspect real-time temperature, wind speed &amp; direction, or synchronize that climate directly into the 3D shelter simulator.</p>
+                                <p>Planetary thermal radar and real-time online weather monitor. Color-coded heat signatures: <strong style="color: #ef4444;">🔴 Red for Extreme Heatwaves</strong>, <strong style="color: #10b981;">🟢 Green for Paradise Comfort Havens</strong>, and <strong style="color: #818cf8;">🟣 Purple for Cold Alpine</strong>. Click anywhere on Earth or search any city to fetch <strong>live online temperatures &amp; wind vectors</strong> from live weather satellites and synchronize them directly into the 3D BioShelter Studio.</p>
                             </div>
                             <div class="page-header-actions">
                                 <button id="btn-apply-map-climate" class="export-btn-primary">
@@ -743,28 +745,65 @@
                             </div>
                         </div>
 
-                        <!-- Map Station Filter Bar -->
-                        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
-                            <button class="map-filter-chip active" data-map-filter="all" style="padding: 6px 14px; font-size: 12px; border-radius: 20px; background: rgba(56,189,248,0.2); border: 1px solid var(--accent-sky); color: var(--text-primary); cursor: pointer; font-weight: 600;">
-                                🌐 All Global Stations
-                            </button>
-                            <button class="map-filter-chip" data-map-filter="extreme_hot" style="padding: 6px 14px; font-size: 12px; border-radius: 20px; background: rgba(239,68,68,0.15); border: 1px solid #ef4444; color: #ef4444; cursor: pointer; font-weight: 600;">
-                                🔥 Extreme Heatwave Hotspots (Red)
-                            </button>
-                            <button class="map-filter-chip" data-map-filter="paradise_comfort" style="padding: 6px 14px; font-size: 12px; border-radius: 20px; background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #10b981; cursor: pointer; font-weight: 600;">
-                                🌴 Paradise Comfort Havens (Green)
-                            </button>
-                            <button class="map-filter-chip" data-map-filter="cold_alpine" style="padding: 6px 14px; font-size: 12px; border-radius: 20px; background: rgba(129,140,248,0.15); border: 1px solid #818cf8; color: #818cf8; cursor: pointer; font-weight: 600;">
-                                ❄️ Cold Alpine Mountains (Purple)
-                            </button>
+                        <!-- Live Global Weather Search Bar & Online API Controls -->
+                        <div class="assembly-card" style="padding: 16px; margin-bottom: 14px; background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(16,185,129,0.08)); border-color: rgba(56,189,248,0.3);">
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+                                <div style="flex: 1; min-width: 260px; position: relative;">
+                                    <input type="text" id="input-map-city-search" class="input-text" placeholder="🔍 Search ANY city, country, or coordinates worldwide (e.g. Tokyo, London, Mumbai, Dubai, Paris, Cairo, Sydney)..." style="width: 100%; padding-left: 14px; font-size: 13px;">
+                                </div>
+                                <button id="btn-map-search-online" class="export-btn-primary" style="padding: 9px 18px; font-size: 12px; background: linear-gradient(135deg, #0284c7, #10b981); cursor: pointer;">
+                                    ⚡ Fetch Live Online Weather
+                                </button>
+                                <button id="btn-map-my-location" class="btn-resend-otp" style="padding: 9px 14px; font-size: 12px; cursor: pointer;">
+                                    📍 My GPS Location
+                                </button>
+                            </div>
+                            <div id="search-online-status" style="font-size: 11px; color: var(--text-secondary); margin-top: 8px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+                                <span>⚡ <strong>Real-Time Weather Grid:</strong> Live planetary meteorological satellite &amp; online Open-Meteo weather API active.</span>
+                                <span id="map-live-api-status-badge" style="color: var(--accent-emerald); font-weight: 700;">● Live Online Weather API Online</span>
+                            </div>
                         </div>
 
-                        <!-- Canvas Map Card -->
-                        <div class="assembly-card" style="padding: 18px; align-items: center; background: var(--bg-card);">
-                            <canvas id="world-map-canvas" width="940" height="480" style="border-radius: 12px; max-width: 100%; height: auto; border: 1px solid var(--border-glass);"></canvas>
+                        <!-- Map Layer Switcher & Station Filter Bar -->
+                        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px;">
+                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                <button class="map-layer-btn active" data-map-layer="google_street" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; background: rgba(56,189,248,0.2); border: 1px solid var(--accent-sky); color: var(--text-primary); cursor: pointer; font-weight: 600;">
+                                    🗺️ Google Street
+                                </button>
+                                <button class="map-layer-btn" data-map-layer="google_satellite" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-glass); color: var(--text-secondary); cursor: pointer; font-weight: 600;">
+                                    🛰️ Google Satellite
+                                </button>
+                                <button class="map-layer-btn" data-map-layer="carto_dark" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-glass); color: var(--text-secondary); cursor: pointer; font-weight: 600;">
+                                    🌌 Dark Thermal Radar
+                                </button>
+                                <button class="map-layer-btn" data-map-layer="google_terrain" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-glass); color: var(--text-secondary); cursor: pointer; font-weight: 600;">
+                                    🏔️ Google Terrain
+                                </button>
+                            </div>
+
+                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                <button class="map-filter-chip active" data-map-filter="all" style="padding: 6px 12px; font-size: 11px; border-radius: 20px; background: rgba(56,189,248,0.2); border: 1px solid var(--accent-sky); color: var(--text-primary); cursor: pointer; font-weight: 600;">
+                                    🌐 All Global Stations
+                                </button>
+                                <button class="map-filter-chip" data-map-filter="extreme_hot" style="padding: 6px 12px; font-size: 11px; border-radius: 20px; background: rgba(239,68,68,0.15); border: 1px solid #ef4444; color: #ef4444; cursor: pointer; font-weight: 600;">
+                                    🔥 Extreme Hot (Red)
+                                </button>
+                                <button class="map-filter-chip" data-map-filter="paradise_comfort" style="padding: 6px 12px; font-size: 11px; border-radius: 20px; background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #10b981; cursor: pointer; font-weight: 600;">
+                                    🌴 Comfort Havens (Green)
+                                </button>
+                                <button class="map-filter-chip" data-map-filter="cold_alpine" style="padding: 6px 12px; font-size: 11px; border-radius: 20px; background: rgba(129,140,248,0.15); border: 1px solid #818cf8; color: #818cf8; cursor: pointer; font-weight: 600;">
+                                    ❄️ Cold Alpine (Purple)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Leaflet / Google Map Card -->
+                        <div class="assembly-card" style="padding: 14px; background: var(--bg-card); position: relative;">
+                            <div id="interactive-world-map-leaflet" style="width: 100%; height: 500px; border-radius: 10px; z-index: 1; border: 1px solid var(--border-glass);"></div>
+                            <canvas id="world-map-canvas" width="940" height="480" style="display: none;"></canvas>
                             
                             <!-- Global Temp Scale Legend -->
-                            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; width: 100%; max-width: 900px; margin-top: 12px; font-size: 11px; color: var(--text-secondary); gap: 8px;">
+                            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; width: 100%; margin-top: 12px; font-size: 11px; color: var(--text-secondary); gap: 8px;">
                                 <span><strong>Planetary Thermal Spectrum:</strong></span>
                                 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
                                     <span style="color: #818cf8; font-weight: 600;">&le; 10°C (Alpine/Cold)</span>
@@ -773,6 +812,39 @@
                                     <span style="color: #f59e0b; font-weight: 600;">28°C - 38°C (Warm)</span>
                                     <span style="color: #f97316; font-weight: 600;">38°C - 45°C (Extreme)</span>
                                     <span style="color: #ef4444; font-weight: 800;">&gt; 45°C+ (Catastrophic Heatwave 🔴)</span>
+                                </div>
+                            </div>
+
+                            <!-- Real-Time Selected Location Telemetry Card (Hover / Click Overlay) -->
+                            <div id="map-selected-telemetry-hud" style="margin-top: 14px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); border-radius: 10px; padding: 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                                <div style="flex: 1; min-width: 250px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span id="live-map-inspect-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; background: rgba(239,68,68,0.2); color: #ef4444;">🔴 EXTREME HEATWAVE</span>
+                                        <span id="live-map-inspect-coords" style="font-size: 11px; color: var(--text-muted);">28.2819° N, 68.4386° E</span>
+                                    </div>
+                                    <h3 id="live-map-inspect-name" style="font-size: 17px; font-weight: 800; color: var(--text-primary); margin: 4px 0;">Jacobabad / Indus Valley Basin, Pakistan</h3>
+                                    <p id="live-map-inspect-statement" style="font-size: 11px; color: var(--text-secondary); line-height: 1.45;">Extreme wet-bulb emergency: Ambient temp 51.2°C with wet-bulb exceeding human survival threshold. Subterranean earth-sheltered cooling mandatory.</p>
+                                </div>
+
+                                <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
+                                    <div style="text-align: center; min-width: 80px;">
+                                        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Live Temperature</div>
+                                        <div id="live-map-inspect-temp" style="font-size: 22px; font-weight: 900; color: #ef4444;">51.2°C</div>
+                                        <div id="live-map-inspect-temp-f" style="font-size: 10px; color: var(--text-muted);">124.2°F</div>
+                                    </div>
+                                    <div style="text-align: center; min-width: 100px;">
+                                        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Wind Speed &amp; Vector</div>
+                                        <div id="live-map-inspect-wind" style="font-size: 15px; font-weight: 800; color: #f59e0b;">4.8 m/s (17.3 km/h)</div>
+                                        <div id="live-map-inspect-wind-dir" style="font-size: 10px; color: var(--text-muted);">SW (220°) ➔ NE (40°)</div>
+                                    </div>
+                                    <div style="text-align: center; min-width: 70px;">
+                                        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Humidity</div>
+                                        <div id="live-map-inspect-humidity" style="font-size: 16px; font-weight: 800; color: var(--accent-sky);">44%</div>
+                                        <div id="live-map-inspect-source" style="font-size: 9px; color: var(--accent-emerald); font-weight: 600;">⚡ Live Online</div>
+                                    </div>
+                                    <button id="btn-apply-selected-map-station" class="export-btn-primary" style="padding: 10px 18px; font-size: 12px; background: linear-gradient(135deg, #0284c7, #10b981); cursor: pointer;">
+                                        🚀 Simulate in 3D BioShelter &rarr;
+                                    </button>
                                 </div>
                             </div>
                         </div>

@@ -82,6 +82,7 @@ class BioShelterApp {
         this.bindUserDataEvents();
         this.bindSOSEvents();
         this.bindComfortMatcherEvents();
+        this.initWorldMap();
         this.updateSimulation();
         this.renderCommunityShelters();
         this.renderHazardReports();
@@ -3053,70 +3054,27 @@ class BioShelterApp {
         }
     }
 
-    renderWorldMapTab() {
-        if (this.worldMapEngine) {
-            setTimeout(() => this.worldMapEngine.render(), 30);
+    initWorldMap() {
+        try {
+            if (!this.worldMapEngine) {
+                this.worldMapEngine = new WorldMapEngine('interactive-world-map-leaflet', (station) => {
+                    this.onSelectWorldStation(station);
+                });
+            }
+        } catch (e) {
+            console.warn('World map init fallback:', e);
         }
+    }
 
-        const container = document.getElementById('world-stations-table-container');
-        if (!container) return;
-
-        const stations = GLOBAL_STATIONS;
-
-        container.innerHTML = `
-            <div style="overflow-x: auto;">
-                <table class="comparison-table" style="font-size: 12px; margin-top: 10px; width: 100%;">
-                    <thead>
-                        <tr>
-                            <th>Station / Region</th>
-                            <th>Country</th>
-                            <th>Coordinates</th>
-                            <th>Surface Temp (°C)</th>
-                            <th>Humidity (%)</th>
-                            <th>Wet-Bulb (°C)</th>
-                            <th>Solar GHI (W/m²)</th>
-                            <th>Climate Classification</th>
-                            <th>Hazard Alert</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${stations.map(st => `
-                            <tr style="${this.worldMapEngine && this.worldMapEngine.selectedStation && this.worldMapEngine.selectedStation.id === st.id ? 'background: rgba(56, 189, 248, 0.1);' : ''}">
-                                <td><strong>${st.name}</strong></td>
-                                <td>${st.country}</td>
-                                <td style="font-family: var(--font-mono); font-size: 11px;">${st.coordinates}</td>
-                                <td><strong style="color: ${this.worldMapEngine ? this.worldMapEngine.getTempColor(st.tempC) : '#f87171'}; font-size: 13px;">${st.tempC.toFixed(1)}°C</strong></td>
-                                <td>${st.humidity}%</td>
-                                <td>${st.wetBulbC}°C</td>
-                                <td>${st.solarGhi} W/m²</td>
-                                <td style="font-size: 11px; color: var(--text-secondary);">${st.climateType}</td>
-                                <td><span class="rec-priority-badge ${st.severity === 'critical' ? 'critical' : (st.severity === 'high' ? 'high' : 'moderate')}">${st.status}</span></td>
-                                <td>
-                                    <button class="btn-load-twin btn-apply-station-row" data-station-id="${st.id}" style="padding: 4px 10px; font-size: 11px;">
-                                        Apply to Studio
-                                    </button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `;
-
-        container.querySelectorAll('.btn-apply-station-row').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const stId = btn.getAttribute('data-station-id');
-                const st = stations.find(s => s.id === stId);
-                if (st) {
-                    if (this.worldMapEngine) {
-                        this.worldMapEngine.selectedStation = st;
-                        this.worldMapEngine.render();
-                    }
-                    this.applyWorldStationToShelter(st);
-                }
-            });
-        });
+    renderWorldMapTab() {
+        if (!this.worldMapEngine) {
+            this.initWorldMap();
+        }
+        if (this.worldMapEngine && this.worldMapEngine.map) {
+            setTimeout(() => {
+                this.worldMapEngine.map.invalidateSize();
+            }, 80);
+        }
     }
 
     onSelectWorldStation(station) {

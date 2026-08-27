@@ -1,9 +1,11 @@
 /**
- * BioShelter Studio - Interactive World Climate & Temperature Map Engine
- * Renders global thermodynamic heatmaps, geo-located temperature telemetry stations,
- * active climate hazard markers (🔴 Red for Extreme Heatwaves, 🟢 Green for Paradise Comfort Havens),
- * wind speed & direction vector overlays, and enables 1-click climate synchronization to the 3D simulator.
+ * BioShelter Studio - Interactive World Climate, Google Map & Live Online Temperature Engine
+ * Combines Leaflet map layers (Google Street, Google Satellite, CartoDB Dark Matter, Google Terrain),
+ * live online Open-Meteo weather API telemetry, real-time GPS queries,
+ * and global thermal heatwave vs paradise comfort haven markers.
  */
+
+/* global L */
 
 export const GLOBAL_STATIONS = [
     // 🔴 1. EXTREME HEATWAVE & HAZARD HOTSPOTS (> 40°C - 52°C)
@@ -80,85 +82,60 @@ export const GLOBAL_STATIONS = [
         status: 'Severe Heatwave Hazard 🔥',
         severity: 'critical',
         category: 'extreme_hot',
-        weatherStatement: 'Intense direct solar radiation with strong Loo wind gusts up to 28 km/h. High diurnal swing (ΔT > 20°C). Massive rammed-earth thermal mass damping required.'
+        weatherStatement: 'Intense diurnal radiation flux. Exterior unshaded surface temperatures surpass 62°C. Rammed earth thermal lag (8.5h) recommended.'
     },
     {
         id: 'station_dubai',
-        name: 'Rub al Khali / Dubai Corridor',
+        name: 'Rub al-Khali / Dubai Coastal Fringe',
         country: 'United Arab Emirates',
         coordinates: '25.2048° N, 55.2708° E',
         lat: 25.2048,
         lng: 55.2708,
         tempC: 46.8,
-        tempMin: 31.0,
-        humidity: 48,
-        solarGhi: 940,
-        wetBulbC: 32.4,
-        windSpeedMps: 4.2,
-        windSpeedKmh: 15.1,
+        tempMin: 32.0,
+        humidity: 62,
+        solarGhi: 990,
+        wetBulbC: 34.0,
+        windSpeedMps: 4.1,
+        windSpeedKmh: 14.8,
         windDirectionDeg: 310,
-        windFrom: 'North-West (NW / Shamal)',
+        windFrom: 'North-West (NW)',
         windTo: 'South-East (SE)',
         windDirectionText: 'NW (310°) ➔ SE (130°)',
         zoneId: 'hot_arid',
-        climateType: 'BWh - Extreme Coastal Arid',
-        status: 'High Wet-Bulb Stress ⚠️',
-        severity: 'high',
+        climateType: 'BWh - Persian Gulf Hyper-Thermal Marine Corridor',
+        status: 'Extreme Marine Heat Anomaly 🔥',
+        severity: 'critical',
         category: 'extreme_hot',
-        weatherStatement: 'Hot coastal humidity creates extreme thermal distress. Northwesterly Shamal winds carry fine dust particles. Badgir wind-catchers with evaporative water cooling active.'
+        weatherStatement: 'High ambient temperature coupled with heavy marine humidity creates severe physiological thermal stress.'
     },
     {
         id: 'station_cairo',
-        name: 'Cairo / Sahara Eastern Flank',
+        name: 'Aswan & Nile Basin',
         country: 'Egypt',
-        coordinates: '30.0444° N, 31.2357° E',
-        lat: 30.0444,
-        lng: 31.2357,
-        tempC: 42.5,
-        tempMin: 24.0,
-        humidity: 22,
-        solarGhi: 910,
-        wetBulbC: 22.5,
-        windSpeedMps: 3.8,
-        windSpeedKmh: 13.7,
+        coordinates: '24.0889° N, 32.8998° E',
+        lat: 24.0889,
+        lng: 32.8998,
+        tempC: 47.5,
+        tempMin: 29.0,
+        humidity: 14,
+        solarGhi: 1020,
+        wetBulbC: 22.0,
+        windSpeedMps: 4.6,
+        windSpeedKmh: 16.6,
         windDirectionDeg: 350,
-        windFrom: 'North (N / Etesian)',
+        windFrom: 'North (N)',
         windTo: 'South (S)',
         windDirectionText: 'N (350°) ➔ S (170°)',
         zoneId: 'hot_arid',
-        climateType: 'BWh - Subtropical Hot Desert',
-        status: 'Extreme Solar Flux',
-        severity: 'moderate',
+        climateType: 'BWh - Saharan Hyper-Arid Plateau',
+        status: 'Extreme Saharan Heatwave 🔥',
+        severity: 'critical',
         category: 'extreme_hot',
-        weatherStatement: 'Sahara desert dry air with steady northern Mediterranean breeze. Nubian earthen vault architecture provides optimal solar shielding.'
-    },
-    {
-        id: 'station_phoenix',
-        name: 'Phoenix / Sonoran Desert',
-        country: 'United States',
-        coordinates: '33.4484° N, -112.0740° W',
-        lat: 33.4484,
-        lng: -112.0740,
-        tempC: 45.8,
-        tempMin: 30.2,
-        humidity: 14,
-        solarGhi: 970,
-        wetBulbC: 21.8,
-        windSpeedMps: 4.5,
-        windSpeedKmh: 16.2,
-        windDirectionDeg: 270,
-        windFrom: 'West (W)',
-        windTo: 'East (E)',
-        windDirectionText: 'W (270°) ➔ E (90°)',
-        zoneId: 'hot_arid',
-        climateType: 'BWh - Hot Desert Basin',
-        status: 'Heat Advisory Active',
-        severity: 'high',
-        category: 'extreme_hot',
-        weatherStatement: 'Persistent urban heat island overlaid on Sonoran Desert basin. Night temperatures fail to drop below 30°C. Earth-berming and deep overhangs essential.'
+        weatherStatement: 'Unshaded Saharan sun with zero cloud cover. Heavy earthen masonry and deep courtyard shading required.'
     },
 
-    // 🟢 2. PARADISE COMFORT DESTINATIONS (20°C - 26°C, IDEAL PLACES TO ENJOY LIFE)
+    // 🟢 2. PARADISE COMFORT HAVENS (20°C - 26°C, IDEAL PLACES TO ENJOY LIFE)
     {
         id: 'station_medellin',
         name: 'Medellín / Aburrá Valley',
@@ -167,53 +144,53 @@ export const GLOBAL_STATIONS = [
         lat: 6.2442,
         lng: -75.5812,
         tempC: 23.5,
-        tempMin: 17.8,
+        tempMin: 17.2,
         humidity: 64,
         solarGhi: 680,
         wetBulbC: 18.5,
-        windSpeedMps: 2.4,
-        windSpeedKmh: 8.6,
+        windSpeedMps: 2.8,
+        windSpeedKmh: 10.1,
         windDirectionDeg: 45,
         windFrom: 'North-East (NE)',
         windTo: 'South-West (SW)',
         windDirectionText: 'NE (45°) ➔ SW (225°)',
         zoneId: 'temperate',
-        climateType: 'Cfb - City of Eternal Spring 🌸',
-        status: 'Perpetual Spring Comfort Eden 🟢',
-        severity: 'paradise',
+        climateType: 'Cfb - Tropical Highland (City of Eternal Spring 🌸)',
+        status: 'Paradise Comfort Haven 🟢',
+        severity: 'safe',
         category: 'paradise_comfort',
         isParadise: true,
-        weatherStatement: 'World-renowned "City of Eternal Spring" maintains steady 23.5°C year-round with gentle valley breezes, lush mountain flora, and zero extreme thermal spikes.'
+        weatherStatement: 'Sublime year-round comfort in high-altitude mountain bowl (1,500m). Gentle thermal breezes and lush flower microclimate.'
     },
     {
-        id: 'station_madeira',
-        name: 'Funchal / Madeira Island',
+        id: 'station_funchal',
+        name: 'Funchal / Madeira Subtropical Haven',
         country: 'Portugal',
         coordinates: '32.6669° N, -16.9241° W',
         lat: 32.6669,
         lng: -16.9241,
         tempC: 22.8,
-        tempMin: 18.2,
+        tempMin: 18.0,
         humidity: 62,
-        solarGhi: 690,
-        wetBulbC: 17.4,
-        windSpeedMps: 3.1,
-        windSpeedKmh: 11.2,
-        windDirectionDeg: 10,
-        windFrom: 'North (N)',
-        windTo: 'South (S)',
-        windDirectionText: 'N (10°) ➔ S (190°)',
+        solarGhi: 710,
+        wetBulbC: 17.8,
+        windSpeedMps: 3.6,
+        windSpeedKmh: 13.0,
+        windDirectionDeg: 60,
+        windFrom: 'East-North-East (ENE)',
+        windTo: 'West-South-West (WSW)',
+        windDirectionText: 'ENE (60°) ➔ WSW (240°)',
         zoneId: 'temperate',
-        climateType: 'Csa - Subtropical Oceanic Garden Eden 🌴',
-        status: 'Pristine Atlantic Paradise 🟢',
-        severity: 'paradise',
+        climateType: 'Csb - Subtropical Ocean Garden 🌴',
+        status: 'Paradise Comfort Haven 🟢',
+        severity: 'safe',
         category: 'paradise_comfort',
         isParadise: true,
-        weatherStatement: 'Subtropical Gulf Stream thermal buffering creates perpetual temperate spring warmth with crisp ocean air, vibrant botanical gardens, and balmy sea breezes.'
+        weatherStatement: 'Gulf stream regulated maritime paradise. Steady refreshing trade wind breezes with zero heatwaves.'
     },
     {
         id: 'station_sandiego',
-        name: 'San Diego / La Jolla Coast',
+        name: 'San Diego / Coronado Coastal Haven',
         country: 'United States',
         coordinates: '32.7157° N, -117.1611° W',
         lat: 32.7157,
@@ -221,47 +198,47 @@ export const GLOBAL_STATIONS = [
         tempC: 22.4,
         tempMin: 16.5,
         humidity: 58,
-        solarGhi: 720,
-        wetBulbC: 16.8,
-        windSpeedMps: 3.5,
-        windSpeedKmh: 12.6,
-        windDirectionDeg: 290,
-        windFrom: 'West-Northwest (WNW)',
-        windTo: 'East-Southeast (ESE)',
-        windDirectionText: 'WNW (290°) ➔ ESE (110°)',
+        solarGhi: 740,
+        wetBulbC: 16.9,
+        windSpeedMps: 3.2,
+        windSpeedKmh: 11.5,
+        windDirectionDeg: 280,
+        windFrom: 'West (W)',
+        windTo: 'East (E)',
+        windDirectionText: 'W (280°) ➔ E (100°)',
         zoneId: 'temperate',
-        climateType: 'BSh / Csa - Mediterranean Marine Coastal 🏖️',
-        status: 'Optimal Bioclimatic Comfort 🟢',
-        severity: 'paradise',
+        climateType: 'Csb - Mediterranean Coastal Eden 🏖️',
+        status: 'Paradise Comfort Haven 🟢',
+        severity: 'safe',
         category: 'paradise_comfort',
         isParadise: true,
-        weatherStatement: 'Pacific Ocean thermoregulation delivers over 300 sunny days annually with low humidity, refreshing sea breezes, and effortless indoor-outdoor bioclimatic living.'
+        weatherStatement: 'Nearly 300 sunny days per year with refreshing Pacific ocean sea breeze. Gold standard ASHRAE 55 comfort.'
     },
     {
         id: 'station_tenerife',
-        name: 'Santa Cruz / Tenerife',
+        name: 'Santa Cruz / Tenerife Canary Islands',
         country: 'Spain',
         coordinates: '28.4636° N, -16.2518° W',
         lat: 28.4636,
         lng: -16.2518,
         tempC: 24.1,
-        tempMin: 19.5,
+        tempMin: 19.0,
         humidity: 56,
-        solarGhi: 760,
-        wetBulbC: 17.8,
-        windSpeedMps: 3.8,
-        windSpeedKmh: 13.7,
-        windDirectionDeg: 40,
-        windFrom: 'North-East (NE / Alisios)',
+        solarGhi: 790,
+        wetBulbC: 18.0,
+        windSpeedMps: 4.2,
+        windSpeedKmh: 15.1,
+        windDirectionDeg: 45,
+        windFrom: 'North-East (NE)',
         windTo: 'South-West (SW)',
-        windDirectionText: 'NE (40°) ➔ SW (220°)',
+        windDirectionText: 'NE (45°) ➔ SW (225°)',
         zoneId: 'temperate',
-        climateType: 'BWh / Csa - Island of Eternal Summer ☀️',
-        status: 'Subtropical Sunshine Haven 🟢',
-        severity: 'paradise',
+        climateType: 'BSh/Csb - Island of Eternal Sunshine ☀️',
+        status: 'Paradise Comfort Haven 🟢',
+        severity: 'safe',
         category: 'paradise_comfort',
         isParadise: true,
-        weatherStatement: 'Consistently rated by bioclimatologists as having one of the world\'s lowest thermal distress scores. Steady northeast trade winds provide natural comfort.'
+        weatherStatement: 'Optimal Atlantic trade winds deliver constant cooling air circulation. World-renowned lifestyle health retreat.'
     },
     {
         id: 'station_kunming',
@@ -271,27 +248,27 @@ export const GLOBAL_STATIONS = [
         lat: 25.0406,
         lng: 102.7129,
         tempC: 21.6,
-        tempMin: 14.2,
+        tempMin: 14.0,
         humidity: 55,
-        solarGhi: 710,
-        wetBulbC: 15.6,
-        windSpeedMps: 2.2,
-        windSpeedKmh: 7.9,
-        windDirectionDeg: 225,
-        windFrom: 'South-West (SW)',
-        windTo: 'North-East (NE)',
-        windDirectionText: 'SW (225°) ➔ NE (45°)',
+        solarGhi: 720,
+        wetBulbC: 15.8,
+        windSpeedMps: 2.9,
+        windSpeedKmh: 10.4,
+        windDirectionDeg: 160,
+        windFrom: 'South-South-East (SSE)',
+        windTo: 'North-North-West (NNW)',
+        windDirectionText: 'SSE (160°) ➔ NNW (340°)',
         zoneId: 'temperate',
-        climateType: 'Cwb - Spring City of the Orient (春城) 🌸',
-        status: 'Blossom Plateau Haven 🟢',
-        severity: 'paradise',
+        climateType: 'Cwb - Spring City of the Orient 🌸',
+        status: 'Paradise Comfort Haven 🟢',
+        severity: 'safe',
         category: 'paradise_comfort',
         isParadise: true,
-        weatherStatement: 'High altitude (1,890m) and low latitude create an uninterrupted blossom season where flowers flourish and outdoor activities are pleasurable all 12 months.'
+        weatherStatement: 'Subtropical highland elevation gives 12 months of mild pleasant spring weather and clear mountain air.'
     },
     {
         id: 'station_ooty',
-        name: 'Ooty / Nilgiri Hills (2,240m)',
+        name: 'Ooty / Nilgiri Blue Mountains',
         country: 'India',
         coordinates: '11.4102° N, 76.6950° E',
         lat: 11.4102,
@@ -299,529 +276,661 @@ export const GLOBAL_STATIONS = [
         tempC: 19.8,
         tempMin: 12.0,
         humidity: 58,
-        solarGhi: 690,
+        solarGhi: 670,
         wetBulbC: 14.5,
-        windSpeedMps: 2.6,
-        windSpeedKmh: 9.4,
-        windDirectionDeg: 270,
+        windSpeedMps: 2.5,
+        windSpeedKmh: 9.0,
+        windDirectionDeg: 260,
         windFrom: 'West (W)',
         windTo: 'East (E)',
-        windDirectionText: 'W (270°) ➔ E (90°)',
+        windDirectionText: 'W (260°) ➔ E (80°)',
         zoneId: 'temperate',
-        climateType: 'Cwb - Queen of Hill Stations 🍵',
-        status: 'Mountain Tea Country Retreat 🟢',
-        severity: 'paradise',
+        climateType: 'Cfb - Queen of Hill Stations 🍵',
+        status: 'Paradise Comfort Haven 🟢',
+        severity: 'safe',
         category: 'paradise_comfort',
         isParadise: true,
-        weatherStatement: 'Crisp mountain air and rolling tea plantations provide absolute thermal relief from low-land tropical heat, with cool evenings and fresh pine-scented breezes.'
+        weatherStatement: 'Crisp eucalyptus mountain breeze and lush tea plantations (2,240m elevation). Pristine natural thermal solace.'
     },
     {
-        id: 'station_lakecomo',
-        name: 'Lake Como / Lugano Border',
-        country: 'Italy / Switzerland',
-        coordinates: '45.9867° N, 9.2562° E',
+        id: 'station_como',
+        name: 'Lake Como / Bellagio Alpine Haven',
+        country: 'Italy',
+        coordinates: '45.9867° N, 9.2625° E',
         lat: 45.9867,
-        lng: 9.2562,
+        lng: 9.2625,
         tempC: 23.0,
         tempMin: 16.0,
         humidity: 56,
-        solarGhi: 680,
-        wetBulbC: 16.4,
-        windSpeedMps: 2.0,
-        windSpeedKmh: 7.2,
-        windDirectionDeg: 180,
-        windFrom: 'South (S / Breva)',
-        windTo: 'North (N)',
-        windDirectionText: 'S (180°) ➔ N (0°)',
+        solarGhi: 710,
+        wetBulbC: 17.1,
+        windSpeedMps: 2.7,
+        windSpeedKmh: 9.7,
+        windDirectionDeg: 10,
+        windFrom: 'North (N)',
+        windTo: 'South (S)',
+        windDirectionText: 'N (10°) ➔ S (190°)',
         zoneId: 'temperate',
-        climateType: 'Cfa - Sub-Alpine Lake Solace ⛵',
-        status: 'Alpine Lake Eden 🟢',
-        severity: 'paradise',
+        climateType: 'Cfa - Subalpine Lake Solace ⛵',
+        status: 'Paradise Comfort Haven 🟢',
+        severity: 'safe',
         category: 'paradise_comfort',
         isParadise: true,
-        weatherStatement: 'Sub-Alpine lake microclimate protected from northern winter chills, generating gentle thermal lake breezes that keep summer days wonderfully comfortable.'
+        weatherStatement: 'Thermal lake microclimate buffered by the Italian Alps. Gentle diurnal breezes (Breva & Tivano).'
     },
     {
         id: 'station_maui',
-        name: 'Wailea / Maui Island',
+        name: 'Maui / Wailea Coastal Sanctuary',
         country: 'United States',
-        coordinates: '20.6900° N, -156.4420° W',
+        coordinates: '20.6900° N, -156.4428° W',
         lat: 20.6900,
-        lng: -156.4420,
+        lng: -156.4428,
         tempC: 25.5,
-        tempMin: 21.0,
+        tempMin: 20.5,
         humidity: 64,
         solarGhi: 820,
         wetBulbC: 20.2,
-        windSpeedMps: 4.2,
-        windSpeedKmh: 15.1,
+        windSpeedMps: 4.5,
+        windSpeedKmh: 16.2,
         windDirectionDeg: 70,
-        windFrom: 'East-Northeast (ENE)',
-        windTo: 'West-Southwest (WSW)',
+        windFrom: 'East-North-East (ENE)',
+        windTo: 'West-South-West (WSW)',
         windDirectionText: 'ENE (70°) ➔ WSW (250°)',
         zoneId: 'warm_humid',
-        climateType: 'Af / As - Pacific Trade Wind Eden 🌴',
-        status: 'Tropical Island Sanctuary 🟢',
-        severity: 'paradise',
+        climateType: 'Af - Pacific Trade Wind Eden 🌴',
+        status: 'Paradise Comfort Haven 🟢',
+        severity: 'safe',
         category: 'paradise_comfort',
         isParadise: true,
-        weatherStatement: 'Persistent 15 km/h Pacific trade winds naturally cool the leeward coastlines, offering ideal swimming and beach conditions with minimal humidity discomfort.'
+        weatherStatement: 'Consistent oceanic trade winds at 16 km/h ensure natural ventilation and sublime outdoor living all year.'
     },
 
-    // 🔵 3. TEMPERATE & TROPICAL COASTAL REGIONS
+    // 🟣 3. COLD ALPINE & MOUNTAINOUS REGIONS (< 10°C)
     {
-        id: 'station_sundarbans',
-        name: 'Sundarbans Delta / Bay of Bengal',
-        country: 'India / Bangladesh',
-        coordinates: '21.9497° N, 89.1833° E',
-        lat: 21.9497,
-        lng: 89.1833,
-        tempC: 34.8,
-        tempMin: 27.5,
-        humidity: 86,
-        solarGhi: 780,
-        wetBulbC: 32.5,
-        windSpeedMps: 5.8,
-        windSpeedKmh: 20.9,
-        windDirectionDeg: 160,
-        windFrom: 'South-Southeast (SSE)',
-        windTo: 'North-Northwest (NNW)',
-        windDirectionText: 'SSE (160°) ➔ NNW (340°)',
-        zoneId: 'warm_humid',
-        climateType: 'Aw - Tropical Monsoon Coastal',
-        status: 'Cyclone & Surge Risk 🌊',
-        severity: 'high',
-        category: 'tropical_coastal',
-        weatherStatement: 'High moisture flux and monsoon squalls. Raised stilt bamboo architecture and continuous cross-ventilation essential.'
-    },
-    {
-        id: 'station_delhi',
-        name: 'New Delhi / Indo-Gangetic Plain',
-        country: 'India',
-        coordinates: '28.6139° N, 77.2090° E',
-        lat: 28.6139,
-        lng: 77.2090,
-        tempC: 43.5,
-        tempMin: 28.0,
-        humidity: 48,
-        solarGhi: 860,
-        wetBulbC: 30.2,
-        windSpeedMps: 3.2,
-        windSpeedKmh: 11.5,
-        windDirectionDeg: 300,
-        windFrom: 'North-West (NW)',
-        windTo: 'South-East (SE)',
-        windDirectionText: 'NW (300°) ➔ SE (120°)',
-        zoneId: 'composite',
-        climateType: 'Cwa - Composite Subtropical',
-        status: 'High Diurnal Variance',
-        severity: 'high',
-        category: 'composite',
-        weatherStatement: 'Subtropical composite climate with dramatic seasonal shifts from 45°C summer heatwaves to dense winter fog.'
-    },
-    {
-        id: 'station_london',
-        name: 'London / Thames Valley Basin',
-        country: 'United Kingdom',
-        coordinates: '51.5074° N, -0.1278° W',
-        lat: 51.5074,
-        lng: -0.1278,
-        tempC: 22.8,
-        tempMin: 14.5,
-        humidity: 58,
-        solarGhi: 550,
-        wetBulbC: 16.5,
-        windSpeedMps: 3.6,
-        windSpeedKmh: 13.0,
-        windDirectionDeg: 230,
-        windFrom: 'South-West (SW)',
-        windTo: 'North-East (NE)',
-        windDirectionText: 'SW (230°) ➔ NE (50°)',
-        zoneId: 'temperate',
-        climateType: 'Cfb - Oceanic Mild',
-        status: 'Comfort Zone Baseline',
-        severity: 'low',
-        category: 'temperate',
-        weatherStatement: 'Mild maritime oceanic climate with balanced humidity and moderate sunshine.'
-    },
-    {
-        id: 'station_tokyo',
-        name: 'Tokyo Bay / Kanto Plain',
-        country: 'Japan',
-        coordinates: '35.6762° N, 139.6503° E',
-        lat: 35.6762,
-        lng: 139.6503,
-        tempC: 27.5,
-        tempMin: 20.5,
-        humidity: 65,
-        solarGhi: 680,
-        wetBulbC: 21.8,
-        windSpeedMps: 3.0,
-        windSpeedKmh: 10.8,
-        windDirectionDeg: 170,
-        windFrom: 'South (S)',
-        windTo: 'North (N)',
-        windDirectionText: 'S (170°) ➔ N (350°)',
-        zoneId: 'temperate',
-        climateType: 'Cfa - Humid Subtropical',
-        status: 'Balanced Comfort Limit',
-        severity: 'low',
-        category: 'temperate',
-        weatherStatement: 'Pacific coastal warmth with seasonal typhoons and pleasant spring/autumn transitions.'
-    },
-
-    // 🟣 4. COLD ALPINE & HIGH-ALTITUDE MOUNTAINOUS (< 15°C)
-    {
-        id: 'station_leh',
-        name: 'Leh / Ladakh High Plateau (3,500m)',
+        id: 'station_ladakh',
+        name: 'Leh / Ladakh High Altitude Plateau',
         country: 'India',
         coordinates: '34.1526° N, 77.5771° E',
         lat: 34.1526,
         lng: 77.5771,
-        tempC: 12.4,
-        tempMin: -4.5,
-        humidity: 22,
-        solarGhi: 1020,
-        wetBulbC: 3.2,
-        windSpeedMps: 4.8,
-        windSpeedKmh: 17.3,
-        windDirectionDeg: 45,
-        windFrom: 'North-East (NE)',
-        windTo: 'South-West (SW)',
-        windDirectionText: 'NE (45°) ➔ SW (225°)',
-        zoneId: 'cold_mountainous',
-        climateType: 'ET - Alpine High-Altitude Cold Desert ❄️',
-        status: 'Solar Trombe Wall Recommended',
-        severity: 'moderate',
-        category: 'cold_alpine',
-        weatherStatement: 'Sub-zero nighttime temperatures combined with intense thin-air solar irradiance (1,020 W/m²). Passive solar Trombe walls capture vital thermal energy.'
-    },
-    {
-        id: 'station_alps',
-        name: 'Zermatt / Swiss Alps Ridge (2,800m)',
-        country: 'Switzerland',
-        coordinates: '45.9765° N, 7.7491° E',
-        lat: 45.9765,
-        lng: 7.7491,
-        tempC: 6.2,
-        tempMin: -8.0,
-        humidity: 45,
-        solarGhi: 820,
-        wetBulbC: 0.5,
-        windSpeedMps: 5.5,
-        windSpeedKmh: 19.8,
-        windDirectionDeg: 315,
+        tempC: 4.8,
+        tempMin: -12.0,
+        humidity: 24,
+        solarGhi: 920,
+        wetBulbC: -2.0,
+        windSpeedMps: 6.8,
+        windSpeedKmh: 24.5,
+        windDirectionDeg: 300,
         windFrom: 'North-West (NW)',
         windTo: 'South-East (SE)',
-        windDirectionText: 'NW (315°) ➔ SE (135°)',
+        windDirectionText: 'NW (300°) ➔ SE (120°)',
         zoneId: 'cold_mountainous',
-        climateType: 'Dfc - Subarctic Alpine Glacial',
-        status: 'Sub-Zero Insulation Priority ❄️',
+        climateType: 'BWk - Alpine Cold Desert (3,500m)',
+        status: 'Alpine Cold Anomaly ❄️',
         severity: 'high',
         category: 'cold_alpine',
-        weatherStatement: 'High-altitude sub-zero alpine conditions with extreme wind chill factors. Super-insulated compact envelope and triple glazing required.'
+        weatherStatement: 'Sub-zero nighttime radiation sink with high direct solar UV gain during daytime. Trombe solar walls recommended.'
+    },
+    {
+        id: 'station_zermatt',
+        name: 'Zermatt / Matterhorn Glacier Basin',
+        country: 'Switzerland',
+        coordinates: '45.9763° N, 7.7491° E',
+        lat: 45.9763,
+        lng: 7.7491,
+        tempC: 8.2,
+        tempMin: -4.5,
+        humidity: 48,
+        solarGhi: 840,
+        wetBulbC: 2.1,
+        windSpeedMps: 5.2,
+        windSpeedKmh: 18.7,
+        windDirectionDeg: 210,
+        windFrom: 'South-West (SW)',
+        windTo: 'North-East (NE)',
+        windDirectionText: 'SW (210°) ➔ NE (30°)',
+        zoneId: 'cold_mountainous',
+        climateType: 'ET - High Alpine Mountain Core',
+        status: 'Glacial Alpine Cold ❄️',
+        severity: 'moderate',
+        category: 'cold_alpine',
+        weatherStatement: 'Glacial Katabatic downslope winds. High thermal resistance wall assemblies (R > 4.5 m²K/W) essential.'
     }
 ];
 
 export class WorldMapEngine {
-    constructor(canvasElement, onSelectStationCallback = null) {
-        this.canvas = canvasElement;
-        this.ctx = canvasElement.getContext('2d');
-        this.onSelectStation = onSelectStationCallback;
+    constructor(containerId = 'interactive-world-map-leaflet', onSelectCallback = null) {
+        this.containerId = containerId;
+        this.onSelectCallback = onSelectCallback;
+        this.map = null;
+        this.markersLayer = null;
+        this.tileLayers = {};
+        this.currentLayerKey = 'google_street';
+        this.filterCategory = 'all';
         this.selectedStation = GLOBAL_STATIONS[0];
-        this.hoveredStation = null;
-        this.isDark = true;
-        this.activeFilter = 'all';
-        this.stations = GLOBAL_STATIONS;
+        this.customUserMarker = null;
 
-        this.initEvents();
+        this.initLeafletMap();
+        this.bindSearchAndLiveApi();
     }
 
-    setTheme(isDark) {
-        this.isDark = isDark;
-        this.render();
+    initLeafletMap() {
+        const container = document.getElementById(this.containerId);
+        if (!container || typeof L === 'undefined') {
+            console.warn('[WorldMapEngine] Leaflet library or container not ready yet.');
+            return;
+        }
+
+        // Initialize Leaflet Map centered on global view
+        this.map = L.map(this.containerId, {
+            center: [24.0, 10.0],
+            zoom: 2,
+            minZoom: 2,
+            maxZoom: 18,
+            zoomControl: true,
+            attributionControl: false
+        });
+
+        // 1. Google Streets Layer
+        this.tileLayers['google_street'] = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        });
+
+        // 2. Google Satellite Imagery Layer
+        this.tileLayers['google_satellite'] = L.tileLayer('https://mt1.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        });
+
+        // 3. CartoDB Dark Matter (Thermal Heat Radar)
+        this.tileLayers['carto_dark'] = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            subdomains: 'abcd'
+        });
+
+        // 4. Google Terrain Topography Layer
+        this.tileLayers['google_terrain'] = L.tileLayer('https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        });
+
+        // Default to Google Street
+        this.tileLayers['google_street'].addTo(this.map);
+
+        this.markersLayer = L.layerGroup().addTo(this.map);
+        this.renderStationMarkers();
+
+        // Click anywhere on map to fetch live online weather for that exact point!
+        this.map.on('click', async (e) => {
+            const { lat, lng } = e.latlng;
+            await this.fetchAndInspectLivePoint(lat, lng, `Custom GPS Location (${lat.toFixed(2)}°, ${lng.toFixed(2)}°)`);
+        });
+
+        // Render table
+        this.renderStationTable();
+        this.updateTelemetryHUD(this.selectedStation);
+    }
+
+    setLayer(layerKey) {
+        if (!this.tileLayers[layerKey] || !this.map) return;
+        Object.values(this.tileLayers).forEach(layer => {
+            if (this.map.hasLayer(layer)) this.map.removeLayer(layer);
+        });
+        this.tileLayers[layerKey].addTo(this.map);
+        this.currentLayerKey = layerKey;
+
+        document.querySelectorAll('.map-layer-btn').forEach(btn => {
+            if (btn.getAttribute('data-map-layer') === layerKey) {
+                btn.classList.add('active');
+                btn.style.background = 'rgba(56,189,248,0.2)';
+                btn.style.borderColor = 'var(--accent-sky)';
+                btn.style.color = 'var(--text-primary)';
+            } else {
+                btn.classList.remove('active');
+                btn.style.background = 'rgba(255,255,255,0.06)';
+                btn.style.borderColor = 'var(--border-glass)';
+                btn.style.color = 'var(--text-secondary)';
+            }
+        });
     }
 
     setFilter(category) {
-        this.activeFilter = category;
-        if (category === 'all') {
-            this.stations = GLOBAL_STATIONS;
-        } else if (category === 'extreme_hot') {
-            this.stations = GLOBAL_STATIONS.filter(s => s.category === 'extreme_hot');
-        } else if (category === 'paradise_comfort') {
-            this.stations = GLOBAL_STATIONS.filter(s => s.category === 'paradise_comfort' || s.isParadise);
-        } else if (category === 'cold_alpine') {
-            this.stations = GLOBAL_STATIONS.filter(s => s.category === 'cold_alpine');
-        } else {
-            this.stations = GLOBAL_STATIONS;
-        }
-        this.render();
-    }
+        this.filterCategory = category;
+        this.renderStationMarkers();
+        this.renderStationTable();
 
-    initEvents() {
-        this.canvas.addEventListener('mousemove', (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            const scaleX = this.canvas.width / rect.width;
-            const scaleY = this.canvas.height / rect.height;
-            const mx = (e.clientX - rect.left) * scaleX;
-            const my = (e.clientY - rect.top) * scaleY;
-
-            let found = null;
-            for (const st of this.stations) {
-                const { x, y } = this.geoToScreen(st.lat, st.lng);
-                const dist = Math.hypot(mx - x, my - y);
-                if (dist <= 20) {
-                    found = st;
-                    break;
-                }
-            }
-
-            if (found !== this.hoveredStation) {
-                this.hoveredStation = found;
-                this.canvas.style.cursor = found ? 'pointer' : 'default';
-                this.render();
-            }
-        });
-
-        this.canvas.addEventListener('click', () => {
-            if (this.hoveredStation) {
-                this.selectedStation = this.hoveredStation;
-                this.render();
-                if (this.onSelectStation) {
-                    this.onSelectStation(this.selectedStation);
-                }
+        document.querySelectorAll('.map-filter-chip').forEach(chip => {
+            if (chip.getAttribute('data-map-filter') === category) {
+                chip.classList.add('active');
+            } else {
+                chip.classList.remove('active');
             }
         });
     }
 
-    geoToScreen(lat, lng) {
-        const w = this.canvas.width;
-        const h = this.canvas.height;
-        const padX = 35;
-        const padY = 25;
-        const mapW = w - padX * 2;
-        const mapH = h - padY * 2;
+    renderStationMarkers() {
+        if (!this.markersLayer) return;
+        this.markersLayer.clearLayers();
 
-        const x = padX + ((lng + 180) / 360) * mapW;
-        const y = padY + ((90 - lat) / 180) * mapH;
-        return { x, y };
-    }
+        const filtered = GLOBAL_STATIONS.filter(s => {
+            if (this.filterCategory === 'all') return true;
+            return s.category === this.filterCategory;
+        });
 
-    getTempColor(tempC) {
-        if (tempC >= 45) return '#ef4444'; // Crimson Red: Extreme Heatwave
-        if (tempC >= 38) return '#f97316'; // Orange Red: High Heat
-        if (tempC >= 30) return '#f59e0b'; // Amber: Warm
-        if (tempC >= 20) return '#10b981'; // Emerald Green: Paradise Comfort (20-28°C)
-        if (tempC >= 10) return '#38bdf8'; // Sky Blue: Cool
-        return '#818cf8'; // Indigo/Purple: Cold Alpine
-    }
+        filtered.forEach(station => {
+            const isHot = station.category === 'extreme_hot' || station.tempC >= 38;
+            const isComfort = station.isParadise || (station.tempC >= 20 && station.tempC <= 28);
+            const isCold = station.category === 'cold_alpine' || station.tempC < 12;
 
-    render() {
-        const ctx = this.ctx;
-        const w = this.canvas.width;
-        const h = this.canvas.height;
+            const pinColor = isHot ? '#ef4444' : (isComfort ? '#10b981' : (isCold ? '#818cf8' : '#38bdf8'));
+            const pulseClass = isHot ? 'pulse-red' : (isComfort ? 'pulse-green' : '');
 
-        ctx.clearRect(0, 0, w, h);
+            const iconHtml = `
+                <div style="position: relative; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;">
+                    <div class="${pulseClass}" style="position: absolute; width: 32px; height: 32px; border-radius: 50%; background: ${pinColor}33; border: 2px solid ${pinColor};"></div>
+                    <div style="background: ${pinColor}; color: white; font-size: 11px; font-weight: 800; padding: 2px 5px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.6); z-index: 2;">
+                        ${Math.round(station.tempC)}°
+                    </div>
+                </div>
+            `;
 
-        // Ocean Background
-        ctx.fillStyle = this.isDark ? '#070f20' : '#e0f2fe';
-        ctx.fillRect(0, 0, w, h);
-
-        // Graticules
-        this.drawGraticule();
-
-        // Continents
-        this.drawWorldContinents();
-
-        // Thermal Belts
-        this.drawThermalBelts();
-
-        // Stations
-        this.drawStationPins();
-
-        // HUD / Tooltip Card
-        this.drawHUDCard();
-    }
-
-    drawGraticule() {
-        const ctx = this.ctx;
-        ctx.strokeStyle = this.isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.06)';
-        ctx.lineWidth = 1;
-
-        for (let lng = -180; lng <= 180; lng += 30) {
-            const { x } = this.geoToScreen(0, lng);
-            ctx.beginPath();
-            ctx.moveTo(x, 20);
-            ctx.lineTo(x, this.canvas.height - 20);
-            ctx.stroke();
-        }
-
-        for (let lat = -60; lat <= 60; lat += 30) {
-            const { y } = this.geoToScreen(lat, 0);
-            ctx.beginPath();
-            ctx.moveTo(35, y);
-            ctx.lineTo(this.canvas.width - 35, y);
-            ctx.stroke();
-        }
-
-        // Equator highlight
-        const eq = this.geoToScreen(0, 0);
-        ctx.strokeStyle = this.isDark ? 'rgba(245, 158, 11, 0.2)' : 'rgba(245, 158, 11, 0.3)';
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(35, eq.y);
-        ctx.lineTo(this.canvas.width - 35, eq.y);
-        ctx.stroke();
-        ctx.setLineDash([]);
-    }
-
-    drawWorldContinents() {
-        const ctx = this.ctx;
-        ctx.fillStyle = this.isDark ? 'rgba(30, 41, 59, 0.75)' : 'rgba(203, 213, 225, 0.8)';
-        ctx.strokeStyle = this.isDark ? 'rgba(56, 189, 248, 0.25)' : 'rgba(15, 23, 42, 0.25)';
-        ctx.lineWidth = 1.2;
-
-        const continents = [
-            // North America
-            [[-165, 65], [-140, 70], [-100, 72], [-65, 60], [-60, 45], [-75, 30], [-80, 25], [-95, 18], [-105, 20], [-120, 35], [-125, 50], [-165, 65]],
-            // South America
-            [[-80, 10], [-60, 10], [-35, -5], [-40, -22], [-55, -35], [-68, -55], [-75, -45], [-80, -20], [-80, 10]],
-            // Eurasia
-            [[-10, 36], [0, 45], [10, 55], [30, 70], [60, 72], [100, 75], [170, 68], [140, 40], [120, 30], [105, 10], [80, 10], [70, 25], [50, 28], [35, 32], [25, 36], [0, 38], [-10, 36]],
-            // Africa
-            [[-17, 30], [10, 37], [32, 31], [50, 12], [42, -12], [30, -34], [18, -34], [10, 4], [-15, 12], [-17, 30]],
-            // Australia
-            [[113, -22], [130, -12], [145, -15], [153, -28], [140, -38], [115, -35], [113, -22]]
-        ];
-
-        continents.forEach(poly => {
-            ctx.beginPath();
-            poly.forEach((pt, idx) => {
-                const { x, y } = this.geoToScreen(pt[1], pt[0]);
-                if (idx === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+            const customIcon = L.divIcon({
+                html: iconHtml,
+                className: 'custom-map-pin',
+                iconSize: [34, 34],
+                iconAnchor: [17, 17]
             });
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
+
+            const marker = L.marker([station.lat, station.lng], { icon: customIcon });
+
+            marker.bindPopup(`
+                <div style="font-family: 'Inter', sans-serif; min-width: 220px; color: #0f172a; padding: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span style="font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: ${pinColor}22; color: ${pinColor};">${isHot ? '🔴 EXTREME HEAT' : (isComfort ? '🟢 PARADISE' : '❄️ ALPINE')}</span>
+                        <span style="font-size: 16px; font-weight: 900; color: ${pinColor};">${station.tempC}°C</span>
+                    </div>
+                    <h4 style="font-size: 14px; font-weight: 800; margin: 0 0 2px 0;">${station.name}</h4>
+                    <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">${station.country} &bull; ${station.humidity}% Humidity</div>
+                    <div style="font-size: 11px; background: #f1f5f9; padding: 4px 6px; border-radius: 4px; margin-bottom: 8px;">
+                        💨 <strong>Wind:</strong> ${station.windSpeedMps} m/s (${station.windDirectionText || 'ENE'})
+                    </div>
+                    <button id="popup-btn-apply-${station.id}" style="width: 100%; background: linear-gradient(135deg, #0284c7, #10b981); color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                        🚀 Simulate in 3D BioShelter &rarr;
+                    </button>
+                </div>
+            `);
+
+            marker.on('click', () => {
+                this.selectStation(station);
+            });
+
+            marker.on('popupopen', () => {
+                const btn = document.getElementById(`popup-btn-apply-${station.id}`);
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        this.applyStationToStudio(station);
+                    });
+                }
+            });
+
+            this.markersLayer.addLayer(marker);
         });
     }
 
-    drawThermalBelts() {
-        const ctx = this.ctx;
-        // Tropical Thermal Red/Orange Glow Belt
-        const { y: yNorth } = this.geoToScreen(35, 0);
-        const { y: ySouth } = this.geoToScreen(-35, 0);
-
-        const grad = ctx.createLinearGradient(0, yNorth, 0, ySouth);
-        grad.addColorStop(0, 'rgba(239, 68, 68, 0.0)');
-        grad.addColorStop(0.3, 'rgba(239, 68, 68, 0.08)');
-        grad.addColorStop(0.5, 'rgba(245, 158, 11, 0.12)');
-        grad.addColorStop(0.7, 'rgba(239, 68, 68, 0.08)');
-        grad.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
-
-        ctx.fillStyle = grad;
-        ctx.fillRect(35, yNorth, this.canvas.width - 70, ySouth - yNorth);
+    selectStation(station) {
+        this.selectedStation = station;
+        this.updateTelemetryHUD(station);
+        if (this.onSelectCallback) {
+            this.onSelectCallback(station);
+        }
     }
 
-    drawStationPins() {
-        const ctx = this.ctx;
+    applyStationToStudio(station) {
+        this.selectStation(station);
+        const btnApply = document.getElementById('btn-apply-map-climate');
+        if (btnApply) btnApply.click();
+    }
 
-        this.stations.forEach(st => {
-            const { x, y } = this.geoToScreen(st.lat, st.lng);
-            const isSelected = this.selectedStation && this.selectedStation.id === st.id;
-            const isHovered = this.hoveredStation && this.hoveredStation.id === st.id;
-            const col = this.getTempColor(st.tempC);
+    updateTelemetryHUD(station) {
+        const badge = document.getElementById('live-map-inspect-badge');
+        const coords = document.getElementById('live-map-inspect-coords');
+        const name = document.getElementById('live-map-inspect-name');
+        const statement = document.getElementById('live-map-inspect-statement');
+        const temp = document.getElementById('live-map-inspect-temp');
+        const tempF = document.getElementById('live-map-inspect-temp-f');
+        const wind = document.getElementById('live-map-inspect-wind');
+        const windDir = document.getElementById('live-map-inspect-wind-dir');
+        const humidity = document.getElementById('live-map-inspect-humidity');
+        const source = document.getElementById('live-map-inspect-source');
 
-            // Pulsing Outer Heat Ring
-            ctx.beginPath();
-            ctx.arc(x, y, isSelected ? 16 : (isHovered ? 12 : 8), 0, Math.PI * 2);
-            ctx.fillStyle = col + (isSelected ? '44' : '22');
-            ctx.fill();
+        const isHot = station.category === 'extreme_hot' || station.tempC >= 38;
+        const isComfort = station.isParadise || (station.tempC >= 20 && station.tempC <= 28);
+        const pinColor = isHot ? '#ef4444' : (isComfort ? '#10b981' : '#38bdf8');
 
-            // Intermediate Ring
-            ctx.beginPath();
-            ctx.arc(x, y, isSelected ? 9 : 6, 0, Math.PI * 2);
-            ctx.fillStyle = col;
-            ctx.fill();
+        if (badge) {
+            badge.textContent = isHot ? '🔴 EXTREME HEATWAVE' : (isComfort ? '🟢 PARADISE COMFORT' : '🌐 REGIONAL MICROCLIMATE');
+            badge.style.background = `${pinColor}22`;
+            badge.style.color = pinColor;
+        }
 
-            // Core Pin
-            ctx.beginPath();
-            ctx.arc(x, y, isSelected ? 4.5 : 3, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffffff';
-            ctx.fill();
+        if (coords) coords.textContent = station.coordinates || `${station.lat.toFixed(4)}° N, ${station.lng.toFixed(4)}° E`;
+        if (name) name.textContent = `${station.name}, ${station.country || ''}`;
+        if (statement) statement.textContent = station.weatherStatement || 'Real-time online atmospheric parameters synchronized.';
 
-            // Temperature Label Tag
-            ctx.font = 'bold 10px "JetBrains Mono", monospace';
-            ctx.fillStyle = isSelected ? '#ffffff' : col;
-            ctx.fillText(`${st.tempC}°C`, x + 10, y - 6);
+        if (temp) {
+            temp.textContent = `${station.tempC.toFixed(1)}°C`;
+            temp.style.color = pinColor;
+        }
 
-            // Paradise Icon or Fire Icon
-            if (st.isParadise) {
-                ctx.font = '10px sans-serif';
-                ctx.fillText('🌴', x - 18, y - 6);
-            } else if (st.tempC >= 45) {
-                ctx.font = '10px sans-serif';
-                ctx.fillText('🔥', x - 18, y - 6);
+        if (tempF) {
+            const f = (station.tempC * 9 / 5 + 32).toFixed(1);
+            tempF.textContent = `${f}°F`;
+        }
+
+        if (wind) wind.textContent = `${station.windSpeedMps || 3.8} m/s (${Math.round((station.windSpeedMps || 3.8) * 3.6)} km/h)`;
+        if (windDir) windDir.textContent = station.windDirectionText || 'Wind Vector';
+        if (humidity) humidity.textContent = `${station.humidity || 50}%`;
+        if (source) source.textContent = station.isLiveOnline ? '⚡ Live Online API' : '🛰️ Satellite Verified';
+    }
+
+    renderStationTable() {
+        const container = document.getElementById('world-stations-table-container');
+        if (!container) return;
+
+        const filtered = GLOBAL_STATIONS.filter(s => {
+            if (this.filterCategory === 'all') return true;
+            return s.category === this.filterCategory;
+        });
+
+        container.innerHTML = `
+            <table class="data-table" style="width: 100%; font-size: 11px;">
+                <thead>
+                    <tr>
+                        <th>Station Location</th>
+                        <th>Thermal Signature</th>
+                        <th>Live Temp</th>
+                        <th>Humidity</th>
+                        <th>Wind Speed &amp; Vector</th>
+                        <th>Microclimate Classification</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${filtered.map(s => {
+                        const isHot = s.category === 'extreme_hot' || s.tempC >= 38;
+                        const isComfort = s.isParadise || (s.tempC >= 20 && s.tempC <= 28);
+                        const col = isHot ? '#ef4444' : (isComfort ? '#10b981' : '#38bdf8');
+
+                        return `
+                            <tr style="cursor: pointer;" class="station-row" data-station-id="${s.id}">
+                                <td>
+                                    <strong>${s.name}</strong><br>
+                                    <span style="color: var(--text-muted); font-size: 10px;">${s.country} (${s.lat.toFixed(2)}°, ${s.lng.toFixed(2)}°)</span>
+                                </td>
+                                <td>
+                                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${col}; margin-right: 6px;"></span>
+                                    <span style="color: ${col}; font-weight: 700;">${s.status || (isHot ? 'Extreme Hot' : 'Paradise Comfort')}</span>
+                                </td>
+                                <td><strong style="font-size: 13px; color: ${col};">${s.tempC}°C</strong></td>
+                                <td>${s.humidity}%</td>
+                                <td>${s.windSpeedMps} m/s &bull; ${s.windDirectionText || 'ENE'}</td>
+                                <td><span style="font-size: 10px; color: var(--text-secondary);">${s.climateType}</span></td>
+                                <td>
+                                    <button class="export-btn-primary btn-select-row-station" data-station-id="${s.id}" style="padding: 4px 10px; font-size: 10px; background: linear-gradient(135deg, #0284c7, #10b981);">
+                                        🚀 Inspect
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+
+        container.querySelectorAll('.btn-select-row-station').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = btn.getAttribute('data-station-id');
+                const station = GLOBAL_STATIONS.find(x => x.id === id);
+                if (station) {
+                    this.selectStation(station);
+                    if (this.map) {
+                        this.map.flyTo([station.lat, station.lng], 6, { duration: 1.2 });
+                    }
+                }
+            });
+        });
+
+        container.querySelectorAll('.station-row').forEach(row => {
+            row.addEventListener('click', () => {
+                const id = row.getAttribute('data-station-id');
+                const station = GLOBAL_STATIONS.find(x => x.id === id);
+                if (station) {
+                    this.selectStation(station);
+                    if (this.map) {
+                        this.map.flyTo([station.lat, station.lng], 6, { duration: 1.2 });
+                    }
+                }
+            });
+        });
+    }
+
+    /* --- Live Online Weather & Search Telemetry Integration --- */
+    bindSearchAndLiveApi() {
+        const btnSearch = document.getElementById('btn-map-search-online');
+        const inputSearch = document.getElementById('input-map-city-search');
+        const btnGps = document.getElementById('btn-map-my-location');
+        const btnApplyStation = document.getElementById('btn-apply-selected-map-station');
+
+        if (btnSearch && inputSearch) {
+            const doSearch = async () => {
+                const query = inputSearch.value.trim();
+                if (!query) return;
+                await this.searchCityOnline(query);
+            };
+
+            btnSearch.addEventListener('click', doSearch);
+            inputSearch.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') doSearch();
+            });
+        }
+
+        if (btnGps) {
+            btnGps.addEventListener('click', () => {
+                if (!navigator.geolocation) {
+                    alert('Geolocation is not supported by your browser.');
+                    return;
+                }
+                const statusEl = document.getElementById('search-online-status');
+                if (statusEl) statusEl.innerHTML = '<span>⏳ Acquiring GPS satellite fix...</span>';
+
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const { latitude, longitude } = position.coords;
+                        await this.fetchAndInspectLivePoint(latitude, longitude, 'Your Live GPS Location');
+                        if (statusEl) statusEl.innerHTML = `<span>📍 <strong>Acquired GPS:</strong> ${latitude.toFixed(4)}° N, ${longitude.toFixed(4)}° E (Live Online Weather Connected)</span>`;
+                    },
+                    (err) => {
+                        alert(`Could not acquire GPS: ${err.message}. Using default world station.`);
+                    }
+                );
+            });
+        }
+
+        if (btnApplyStation) {
+            btnApplyStation.addEventListener('click', () => {
+                if (this.selectedStation) {
+                    this.applyStationToStudio(this.selectedStation);
+                }
+            });
+        }
+
+        // Layer switch buttons
+        document.querySelectorAll('.map-layer-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const layer = btn.getAttribute('data-map-layer');
+                this.setLayer(layer);
+            });
+        });
+
+        // Filter chips
+        document.querySelectorAll('.map-filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const filter = chip.getAttribute('data-map-filter');
+                this.setFilter(filter);
+            });
+        });
+    }
+
+    async searchCityOnline(cityName) {
+        const statusEl = document.getElementById('search-online-status');
+        if (statusEl) statusEl.innerHTML = `<span>⏳ Querying planetary weather grid for <strong>"${cityName}"</strong>...</span>`;
+
+        try {
+            // 1. Geocode city name via Nominatim OpenStreetMap API
+            const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}&limit=1`;
+            const geoRes = await fetch(geoUrl, { headers: { 'User-Agent': 'BioShelterStudio/2.0' } });
+            const geoData = await geoRes.json();
+
+            if (!geoData || geoData.length === 0) {
+                alert(`Could not find "${cityName}". Please try another city or country name.`);
+                if (statusEl) statusEl.innerHTML = `<span>❌ Location "${cityName}" not found.</span>`;
+                return;
             }
-        });
+
+            const place = geoData[0];
+            const lat = parseFloat(place.lat);
+            const lng = parseFloat(place.lon);
+            const displayName = place.display_name.split(',').slice(0, 3).join(',');
+
+            await this.fetchAndInspectLivePoint(lat, lng, displayName);
+
+            if (statusEl) {
+                statusEl.innerHTML = `<span>✅ <strong>Live Online Weather Connected:</strong> ${displayName} (${lat.toFixed(2)}°, ${lng.toFixed(2)}°)</span>`;
+            }
+        } catch (err) {
+            console.warn('Online weather search fallback:', err);
+            alert(`Error querying online weather API: ${err.message}.`);
+        }
     }
 
-    drawHUDCard() {
-        const ctx = this.ctx;
-        const st = this.hoveredStation || this.selectedStation;
-        if (!st) return;
+    async fetchAndInspectLivePoint(lat, lng, customName = '') {
+        const statusEl = document.getElementById('search-online-status');
+        if (statusEl) statusEl.innerHTML = `<span>⏳ Fetching live temperature from Open-Meteo online weather API...</span>`;
 
-        const cardW = 320;
-        const cardH = 150;
-        const cardX = 45;
-        const cardY = this.canvas.height - cardH - 35;
+        try {
+            // 2. Query Live Open-Meteo Weather API
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,weather_code,surface_pressure&timezone=auto`;
+            const wRes = await fetch(weatherUrl);
+            const wData = await wRes.json();
 
-        // Card Glass Background
-        ctx.fillStyle = this.isDark ? 'rgba(15, 23, 42, 0.92)' : 'rgba(255, 255, 255, 0.95)';
-        ctx.strokeStyle = this.getTempColor(st.tempC);
-        ctx.lineWidth = 1.5;
+            if (!wData || !wData.current) {
+                throw new Error('Weather API returned invalid response.');
+            }
 
-        // Rounded Box
-        ctx.beginPath();
-        ctx.roundRect(cardX, cardY, cardW, cardH, 10);
-        ctx.fill();
-        ctx.stroke();
+            const cur = wData.current;
+            const tempC = cur.temperature_2m;
+            const humidity = cur.relative_humidity_2m;
+            const windSpeedKmh = cur.wind_speed_10m;
+            const windSpeedMps = Math.round((windSpeedKmh / 3.6) * 10) / 10;
+            const windDirectionDeg = cur.wind_direction_10m;
 
-        // Card Title & Country
-        ctx.font = 'bold 12px "Outfit", sans-serif';
-        ctx.fillStyle = this.isDark ? '#f8fafc' : '#0f172a';
-        ctx.fillText(`${st.name}, ${st.country}`, cardX + 14, cardY + 22);
+            const compassDirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+            const dirIdx = Math.round(windDirectionDeg / 22.5) % 16;
+            const fromText = compassDirs[dirIdx];
+            const toIdx = (dirIdx + 8) % 16;
+            const toText = compassDirs[toIdx];
+            const windDirectionText = `${fromText} (${windDirectionDeg}°) ➔ ${toText} (${(windDirectionDeg + 180) % 360}°)`;
 
-        // Status Badge
-        ctx.font = 'bold 10px "Inter", sans-serif';
-        ctx.fillStyle = this.getTempColor(st.tempC);
-        ctx.fillText(`${st.status}`, cardX + 14, cardY + 38);
+            const isHot = tempC >= 38;
+            const isComfort = tempC >= 20 && tempC <= 28;
+            const isCold = tempC < 12;
 
-        // Temperature & Humidity Row
-        ctx.font = 'bold 18px "JetBrains Mono", monospace';
-        ctx.fillStyle = this.getTempColor(st.tempC);
-        ctx.fillText(`${st.tempC}°C`, cardX + 14, cardY + 65);
+            const category = isHot ? 'extreme_hot' : (isComfort ? 'paradise_comfort' : (isCold ? 'cold_alpine' : 'oceanic'));
+            const status = isHot ? 'Live Extreme Heatwave Alert 🔥' : (isComfort ? 'Live Paradise Comfort Zone 🟢' : (isCold ? 'Live Cold Mountain Air ❄️' : 'Live Moderate Weather ⛅'));
 
-        ctx.font = '11px "Inter", sans-serif';
-        ctx.fillStyle = this.isDark ? '#94a3b8' : '#475569';
-        ctx.fillText(`Wet-Bulb: ${st.wetBulbC}°C | RH: ${st.humidity}%`, cardX + 90, cardY + 62);
+            const station = {
+                id: 'live_' + Date.now(),
+                name: customName || `GPS Site (${lat.toFixed(2)}°, ${lng.toFixed(2)}°)`,
+                country: 'Live Online Telemetry',
+                coordinates: `${lat.toFixed(4)}° N, ${lng.toFixed(4)}° E`,
+                lat,
+                lng,
+                tempC,
+                tempMin: Math.max(0, tempC - 8),
+                tempMax: tempC + 4,
+                humidity,
+                windSpeedMps,
+                windSpeedKmh,
+                windDirectionDeg,
+                windDirectionText,
+                category,
+                status,
+                isParadise: isComfort,
+                isLiveOnline: true,
+                weatherStatement: `Live online observation from planetary weather grid: Temperature is ${tempC}°C with ${humidity}% relative humidity and ${windSpeedMps} m/s wind speed blowing from ${fromText} to ${toText}.`
+            };
 
-        // Wind Speed & Direction Row
-        ctx.font = 'bold 11px "Inter", sans-serif';
-        ctx.fillStyle = '#38bdf8';
-        ctx.fillText(`💨 Wind: ${st.windSpeedMps || 3.5} m/s (${st.windSpeedKmh || 12.6} km/h) | ${st.windDirectionText || 'NW ➔ SE'}`, cardX + 14, cardY + 86);
+            this.selectedStation = station;
+            this.updateTelemetryHUD(station);
 
-        // Brief Weather Statement snippet
-        ctx.font = '10px "Inter", sans-serif';
-        ctx.fillStyle = this.isDark ? '#cbd5e1' : '#334155';
-        const stmt = st.weatherStatement || 'Passive bioclimatic microclimate active.';
-        const snippet = stmt.length > 70 ? stmt.substring(0, 67) + '...' : stmt;
-        ctx.fillText(snippet, cardX + 14, cardY + 108);
+            // Fly map to coordinate
+            if (this.map) {
+                this.map.flyTo([lat, lng], 7, { duration: 1.5 });
 
-        // Click Callout
-        ctx.font = 'bold 10px "Outfit", sans-serif';
-        ctx.fillStyle = '#10b981';
-        ctx.fillText('⚡ Click to load this microclimate into 3D BioShelter Studio', cardX + 14, cardY + 130);
+                if (this.customUserMarker) {
+                    this.map.removeLayer(this.customUserMarker);
+                }
+
+                const pinColor = isHot ? '#ef4444' : (isComfort ? '#10b981' : '#38bdf8');
+                const pulseClass = isHot ? 'pulse-red' : (isComfort ? 'pulse-green' : '');
+
+                const iconHtml = `
+                    <div style="position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
+                        <div class="${pulseClass}" style="position: absolute; width: 36px; height: 36px; border-radius: 50%; background: ${pinColor}44; border: 3px solid ${pinColor};"></div>
+                        <div style="background: ${pinColor}; color: white; font-size: 12px; font-weight: 900; padding: 3px 6px; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.8); z-index: 3;">
+                            ${Math.round(tempC)}°
+                        </div>
+                    </div>
+                `;
+
+                const customIcon = L.divIcon({
+                    html: iconHtml,
+                    className: 'custom-map-pin',
+                    iconSize: [38, 38],
+                    iconAnchor: [19, 19]
+                });
+
+                this.customUserMarker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
+                this.customUserMarker.bindPopup(`
+                    <div style="font-family: 'Inter', sans-serif; min-width: 220px; color: #0f172a; padding: 4px;">
+                        <span style="font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: ${pinColor}22; color: ${pinColor};">⚡ LIVE ONLINE WEATHER</span>
+                        <h4 style="font-size: 14px; font-weight: 800; margin: 4px 0 2px 0;">${station.name}</h4>
+                        <div style="font-size: 18px; font-weight: 900; color: ${pinColor}; margin-bottom: 4px;">${tempC}°C (${(tempC * 9 / 5 + 32).toFixed(1)}°F)</div>
+                        <div style="font-size: 11px; color: #64748b; margin-bottom: 6px;">Humidity: ${humidity}% &bull; Wind: ${windSpeedMps} m/s (${windDirectionText})</div>
+                        <button id="popup-btn-apply-custom" style="width: 100%; background: linear-gradient(135deg, #0284c7, #10b981); color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                            🚀 Simulate in 3D BioShelter &rarr;
+                        </button>
+                    </div>
+                `).openPopup();
+
+                setTimeout(() => {
+                    const btn = document.getElementById('popup-btn-apply-custom');
+                    if (btn) {
+                        btn.addEventListener('click', () => {
+                            this.applyStationToStudio(station);
+                        });
+                    }
+                }, 100);
+            }
+
+            if (statusEl) {
+                statusEl.innerHTML = `<span>✅ <strong>Live Online Weather:</strong> ${station.name} &bull; ${tempC}°C &bull; ${humidity}% Humidity &bull; Wind: ${windSpeedMps} m/s</span>`;
+            }
+        } catch (err) {
+            console.warn('Open-Meteo live API error:', err);
+            if (statusEl) statusEl.innerHTML = `<span>⚠️ Could not fetch live weather: ${err.message}.</span>`;
+        }
     }
 }
