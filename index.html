@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioShelter Studio &bull; Thermal Comfort, Soil Physics, Community Shelters &amp; Disaster SOS Suite</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- External Libraries (Three.js, OrbitControls, Chart.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- App Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <!-- ==========================================================================
+         FULL-SCREEN SECURITY GATE & ACCOUNT VERIFICATION PORTAL (FIRST PAGE UNLOCK)
+         ========================================================================== -->
+    <div id="auth-landing-gate" class="auth-landing-gate">
+        <div class="gate-card-container">
+            <div class="gate-header">
+                <div class="brand-logo" style="width: 52px; height: 52px; margin: 0 auto;">
+                    <svg viewBox="0 0 24 24" style="width: 30px; height: 30px;"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.84L18 11.2V18h-2v-6H8v6H6v-6.8l6-5.36z"/></svg>
+                </div>
+                <div class="gate-badge-security">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    Identity &amp; Disaster Network Gate
+                </div>
+                <h1 class="gate-title">BioShelter Studio</h1>
+                <p class="gate-desc">Verify your account with Mobile Phone OTP, Google, Microsoft, or your Engineering License Token to unlock the complete modeling suite and emergency broadcast network.</p>
+            </div>
+
+            <!-- Gate Navigation Tabs -->
+            <div class="gate-nav-tabs">
+                <button class="gate-tab-btn active" data-gate-pane="gate-pane-phone">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+                    Mobile Phone OTP
+                </button>
+                <button class="gate-tab-btn" data-gate-pane="gate-pane-sso">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                    Google / Microsoft
+                </button>
+                <button class="gate-tab-btn" data-gate-pane="gate-pane-token">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    License Token PIN
+                </button>
+            </div>
+
+            <!-- Gate Pane 1: Mobile Phone Number OTP Flow -->
+            <div id="gate-pane-phone" class="gate-pane active">
+                <div id="gate-phone-step-1" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="control-group">
+                        <label class="control-label">Country &amp; Mobile Phone Number</label>
+                        <div class="phone-input-row">
+                            <select id="gate-phone-country" class="phone-country-code">
+                                <option value="+1">🇺🇸 +1 (US/CA)</option>
+                                <option value="+91" selected>🇮🇳 +91 (IN)</option>
+                                <option value="+44">🇬🇧 +44 (UK)</option>
+                                <option value="+971">🇦🇪 +971 (UAE)</option>
+                                <option value="+49">🇩🇪 +49 (DE)</option>
+                                <option value="+81">🇯🇵 +81 (JP)</option>
+                                <option value="+61">🇦🇺 +61 (AU)</option>
+                            </select>
+                            <input type="tel" id="gate-phone-number" class="phone-number-input" placeholder="98765 43210">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Your Full Name</label>
+                        <input type="text" id="gate-phone-name" class="input-select" placeholder="e.g. Alex Henderson, Civil Engineer">
+                    </div>
+                    <button id="btn-gate-send-otp" class="export-btn-primary" style="width: 100%; padding: 12px; font-size: 13px;">
+                        Send 6-Digit SMS Verification Code &rarr;
+                    </button>
+                </div>
+
+                <div id="gate-phone-step-2" style="display: none; flex-direction: column; gap: 14px;">
+                    <!-- Dynamic Live OTP Incoming Display Card -->
+                    <div class="dynamic-otp-live-card">
+                        <div class="dynamic-otp-header">
+                            <span style="display: flex; align-items: center; gap: 6px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                                📱 Cellular SMS Dispatch
+                            </span>
+                            <span class="dynamic-otp-badge-live">LIVE OTP CODE</span>
+                        </div>
+                        <div class="dynamic-otp-code-row">
+                            <div>
+                                <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Your 6-Digit Code:</div>
+                                <div id="gate-live-otp-code" class="dynamic-otp-number">------</div>
+                            </div>
+                            <button id="btn-gate-quick-autofill" class="btn-quick-autofill" title="Auto-Fill &amp; Verify Instantly">
+                                ⚡ Auto-Fill &amp; Unlock
+                            </button>
+                        </div>
+                        <div class="dynamic-otp-timer-bar">
+                            <div id="gate-otp-timer-bar-fill" class="dynamic-otp-timer-fill"></div>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 12px; color: var(--text-secondary); text-align: center; margin-top: -4px;">
+                        Or type the 6 digits sent to <strong id="gate-display-otp-phone" style="color: var(--accent-sky);">+91 9876543210</strong>:
+                    </p>
+                    <div class="otp-pin-container">
+                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="0">
+                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="1">
+                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="2">
+                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="3">
+                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="4">
+                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="5">
+                    </div>
+                    <div class="otp-resend-bar" style="justify-content: center; gap: 10px;">
+                        <span>Didn't receive SMS?</span>
+                        <button id="btn-gate-resend-otp" class="btn-resend-otp">Resend in <span id="gate-otp-timer-count">60</span>s</button>
+                    </div>
+                    <button id="btn-gate-verify-otp" class="export-btn-primary" style="width: 100%; padding: 12px; font-size: 13px; background: linear-gradient(135deg, #0284c7, #10b981);">
+                        Verify Account &amp; Unlock Studio &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <!-- Gate Pane 2: Single Sign-On (Google & Microsoft) -->
+            <div id="gate-pane-sso" class="gate-pane">
+                <button id="btn-gate-login-google" class="btn-sso-google" style="padding: 12px; font-size: 13px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    Continue with Google Account
+                </button>
+                <button id="btn-gate-login-microsoft" class="btn-sso-microsoft" style="padding: 12px; font-size: 13px;">
+                    <svg width="20" height="20" viewBox="0 0 21 21">
+                        <path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/>
+                    </svg>
+                    Continue with Microsoft Account
+                </button>
+            </div>
+
+            <!-- Gate Pane 3: License / Certification PIN -->
+            <div id="gate-pane-token" class="gate-pane">
+                <div class="control-group">
+                    <label class="control-label">6-Digit License / Verification PIN Token</label>
+                    <input type="text" id="gate-input-token" class="input-select" placeholder="e.g. 849201" maxlength="6">
+                </div>
+                <button id="btn-gate-verify-token" class="export-btn-primary" style="width: 100%; padding: 12px;">
+                    Verify License &amp; Unlock Studio &rarr;
+                </button>
+            </div>
+
+            <!-- Verification Success State Screen -->
+            <div id="gate-success-overlay" class="gate-success-overlay">
+                <div class="gate-success-icon">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                </div>
+                <h3 id="gate-success-title" style="font-size: 18px; font-weight: 700; color: var(--accent-emerald);">Account Verified!</h3>
+                <p id="gate-success-msg" style="font-size: 13px; color: var(--text-secondary);">Unlocking full BioShelter modeling suite and emergency telemetry...</p>
+            </div>
+
+            <!-- Guest Explorer Bypass -->
+            <div style="text-align: center; margin-top: 4px;">
+                <button id="btn-gate-guest-access" class="gate-guest-btn">
+                    Skip / Continue as Guest Engineer &rarr;
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Top Header -->
+    <header class="app-header">
+        <div class="brand-section">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.84L18 11.2V18h-2v-6H8v6H6v-6.8l6-5.36z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="brand-title">BioShelter <span>Studio</span></div>
+                <div class="brand-subtitle">Bioclimatic Engineering &amp; Disaster Resilience Network</div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <!-- Climate Zone Selector -->
+            <div class="zone-selector-wrapper">
+                <span class="zone-label">Zone:</span>
+                <select id="select-climate-zone" class="custom-select">
+                    <option value="hot_arid">Hot &amp; Arid (Desert / Dry)</option>
+                    <option value="warm_humid">Warm &amp; Humid (Tropical Coastal)</option>
+                    <option value="composite">Composite (Subtropical Semi-Arid)</option>
+                    <option value="temperate">Temperate / Highland</option>
+                    <option value="cold_mountainous">Cold &amp; Mountainous (Alpine)</option>
+                </select>
+            </div>
+
+            <!-- Diurnal Time Scrubber Bar -->
+            <div class="time-scrubber-bar">
+                <button id="btn-play-pause" class="btn-play-pause" title="Play / Pause 24-Hour Diurnal Cycle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                </button>
+                <input type="range" id="time-scrubber-slider" class="scrubber-slider" min="0" max="23" value="13" step="1">
+                <div id="time-scrubber-clock" class="scrubber-clock">13:00</div>
+            </div>
+
+            <!-- Dark / Light Theme Mode Toggle -->
+            <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Light / Dark Mode">
+                <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                    <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
+                </svg>
+                <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.3 2a10 10 0 0 0-.19 20 10.04 10.04 0 0 0 9.8-7.9 1 1 0 0 0-1.12-1.22A8 8 0 1 1 11.1 3.21a1 1 0 0 0 1.2-1.21z"/>
+                </svg>
+            </button>
+
+            <!-- Emergency SOS Panic Button in Header -->
+            <button id="btn-header-panic-sos" class="btn-panic-sos" title="Broadcast Immediate Emergency Distress Signal">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                SOS Broadcast
+            </button>
+
+            <!-- Cloud Save Model Button -->
+            <button id="btn-save-project" class="btn-sign-in-nav" style="background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.35); color: #10b981;" title="Save Shelter Model to Cloud Workspace">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                Save Model
+            </button>
+
+            <!-- Authentication User Profile Section -->
+            <div id="auth-header-section">
+                <button id="btn-open-login-modal" class="btn-sign-in-nav">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                    Sign In (Google / Microsoft / Phone)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Top Global SOS Disaster Warning Banner -->
+    <div id="top-sos-banner" class="sos-top-banner">
+        <div class="sos-banner-content">
+            <div class="sos-banner-icon">!</div>
+            <div>
+                <div id="sos-banner-title" class="sos-banner-text-title">EMERGENCY DISASTER BROADCAST IN PROGRESS</div>
+                <div id="sos-banner-desc" class="sos-banner-text-desc">Extreme environmental hazard detected. All users receive immediate SMS emergency coordinates.</div>
+            </div>
+        </div>
+        <div class="sos-banner-actions">
+            <button id="btn-sos-nearest-shelter" class="sos-btn-shelter-nav">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                Evacuate to Bunker
+            </button>
+            <button id="btn-sos-mute-siren" class="sos-btn-mute" title="Mute / Unmute Emergency Siren Audio">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                Mute Siren
+            </button>
+            <button id="btn-sos-dismiss-banner" class="sos-btn-dismiss" title="Dismiss Alert">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Panic Quick Button -->
+    <button id="btn-floating-panic" class="floating-panic-btn" title="One-Tap Instant SOS Alert">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        PANIC SOS
+    </button>
+
+    <!-- Simulated SMS Notification Push Toast -->
+    <div id="sms-toast-simulator" class="sms-toast-simulator">
+        <div class="sms-toast-header">
+            <span>SMS Emergency Net Gateway</span>
+            <span id="sms-toast-time">Just Now</span>
+        </div>
+        <div id="sms-toast-content" class="sms-toast-body">
+            Your 6-digit BioShelter verification code is <span id="sms-toast-code" class="sms-toast-code-badge">123456</span>.
+        </div>
+    </div>
+
+    <!-- Main Studio Workspace Container -->
+    <div class="app-container">
+        <!-- Left Sidebar: Architectural & Thermodynamic Parameters -->
+        <aside class="sidebar-panel">
+            <!-- 1. Regional Climate Overview -->
+            <div class="param-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z"/></svg>
+                        Regional Bioclimate
+                    </div>
+                    <span id="zone-region" class="section-badge">Desert</span>
+                </div>
+                <p id="zone-description" style="font-size: 11px; color: var(--text-secondary); line-height: 1.5;">
+                    High diurnal temperature variation (DTR > 15°C), intense direct solar radiation, very low relative humidity.
+                </p>
+            </div>
+
+            <!-- 2. Shelter Typology & Form -->
+            <div class="param-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9.3V4h-3v2.6L12 3 2 12h3v8h14v-8h3l-3-2.7z"/></svg>
+                        Shelter Typology
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Archetype Design</label>
+                    <select id="select-typology" class="input-select">
+                        <option value="wind_tower">Arid Wind-Tower (Badgir Scoop)</option>
+                        <option value="vault">Earthen Vaulted (Nubian Style)</option>
+                        <option value="stilt_vernacular">Tropical Raised-Stilt Bamboo</option>
+                        <option value="solar_trombe_wall">Alpine Solar Trombe Wall</option>
+                        <option value="gable">Standard Gable Transitional</option>
+                        <option value="flat">Compact Flat Roof</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Foundation / Plinth</label>
+                    <select id="select-foundation" class="input-select">
+                        <option value="slab">Thermal Mass Slab-on-Grade</option>
+                        <option value="stilt_elevated">Ventilated Stilt Floor (1.0m)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 3. Geometry Dimensions -->
+            <div class="param-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.991.991 0 013 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88v9z"/></svg>
+                        Spatial Geometry
+                    </div>
+                </div>
+                <div class="grid-2-cols">
+                    <div class="control-group">
+                        <label class="control-label">Length (E-W) <span id="val-length" class="control-value">6.0</span>m</label>
+                        <input type="range" id="slider-length" class="input-slider" min="3" max="12" step="0.5" value="6.0">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Width (N-S) <span id="val-width" class="control-value">4.0</span>m</label>
+                        <input type="range" id="slider-width" class="input-slider" min="2.5" max="8" step="0.5" value="4.0">
+                    </div>
+                </div>
+                <div class="grid-2-cols">
+                    <div class="control-group">
+                        <label class="control-label">Height <span id="val-height" class="control-value">3.0</span>m</label>
+                        <input type="range" id="slider-height" class="input-slider" min="2.2" max="4.5" step="0.1" value="3.0">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Pitch <span id="val-pitch" class="control-value">15</span>&deg;</label>
+                        <input type="range" id="slider-pitch" class="input-slider" min="0" max="45" step="5" value="15">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Fenestration, Shading & Ventilation -->
+            <div class="param-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                        Passive Airflow &amp; Shading
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Window-to-Wall Ratio (WWR) <span id="val-wwr" class="control-value">15</span>%</label>
+                    <input type="range" id="slider-wwr" class="input-slider" min="5" max="40" step="1" value="15">
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Overhang Depth <span id="val-overhang" class="control-value">0.6</span>m</label>
+                    <input type="range" id="slider-overhang" class="input-slider" min="0.1" max="1.5" step="0.1" value="0.6">
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Ventilation Strategy</label>
+                    <select id="select-vent-mode" class="input-select">
+                        <option value="night_purge">Night-Purge (Flush cooling 20:00-07:00)</option>
+                        <option value="continuous_cross">Continuous Cross-Ventilation</option>
+                        <option value="adaptive_diurnal">Adaptive (Open when Tout &lt; Tin)</option>
+                        <option value="comfort_vent">Comfort-Controlled Ventilation</option>
+                        <option value="minimum_airtight">Sealed Airtight Infiltration (Cold)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Occupants <span id="val-occupants" class="control-value">3</span> Persons</label>
+                    <input type="range" id="slider-occupants" class="input-slider" min="1" max="10" step="1" value="3">
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Main Viewport with Multi-Tab Interface -->
+        <main class="main-workspace">
+            <!-- Navigation Tabs Bar -->
+            <nav class="tab-nav-bar">
+                <!-- 1. DEDICATED FULL-PAGE LOGIN & IDENTITY PORTAL (FIRST PAGE) -->
+                <button class="tab-btn active" data-tab="tab-login" style="background: rgba(56, 189, 248, 0.16); color: var(--accent-sky); border: 1px solid rgba(56, 189, 248, 0.4); font-weight: 700;">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                    Sign In / Login
+                </button>
+                <button class="tab-btn" data-tab="tab-3d">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.991.991 0 013 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88v9z"/></svg>
+                    3D Digital Twin
+                </button>
+                <button class="tab-btn" data-tab="tab-diurnal">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+                    Diurnal Curves
+                </button>
+                <button class="tab-btn" data-tab="tab-weather">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z"/></svg>
+                    Weather &amp; Solar
+                </button>
+                <!-- NEW INTERACTIVE WORLD TEMPERATURE & CLIMATE MAP -->
+                <button class="tab-btn" data-tab="tab-world-map" style="color: #38bdf8;">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    World Temp Map
+                </button>
+                <button class="tab-btn" data-tab="tab-soil">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-5.33 0-8 3.2-8 7.14 0 2.36 1.4 4.54 3.8 6.55L12 20.5l4.2-4.81c2.4-2.01 3.8-4.19 3.8-6.55C20 5.2 17.33 2 12 2zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    Soil &amp; Geothermics
+                </button>
+                <button class="tab-btn" data-tab="tab-bunkers">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                    Nearby Bunkers
+                </button>
+                <!-- NEW USER DATA PAGE: Community Shelters -->
+                <button class="tab-btn" data-tab="tab-community">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                    Community Shelters
+                </button>
+                <!-- NEW USER DATA PAGE: Citizen Hazard Reports -->
+                <button class="tab-btn" data-tab="tab-hazards">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                    Citizen Hazard Reports
+                </button>
+                <!-- NEW DISASTER SOS HUB -->
+                <button class="tab-btn" data-tab="tab-sos-hub" style="color: #f87171;">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                    Disaster SOS Hub
+                </button>
+                <button class="tab-btn" data-tab="tab-psychro">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.1 0 2 .9 2 2v.26c3.96 1.07 7 4.67 7 8.99 0 5.1-4.14 9.25-9.25 9.25S2.5 18.35 2.5 13.25c0-4.32 3.04-7.92 7-8.99V4c0-1.1.9-2 2-2zm0 4.5C8.41 6.5 5.5 9.41 5.5 13s2.91 6.5 6.5 6.5 6.5-2.91 6.5-6.5-2.91-6.5-6.5-6.5z"/></svg>
+                    Psychrometric Chart
+                </button>
+                <button class="tab-btn" data-tab="tab-materials">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+                    Materials Config
+                </button>
+                <!-- NEW USER CUSTOM MATERIAL LAB -->
+                <button class="tab-btn" data-tab="tab-custom-materials">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4 8c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3z"/></svg>
+                    Custom Material Lab
+                </button>
+                <button class="tab-btn" data-tab="tab-optimizer">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    Optimizer
+                </button>
+                <button class="tab-btn" data-tab="tab-export">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Dossier &amp; Exporter
+                </button>
+            </nav>
+
+            <!-- Tab Viewport Content Panes -->
+            <div class="tab-viewport">
+                <!-- 1. Dedicated Login & User Profile Hub Tab (FIRST ACTIVE PAGE) -->
+                <div id="tab-login" class="tab-pane active">
+                    <div class="tab-content-scroll">
+                        <div id="login-page-dynamic-container">
+                            <!-- Dynamically rendered login page / profile dashboard -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 3D Digital Twin Tab -->
+                <div id="tab-3d" class="tab-pane">
+                    <div id="three-canvas-container"></div>
+
+                    <!-- Floating HUD Metrics (Top Left) -->
+                    <div class="hud-overlay-top-left">
+                        <div class="hud-card">
+                            <div class="hud-header">
+                                <span class="hud-title">Operative Comfort Temp</span>
+                                <span id="hud-adaptive-status" class="section-badge" style="background: rgba(16,185,129,0.2); color: #34d399;">COMFORTABLE</span>
+                            </div>
+                            <div style="display: flex; align-items: baseline; gap: 8px;">
+                                <span id="hud-operative-temp" class="hud-value-large">26.4°C</span>
+                                <span style="font-size: 12px; color: var(--text-muted);">T_op (Indoor + MRT)</span>
+                            </div>
+
+                            <div class="hud-grid-metrics">
+                                <div class="hud-metric-box">
+                                    <div class="hud-metric-label">Indoor Air Temp</div>
+                                    <div id="hud-indoor-temp" class="hud-metric-val">25.8°C</div>
+                                </div>
+                                <div class="hud-metric-box">
+                                    <div class="hud-metric-label">Ambient Outdoor</div>
+                                    <div id="hud-ambient-temp" class="hud-metric-val">39.2°C</div>
+                                </div>
+                                <div class="hud-metric-box">
+                                    <div class="hud-metric-label">PPD Dissatisfied</div>
+                                    <div id="hud-ppd" class="hud-metric-val">8.5%</div>
+                                </div>
+                                <div class="hud-metric-box">
+                                    <div class="hud-metric-label">Airflow Rate</div>
+                                    <div id="hud-ach" class="hud-metric-val">4.5 ACH</div>
+                                </div>
+                            </div>
+
+                            <!-- PMV Bar Gauge -->
+                            <div class="pmv-meter-container">
+                                <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                                    <span style="color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Fanger PMV: <strong id="hud-pmv-value" style="color: var(--accent-emerald);">+0.15</strong></span>
+                                    <span style="color: var(--text-muted);">ASHRAE 55 Range</span>
+                                </div>
+                                <div class="pmv-meter-track">
+                                    <div id="hud-pmv-indicator" class="pmv-indicator-needle" style="left: 52%;"></div>
+                                </div>
+                                <div class="pmv-labels-row">
+                                    <span>-3 Cold</span>
+                                    <span>0 Neutral</span>
+                                    <span>+3 Hot</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Summary Card -->
+                        <div class="hud-card" style="min-width: 200px;">
+                            <div class="hud-grid-metrics" style="margin-top: 0;">
+                                <div class="hud-metric-box">
+                                    <div class="hud-metric-label">Comfort Score</div>
+                                    <div id="hud-comfort-score" class="hud-metric-val" style="color: var(--accent-emerald);">88%</div>
+                                </div>
+                                <div class="hud-metric-box">
+                                    <div class="hud-metric-label">Thermal Damping</div>
+                                    <div id="hud-damping-ratio" class="hud-metric-val" style="color: var(--accent-sky);">68%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Heatmap Color Gradient Legend (Bottom Left) -->
+                    <div class="heatmap-legend">
+                        <div style="font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Surface Heat Flux Gradient</div>
+                        <div class="legend-bar"></div>
+                        <div class="legend-labels">
+                            <span>15°C (Cool)</span>
+                            <span>25°C</span>
+                            <span>45°C+ (Hot)</span>
+                        </div>
+                    </div>
+
+                    <!-- 3D Toolbar Controls (Bottom Right) -->
+                    <div class="viewport-toolbar">
+                        <button id="btn-toggle-heatmap" class="toolbar-btn active" title="Toggle Thermal Gradient Heatmap">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 14.93V18h-2v-1.07A4.002 4.002 0 0110 9.17V5h4v4.17a4.002 4.002 0 01-1 7.76z"/></svg>
+                        </button>
+                        <button id="btn-toggle-airflow" class="toolbar-btn active" title="Toggle Airflow Streamline Dynamics">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14.5 17c0 1.65-1.35 3-3 3s-3-1.35-3-3h2c0 .55.45 1 1 1s1-.45 1-1-1-1.5-1-1.5V9h2v6.5c0 .01 1 .84 1 1.5zM19 12c0 2.21-1.79 4-4 4s-4-1.79-4-4h2c0 1.1.9 2 2 2s2-.9 2-2-2-3-2-3V3h2v6s2 1.35 2 3z"/></svg>
+                        </button>
+                        <button id="btn-toggle-cutaway" class="toolbar-btn" title="Toggle Cutaway Roof Interior Inspection">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 14H7v-2h10v2zm0-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                        </button>
+                        <button id="btn-reset-camera" class="toolbar-btn" title="Reset Camera Viewpoint">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. 24h Diurnal Curves Tab -->
+                <div id="tab-diurnal" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="chart-container-card">
+                            <div class="chart-card-header">
+                                <div class="chart-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+                                    24-Hour Diurnal Temperature Profile &amp; Adaptive Comfort Limits (ASHRAE 55)
+                                </div>
+                            </div>
+                            <div class="chart-canvas-wrapper">
+                                <canvas id="diurnal-temp-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="grid-2-cols">
+                            <div class="chart-container-card">
+                                <div class="chart-card-header">
+                                    <div class="chart-title">Hourly Heat Flux Balance (Watts)</div>
+                                </div>
+                                <div class="chart-canvas-wrapper">
+                                    <canvas id="heat-flux-chart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="chart-container-card">
+                                <div class="chart-card-header">
+                                    <div class="chart-title">Fanger PMV Index &amp; Ventilation Rate (ACH)</div>
+                                </div>
+                                <div class="chart-canvas-wrapper">
+                                    <canvas id="pmv-ach-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Weather & Solar Intelligence Tab -->
+                <div id="tab-weather" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="weather-kpi-grid">
+                            <div class="weather-kpi-card">
+                                <span class="weather-kpi-title">Wet-Bulb Temp</span>
+                                <span id="weather-wetbulb-val" class="weather-kpi-val">22.4°C</span>
+                            </div>
+                            <div class="weather-kpi-card">
+                                <span class="weather-kpi-title">Dew-Point</span>
+                                <span id="weather-dewpoint-val" class="weather-kpi-val">14.1°C</span>
+                            </div>
+                            <div class="weather-kpi-card">
+                                <span class="weather-kpi-title">Vapor Deficit (VPD)</span>
+                                <span id="weather-vpd-val" class="weather-kpi-val">3.45 kPa</span>
+                            </div>
+                            <div class="weather-kpi-card">
+                                <span class="weather-kpi-title">Solar UV Index</span>
+                                <span id="weather-uv-val" class="weather-kpi-val" style="color: #f59e0b;">UV 9.2</span>
+                            </div>
+                            <div class="weather-kpi-card">
+                                <span class="weather-kpi-title">Air Pressure</span>
+                                <span id="weather-pressure-val" class="weather-kpi-val">98.4 kPa</span>
+                            </div>
+                            <div class="weather-kpi-card">
+                                <span class="weather-kpi-title">Eaves Wind Velocity</span>
+                                <span id="weather-wind-eaves-val" class="weather-kpi-val" style="color: var(--accent-emerald);">3.1 m/s</span>
+                            </div>
+                        </div>
+
+                        <div class="chart-container-card">
+                            <div class="chart-card-header">
+                                <div class="chart-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z"/></svg>
+                                    Solar Irradiance Decomposition: Global (GHI), Direct Normal (DNI), Diffuse (DHI)
+                                </div>
+                            </div>
+                            <div class="chart-canvas-wrapper">
+                                <canvas id="weather-solar-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: Global Climate & Surface Temperature World Map Tab -->
+                <div id="tab-world-map" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="page-header-bar">
+                            <div class="page-header-info">
+                                <h2>Interactive Global Climate &amp; Surface Temperature Map</h2>
+                                <p>Planetary thermal radar and climate anomaly monitor. Click on any city or station across the globe to inspect real-time temperature, wet-bulb metrics, and heatwave hazards, or synchronize that climate directly into the 3D shelter simulator.</p>
+                            </div>
+                            <div class="page-header-actions">
+                                <button id="btn-apply-map-climate" class="export-btn-primary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                    Apply Selected Region to Shelter Studio
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Canvas Map Card -->
+                        <div class="assembly-card" style="padding: 18px; align-items: center; background: var(--bg-card);">
+                            <canvas id="world-map-canvas" width="940" height="480" style="border-radius: 12px; max-width: 100%; height: auto; border: 1px solid var(--border-glass);"></canvas>
+                            
+                            <!-- Global Temp Scale Legend -->
+                            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; width: 100%; max-width: 900px; margin-top: 12px; font-size: 11px; color: var(--text-secondary); gap: 8px;">
+                                <span><strong>Planetary Thermal Spectrum:</strong></span>
+                                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+                                    <span style="color: #818cf8; font-weight: 600;">&le; 10°C (Alpine/Cold)</span>
+                                    <span style="color: #38bdf8; font-weight: 600;">10°C - 20°C (Cool)</span>
+                                    <span style="color: #10b981; font-weight: 600;">20°C - 30°C (Comfort)</span>
+                                    <span style="color: #f59e0b; font-weight: 600;">30°C - 38°C (Warm)</span>
+                                    <span style="color: #f97316; font-weight: 600;">38°C - 45°C (Extreme)</span>
+                                    <span style="color: #ef4444; font-weight: 700;">&gt; 45°C+ (Catastrophic Heatwave)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Regional Stations Grid Table -->
+                        <div class="comparison-container">
+                            <div class="chart-title">Global Weather Stations &amp; Bioclimatic Telemetry Grid</div>
+                            <div id="world-stations-table-container"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Soil Physics & Geothermics Tab (Fixed slider & elements) -->
+                <div id="tab-soil" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="soil-overview-grid">
+                            <!-- Soil Selector & Properties Card -->
+                            <div class="soil-props-card">
+                                <div class="chart-title">Geotechnical Soil Profile &amp; Diffusivity</div>
+                                <div class="control-group">
+                                    <label class="control-label">Regional Soil Classification</label>
+                                    <select id="select-soil-type" class="input-select">
+                                        <option value="desert_sand">Desert Dune Sand (Coarse &amp; Dry)</option>
+                                        <option value="black_cotton_clay">Black Cotton Soil (Expansive Clay)</option>
+                                        <option value="alluvial_loam">Alluvial Loam (Agricultural Plain)</option>
+                                        <option value="laterite_red_soil">Laterite &amp; Hard Red Bedrock</option>
+                                        <option value="alpine_permafrost_scree">Alpine Scree &amp; Permafrost Subsoil</option>
+                                    </select>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Earth Berming Depth: <span id="val-soil-depth" class="control-value">3.0</span>m</label>
+                                    <input type="range" id="slider-soil-depth" class="input-slider" min="0.5" max="6.0" step="0.5" value="3.0">
+                                </div>
+
+                                <div class="soil-metrics-grid">
+                                    <div class="soil-metric-box">
+                                        <span class="hud-metric-label">Thermal Conductivity (k)</span>
+                                        <span id="soil-k-val" class="hud-metric-val" style="color: var(--accent-sky);">0.35 W/m·K</span>
+                                    </div>
+                                    <div class="soil-metric-box">
+                                        <span class="hud-metric-label">Thermal Diffusivity (α)</span>
+                                        <span id="soil-diffusivity-val" class="hud-metric-val" style="color: var(--accent-emerald);">0.022 m²/day</span>
+                                    </div>
+                                    <div class="soil-metric-box">
+                                        <span class="hud-metric-label">Moisture Content</span>
+                                        <span id="soil-moisture-val" class="hud-metric-val">3%</span>
+                                    </div>
+                                    <div class="soil-metric-box">
+                                        <span class="hud-metric-label">Safe Bearing Capacity</span>
+                                        <span id="soil-bearing-val" class="hud-metric-val">200 kN/m²</span>
+                                    </div>
+                                </div>
+
+                                <div class="suitability-callout">
+                                    <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Earthen Construction Suitability:</div>
+                                    <div id="soil-suitability-text">Optimal compaction for Earthbag / Superadobe and rammed earth with local clay-silt stabilizer.</div>
+                                </div>
+                            </div>
+
+                            <!-- Earth Berming & Geothermal Benefits Card -->
+                            <div class="soil-props-card">
+                                <div class="chart-title">Subsurface Geothermal Passive Cooling</div>
+                                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                                    Earth-sheltering dampens extreme surface temperature swings using soil volumetric heat capacity. At 3.0m depth, ground temperature remains stable year-round without mechanical power.
+                                </p>
+                                <div class="hud-metric-box" style="padding: 14px; background: rgba(16,185,129,0.05); border-color: rgba(16,185,129,0.2);">
+                                    <div class="hud-metric-label">Steady Geothermal Temperature</div>
+                                    <div id="soil-geothermal-benefit" class="hud-value-large" style="color: var(--accent-emerald); font-size: 22px; margin-top: 4px;">23.5°C (ΔT = 16.0°C cooling)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kusuda Subsurface Temperature Attenuation Chart -->
+                        <div class="chart-container-card">
+                            <div class="chart-card-header">
+                                <div class="chart-title">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-5.33 0-8 3.2-8 7.14 0 2.36 1.4 4.54 3.8 6.55L12 20.5l4.2-4.81c2.4-2.01 3.8-4.19 3.8-6.55C20 5.2 17.33 2 12 2z"/></svg>
+                                    Annual Ground Temperature vs. Depth Attenuation (Kusuda Formulation: z = 0m, 1m, 2m, 3m, 5m)
+                                </div>
+                            </div>
+                            <div class="chart-canvas-wrapper">
+                                <canvas id="soil-depth-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Nearby Bunkers Tab -->
+                <div id="tab-bunkers" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h2 style="font-size: 17px; font-weight: 700; color: var(--text-primary);">Nearby Emergency Bunkers &amp; Subterranean Refuges</h2>
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Geolocated catalog of earth-covered blast shelters, cyclone safe-havens, and geothermal life-support facilities.</p>
+                            </div>
+                            <span id="bunker-count-badge" class="section-badge" style="padding: 6px 14px; font-size: 12px;">Verified Facilities</span>
+                        </div>
+
+                        <div id="bunkers-list-container" class="bunkers-container"></div>
+                    </div>
+                </div>
+
+                <!-- 6. NEW: Community Shelters Registry (User Data Entry Page) -->
+                <div id="tab-community" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="page-header-bar">
+                            <div class="page-header-info">
+                                <h2>Community Shelter &amp; Refuge Registry</h2>
+                                <p>Public repository of user-submitted bioclimatic shelters, emergency earthbag pods, and community cooling hubs.</p>
+                            </div>
+                            <div class="page-header-actions">
+                                <div class="search-input-wrapper">
+                                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                                    <input type="text" id="input-search-community" placeholder="Search shelters, regions...">
+                                </div>
+                                <button id="btn-open-submit-shelter-modal" class="btn-primary-action">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                    Register New Shelter
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="community-shelters-list" class="community-grid"></div>
+                    </div>
+                </div>
+
+                <!-- 7. NEW: Citizen Hazard Reports (User Disaster Submissions) -->
+                <div id="tab-hazards" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="page-header-bar">
+                            <div class="page-header-info">
+                                <h2>Citizen Disaster &amp; Hazard Incident Live Feed</h2>
+                                <p>Crowdsourced real-time reports of extreme heatwaves, flood inundation, wildfire fronts, and structural hazards.</p>
+                            </div>
+                            <div class="page-header-actions">
+                                <button id="btn-open-report-hazard-modal" class="btn-panic-sos" style="animation: none;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                                    Report Active Hazard
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="hazard-reports-feed" class="hazard-feed-grid"></div>
+                    </div>
+                </div>
+
+                <!-- 8. NEW: Emergency Disaster SOS Broadcast Hub -->
+                <div id="tab-sos-hub" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="page-header-bar">
+                            <div class="page-header-info">
+                                <h2>Disaster Broadcast &amp; Alert Dispatch Center</h2>
+                                <p>Simulate regional climate catastrophes and broadcast automated SMS/Push evacuation orders to all registered citizen phone numbers.</p>
+                            </div>
+                            <div class="page-header-actions">
+                                <button id="btn-panic-hub-trigger" class="btn-panic-sos">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                                    SEND IMMEDIATE GLOBAL SOS
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="sos-deck-grid">
+                            <!-- Left: Disaster Scenarios Trigger Deck -->
+                            <div class="sos-trigger-card">
+                                <div class="chart-title">Trigger Regional Disaster Simulation</div>
+                                <p style="font-size: 12px; color: var(--text-secondary);">Select a high-threat climate event to test siren telemetry and multi-channel SMS delivery:</p>
+
+                                <div class="sos-scenario-select">
+                                    <button class="scenario-btn" data-scenario="heatwave_critical">
+                                        <div>
+                                            <div class="scenario-title" style="color: #f87171;">Catastrophic Heatwave (50°C+)</div>
+                                            <div class="scenario-sub">Wet-Bulb limit breach &bull; Directs users to Subterranean Bunkers</div>
+                                        </div>
+                                        <span class="section-badge" style="background: rgba(239,68,68,0.2); color: #f87171;">CRITICAL</span>
+                                    </button>
+
+                                    <button class="scenario-btn" data-scenario="cyclone_surge">
+                                        <div>
+                                            <div class="scenario-title" style="color: #38bdf8;">Category 5 Cyclone &amp; Flood Surge</div>
+                                            <div class="scenario-sub">3.2m Tidal Surge &bull; Evacuates users to Elevated Stilt Sanctuaries</div>
+                                        </div>
+                                        <span class="section-badge" style="background: rgba(56,189,248,0.2); color: #38bdf8;">FLOOD</span>
+                                    </button>
+
+                                    <button class="scenario-btn" data-scenario="wildfire_incursion">
+                                        <div>
+                                            <div class="scenario-title" style="color: #fbbf24;">Wildfire Front &amp; Toxic Ash</div>
+                                            <div class="scenario-sub">High PM2.5 &bull; Deploys Earthbag Firewalls &amp; Evacuation Vectors</div>
+                                        </div>
+                                        <span class="section-badge" style="background: rgba(245,158,11,0.2); color: #fbbf24;">WILDFIRE</span>
+                                    </button>
+
+                                    <button class="scenario-btn" data-scenario="sandstorm_haboob">
+                                        <div>
+                                            <div class="scenario-title" style="color: #a855f7;">Haboob Sandstorm &amp; Grid Failure</div>
+                                            <div class="scenario-sub">Zero visibility &bull; Initiates geothermal airtight life-support</div>
+                                        </div>
+                                        <span class="section-badge" style="background: rgba(168,85,247,0.2); color: #a855f7;">SANDSTORM</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Right: Live SMS Broadcast Dispatch Log -->
+                            <div class="dispatch-log-card">
+                                <div class="chart-title">Real-Time SMS / Broadcast Dispatch Feed</div>
+                                <div id="sos-dispatch-feed" class="dispatch-feed">
+                                    <div style="text-align: center; color: var(--text-muted); padding: 30px; font-size: 12px;">
+                                        No active broadcast dispatches yet. Trigger a disaster scenario or Panic SOS to test live SMS broadcasts.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. Psychrometric Bioclimatic Chart Tab -->
+                <div id="tab-psychro" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="psychro-container-card">
+                            <canvas id="psychro-canvas" width="880" height="460"></canvas>
+                            <p style="font-size: 12px; color: var(--text-secondary); text-align: center; max-width: 800px; line-height: 1.5;">
+                                The Givoni Bioclimatic Chart plots the 24-hour diurnal state loop against natural bioclimatic strategy zones: 
+                                <strong style="color: #10b981;">Comfort Zone</strong>, 
+                                <strong style="color: #38bdf8;">Natural Ventilation</strong>, 
+                                <strong style="color: #f59e0b;">Thermal Mass &amp; Night Flush</strong>, 
+                                <strong style="color: #a855f7;">Evaporative Cooling</strong>, and 
+                                <strong style="color: #ef4444;">Passive Solar Heating</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10. Envelope Materials Tab -->
+                <div id="tab-materials" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="assembly-grid">
+                            <!-- Exterior Walls Configurator -->
+                            <div class="assembly-card">
+                                <div class="chart-card-header">
+                                    <div class="chart-title">Exterior Wall Assembly Multi-Layer Builder</div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Load Regional Wall Preset</label>
+                                    <select id="select-wall-preset" class="input-select">
+                                        <option value="rammed_earth_300">Rammed Earth Wall (300mm Monolithic)</option>
+                                        <option value="cseb_interlocking_230">CSEB Interlocking Earth Brick (230mm)</option>
+                                        <option value="bamboo_mud_infill">Bamboo Lattice + Mud/Lime Plaster (75mm)</option>
+                                        <option value="aac_block_200">AAC Block Wall + Lime Render (200mm)</option>
+                                        <option value="stone_straw_insul_350">High-Altitude Stone Wall + Straw (350mm)</option>
+                                        <option value="cgi_uninsulated">Bare CGI Metal Sheet (Emergency Baseline)</option>
+                                        <option value="puf_panel_50">PUF Insulated Panel (50mm Modular)</option>
+                                    </select>
+                                </div>
+
+                                <div class="physics-summary-box">
+                                    <div>
+                                        <div class="hud-metric-label">U-Value</div>
+                                        <div id="wall-u-val" class="hud-metric-val" style="color: var(--accent-sky); font-size: 13px;">0.85 W/m²·K</div>
+                                    </div>
+                                    <div style="grid-column: span 3;">
+                                        <div class="hud-metric-label">Thermal Time Lag (φ) &amp; Damping (f)</div>
+                                        <div id="wall-lag-val" class="hud-metric-val" style="color: var(--accent-emerald); font-size: 13px;">8.5 hrs (f = 0.28)</div>
+                                    </div>
+                                </div>
+
+                                <div id="wall-layers-list" class="layer-list"></div>
+                            </div>
+
+                            <!-- Roof Assembly Configurator -->
+                            <div class="assembly-card">
+                                <div class="chart-card-header">
+                                    <div class="chart-title">Roof Envelope Assembly Multi-Layer Builder</div>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label">Load Regional Roof Preset</label>
+                                    <select id="select-roof-preset" class="input-select">
+                                        <option value="vaulted_earth_terracotta">Vaulted CSEB Roof + White Lime Coating</option>
+                                        <option value="thatched_high_pitch">Thick Thatch on Bamboo Frame (150mm)</option>
+                                        <option value="double_skin_vented">Double-Skin Naturally Vented Roof (CGI + Cavity + Wood Fiber)</option>
+                                        <option value="cgi_bare_roof">Bare CGI Roof Sheet (Emergency Disaster Baseline)</option>
+                                        <option value="insulated_compact_flat">Heavily Insulated Flat Roof (Alpine Style)</option>
+                                        <option value="puf_roof_50">PUF Insulated Roof Panel (50mm)</option>
+                                    </select>
+                                </div>
+
+                                <div class="physics-summary-box">
+                                    <div>
+                                        <div class="hud-metric-label">U-Value</div>
+                                        <div id="roof-u-val" class="hud-metric-val" style="color: var(--accent-sky); font-size: 13px;">0.45 W/m²·K</div>
+                                    </div>
+                                    <div style="grid-column: span 3;">
+                                        <div class="hud-metric-label">Thermal Time Lag (φ) &amp; Damping (f)</div>
+                                        <div id="roof-lag-val" class="hud-metric-val" style="color: var(--accent-emerald); font-size: 13px;">5.2 hrs (f = 0.35)</div>
+                                    </div>
+                                </div>
+
+                                <div id="roof-layers-list" class="layer-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 11. NEW: Custom Material Lab (User Material Form & Calculator) -->
+                <div id="tab-custom-materials" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="page-header-bar">
+                            <div class="page-header-info">
+                                <h2>Custom Biophysical Material Lab</h2>
+                                <p>Design custom indigenous composites, calculate thermophysical properties, and add them to your shelter assemblies.</p>
+                            </div>
+                        </div>
+
+                        <div class="material-lab-grid">
+                            <div class="assembly-card">
+                                <div class="chart-title">Define Custom Thermal Material</div>
+                                <form id="form-custom-material" style="display: flex; flex-direction: column; gap: 12px;">
+                                    <div class="control-group">
+                                        <label class="control-label">Material Name</label>
+                                        <input type="text" id="mat-name" class="input-select" placeholder="e.g. Hemp-Lime Monolithic Infill" required>
+                                    </div>
+                                    <div class="grid-2-cols">
+                                        <div class="control-group">
+                                            <label class="control-label">Conductivity (k) [W/m·K]</label>
+                                            <input type="number" id="mat-k" class="input-select" step="0.01" min="0.01" max="5.0" value="0.08" required>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Density (ρ) [kg/m³]</label>
+                                            <input type="number" id="mat-rho" class="input-select" step="10" min="10" max="3000" value="380" required>
+                                        </div>
+                                    </div>
+                                    <div class="grid-2-cols">
+                                        <div class="control-group">
+                                            <label class="control-label">Specific Heat (cp) [J/kg·K]</label>
+                                            <input type="number" id="mat-cp" class="input-select" step="50" min="100" max="4000" value="1600" required>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Embodied Carbon (kg CO₂/m³)</label>
+                                            <input type="number" id="mat-carbon" class="input-select" step="5" min="-500" max="2000" value="-120">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="export-btn-primary" style="margin-top: 8px;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                        Save to Custom Material Library
+                                    </button>
+                                </form>
+                            </div>
+
+                            <div class="assembly-card">
+                                <div class="chart-title">Saved Custom Materials Library</div>
+                                <div id="custom-materials-list" class="layer-list">
+                                    <div style="text-align: center; color: var(--text-muted); padding: 20px; font-size: 12px;">
+                                        No custom materials created yet. Use the form on the left to add your first material!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 12. Bioclimatic Passive Optimizer Tab -->
+                <div id="tab-optimizer" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h2 style="font-size: 17px; font-weight: 700; color: var(--text-primary);">Bioclimatic Diagnostic Engine &amp; Passive Retrofit Recommender</h2>
+                                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Identifies thermodynamic bottlenecks in your shelter design and synthesizes area-specific passive architecture interventions.</p>
+                            </div>
+                            <button id="btn-apply-optimizations" class="export-btn-primary">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                Apply All Passive Interventions
+                            </button>
+                        </div>
+
+                        <!-- Prioritized Diagnostic Cards -->
+                        <div id="optimizer-recommendations-list" class="optimizer-grid"></div>
+
+                        <!-- Side-by-Side Comparison Matrix -->
+                        <div class="comparison-container">
+                            <h3 style="font-size: 14px; font-weight: 700; color: var(--text-primary);">Comparative Performance Matrix: Baseline vs. Optimized Shelter</h3>
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>Metric Indicator</th>
+                                        <th>Baseline Shelter</th>
+                                        <th>Optimized Shelter</th>
+                                        <th>Performance Delta (&Delta;)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comparison-table-body"></tbody>
+                            </table>
+                            <div class="chart-canvas-wrapper" style="height: 240px; margin-top: 10px;">
+                                <canvas id="comparison-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 13. Engineering Dossier & Exporter Tab -->
+                <div id="tab-export" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="export-grid">
+                            <!-- Report Generator Card -->
+                            <div class="export-card">
+                                <div class="chart-title">Comprehensive Printable Engineering Dossier</div>
+                                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                                    Generates a complete, formal technical report conforming to ASHRAE 55 and ISO 7730 standards, complete with climate tables, envelope thermophysical schedules, transient differential equations, and PMV distribution.
+                                </p>
+                                <button id="btn-open-report" class="export-btn-primary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+                                    Generate &amp; Print Dossier (PDF)
+                                </button>
+                                <button id="btn-export-bim" class="export-btn-secondary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                    Export CAD / BIM JSON Model
+                                </button>
+                            </div>
+
+                            <!-- Python Simulation Script Card -->
+                            <div class="export-card">
+                                <div class="chart-title">Standalone Python Numerical Simulation Code</div>
+                                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                                    Download or copy an executable, zero-dependency Python numerical simulation script modeling the dynamic transient energy balance for external academic or research validation.
+                                </p>
+                                <div style="display: flex; gap: 10px;">
+                                    <button id="btn-download-python" class="export-btn-primary" style="flex: 1;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                        Download .py Script
+                                    </button>
+                                    <button id="btn-copy-python" class="export-btn-secondary">Copy Code</button>
+                                </div>
+                                <pre id="python-code-preview" class="code-preview-block"># Generating Python code...</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==========================================================================
+         MODALS: Multi-Auth Gateway, Phone OTP, Community Shelter, Hazard Report
+         ========================================================================== -->
+
+    <!-- Modal 1: Multi-Provider Authentication Gateway (Google, Microsoft, Phone OTP, Verify) -->
+    <div id="login-modal" class="modal-backdrop">
+        <div class="modal-card">
+            <button id="btn-close-login-modal" class="modal-close-btn" title="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+            <div style="text-align: center;">
+                <div class="brand-logo" style="width: 44px; height: 44px; margin: 0 auto 8px;">
+                    <svg viewBox="0 0 24 24" style="width: 26px; height: 26px;"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.84L18 11.2V18h-2v-6H8v6H6v-6.8l6-5.36z"/></svg>
+                </div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary);">BioShelter Identity Gateway</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">Sign in to save certified models and receive disaster SOS alerts.</p>
+            </div>
+
+            <!-- Auth Mode Tabs -->
+            <div class="auth-nav-tabs">
+                <button class="auth-tab-btn active" data-auth-pane="pane-phone">Mobile Phone OTP</button>
+                <button class="auth-tab-btn" data-auth-pane="pane-sso">Google &amp; Microsoft</button>
+                <button class="auth-tab-btn" data-auth-pane="pane-verify">Verify Code</button>
+                <button class="auth-tab-btn" data-auth-pane="pane-guest">Guest Mode</button>
+            </div>
+
+            <!-- Pane A: Phone OTP Login & Verification -->
+            <div id="pane-phone" class="auth-pane active">
+                <div id="phone-step-1">
+                    <p style="font-size: 12px; color: var(--text-secondary);">Enter your mobile number to receive a 6-digit verification code &amp; register for SOS emergency broadcasts:</p>
+                    <div class="phone-input-row" style="margin-top: 8px;">
+                        <select id="phone-country-code" class="phone-country-code">
+                            <option value="+1">🇺🇸 +1 (US/CA)</option>
+                            <option value="+91" selected>🇮🇳 +91 (IN)</option>
+                            <option value="+44">🇬🇧 +44 (UK)</option>
+                            <option value="+971">🇦🇪 +971 (UAE)</option>
+                            <option value="+49">🇩🇪 +49 (DE)</option>
+                            <option value="+81">🇯🇵 +81 (JP)</option>
+                            <option value="+61">🇦🇺 +61 (AU)</option>
+                        </select>
+                        <input type="tel" id="input-phone-number" class="phone-number-input" placeholder="98765 43210">
+                    </div>
+                    <div class="control-group" style="margin-top: 10px;">
+                        <label class="control-label">Your Full Name</label>
+                        <input type="text" id="input-phone-name" class="input-select" placeholder="e.g. Alex Henderson">
+                    </div>
+                    <button id="btn-send-otp" class="export-btn-primary" style="margin-top: 12px;">
+                        Send 6-Digit Verification SMS
+                    </button>
+                </div>
+
+                <div id="phone-step-2" style="display: none;">
+                    <p style="font-size: 12px; color: var(--text-secondary);">Enter the 6-digit code sent to <strong id="display-otp-phone" style="color: var(--accent-sky);">+91 9876543210</strong>:</p>
+                    <div class="otp-pin-container">
+                        <input type="text" maxlength="1" class="otp-pin-digit" data-idx="0">
+                        <input type="text" maxlength="1" class="otp-pin-digit" data-idx="1">
+                        <input type="text" maxlength="1" class="otp-pin-digit" data-idx="2">
+                        <input type="text" maxlength="1" class="otp-pin-digit" data-idx="3">
+                        <input type="text" maxlength="1" class="otp-pin-digit" data-idx="4">
+                        <input type="text" maxlength="1" class="otp-pin-digit" data-idx="5">
+                    </div>
+                    <div class="otp-resend-bar">
+                        <span>Didn't receive SMS?</span>
+                        <button id="btn-resend-otp" class="btn-resend-otp">Resend in <span id="otp-timer-count">60</span>s</button>
+                    </div>
+                    <button id="btn-verify-otp" class="export-btn-primary" style="margin-top: 10px;">
+                        Verify &amp; Activate Account
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pane B: Google & Microsoft Single Sign-On -->
+            <div id="pane-sso" class="auth-pane">
+                <button id="btn-login-google" class="btn-sso-google">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    Sign in with Google Account
+                </button>
+
+                <button id="btn-login-microsoft" class="btn-sso-microsoft">
+                    <svg width="18" height="18" viewBox="0 0 21 21">
+                        <path fill="#f25022" d="M1 1h9v9H1z"/>
+                        <path fill="#00a4ef" d="M1 11h9v9H1z"/>
+                        <path fill="#7fba00" d="M11 1h9v9h-9z"/>
+                        <path fill="#ffb900" d="M11 11h9v9h-9z"/>
+                    </svg>
+                    Sign in with Microsoft Account
+                </button>
+            </div>
+
+            <!-- Pane C: Account Verification Code Entry -->
+            <div id="pane-verify" class="auth-pane">
+                <p style="font-size: 12px; color: var(--text-secondary);">Enter your institutional account certification or license verification token:</p>
+                <div class="control-group">
+                    <label class="control-label">6-Digit Verification Token</label>
+                    <input type="text" id="input-account-token" class="input-select" placeholder="e.g. 784921" maxlength="6">
+                </div>
+                <button id="btn-verify-account-token" class="export-btn-primary" style="margin-top: 6px;">
+                    Validate Certification Token
+                </button>
+            </div>
+
+            <!-- Pane D: Guest Explorer Access -->
+            <div id="pane-guest" class="auth-pane">
+                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                    Explore all 3D digital twins, psychrometric curves, world climate maps, soil geothermics, and simulation tools immediately with a temporary guest engineer session.
+                </p>
+                <button id="btn-guest-login-modal" class="export-btn-primary" style="margin-top: 10px; width: 100%; justify-content: center; background: linear-gradient(135deg, #475569, #0284c7);">
+                    ⚡ Continue as Guest Engineer &rarr;
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Submit New Community Shelter Modal -->
+    <div id="submit-shelter-modal" class="modal-backdrop">
+        <div class="modal-card" style="max-width: 520px;">
+            <button id="btn-close-shelter-modal" class="modal-close-btn" title="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary);">Register New Community Shelter</h3>
+            <form id="form-submit-shelter" style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="control-group">
+                    <label class="control-label">Shelter Name</label>
+                    <input type="text" id="new-shelter-name" class="input-select" placeholder="e.g. Thar Desert Earthbag Sanctuary" required>
+                </div>
+                <div class="grid-2-cols">
+                    <div class="control-group">
+                        <label class="control-label">Climate Zone</label>
+                        <select id="new-shelter-zone" class="input-select">
+                            <option value="hot_arid">Hot &amp; Arid</option>
+                            <option value="warm_humid">Warm &amp; Humid</option>
+                            <option value="composite">Composite</option>
+                            <option value="temperate">Temperate</option>
+                            <option value="cold_mountainous">Cold &amp; Mountainous</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Typology</label>
+                        <select id="new-shelter-typology" class="input-select">
+                            <option value="wind_tower">Arid Wind-Tower</option>
+                            <option value="vault">Earthen Vault</option>
+                            <option value="stilt_vernacular">Raised-Stilt Bamboo</option>
+                            <option value="solar_trombe_wall">Solar Trombe Wall</option>
+                            <option value="gable">Gable Transitional</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-2-cols">
+                    <div class="control-group">
+                        <label class="control-label">Location / Region</label>
+                        <input type="text" id="new-shelter-location" class="input-select" placeholder="Sector 7, Rajasthan" required>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Capacity (Persons)</label>
+                        <input type="number" id="new-shelter-capacity" class="input-select" value="40" min="1" max="500">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Wall &amp; Roof Materials</label>
+                    <input type="text" id="new-shelter-materials" class="input-select" placeholder="Rammed Earth 300mm + Vaulted Brick" required>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Emergency Contact Phone</label>
+                    <input type="tel" id="new-shelter-phone" class="input-select" placeholder="+91 98765-43210" required>
+                </div>
+                <button type="submit" class="export-btn-primary" style="margin-top: 8px;">
+                    Submit &amp; Publish Shelter
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 3: Report Disaster Hazard Incident Modal -->
+    <div id="report-hazard-modal" class="modal-backdrop">
+        <div class="modal-card">
+            <button id="btn-close-hazard-modal" class="modal-close-btn" title="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+            <h3 style="font-size: 18px; font-weight: 700; color: #f87171;">Report Active Disaster Hazard</h3>
+            <form id="form-report-hazard" style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="control-group">
+                    <label class="control-label">Hazard Headline</label>
+                    <input type="text" id="hazard-input-title" class="input-select" placeholder="e.g. Extreme 49°C Heatwave Inundation" required>
+                </div>
+                <div class="grid-2-cols">
+                    <div class="control-group">
+                        <label class="control-label">Hazard Type</label>
+                        <select id="hazard-input-type" class="input-select">
+                            <option value="extreme_heatwave">Extreme Heatwave</option>
+                            <option value="flash_flood">Flash Flood / Cyclone Surge</option>
+                            <option value="wildfire">Wildfire Encroachment</option>
+                            <option value="sandstorm">Severe Haboob Sandstorm</option>
+                            <option value="structural_collapse">Structural / Seismic Collapse</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Severity Level</label>
+                        <select id="hazard-input-severity" class="input-select">
+                            <option value="critical">Critical Emergency</option>
+                            <option value="high">High Warning</option>
+                            <option value="moderate">Moderate Advisory</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Location / Coordinates</label>
+                    <input type="text" id="hazard-input-location" class="input-select" placeholder="Sector 4 Arid Basin (26.91° N, 70.90° E)" required>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Detailed Observation &amp; Affected People</label>
+                    <textarea id="hazard-input-desc" class="input-select" rows="3" placeholder="Describe temperature, wind, structural damages or evacuation requirements..." required></textarea>
+                </div>
+                <button type="submit" class="btn-panic-sos" style="animation: none; justify-content: center; width: 100%; padding: 10px;">
+                    Broadcast Hazard to Community
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL 4: GOOGLE ACCOUNT LOGIN & OAUTH CHOOSER PAGE
+         ========================================================================== -->
+    <div id="google-auth-modal" class="modal-backdrop">
+        <div class="modal-card" style="max-width: 440px; padding: 28px; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-glow); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+            <button id="btn-close-google-modal" class="modal-close-btn" title="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+            
+            <div style="text-align: center; margin-bottom: 20px;">
+                <svg width="36" height="36" viewBox="0 0 24 24" style="margin-bottom: 8px;">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">Sign in with Google</h3>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Choose an account to continue to <strong>BioShelter Studio</strong></p>
+            </div>
+
+            <!-- List of Clickable Google Profiles -->
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                <button class="google-account-item" data-google-email="sarah.lin.climate@gmail.com" data-google-name="Dr. Sarah Lin" data-google-role="Lead Thermal Physicist">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="Sarah" class="google-acc-avatar">
+                    <div style="text-align: left; flex: 1;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Dr. Sarah Lin</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">sarah.lin.climate@gmail.com</div>
+                    </div>
+                    <span class="section-badge" style="font-size: 10px;">Physicist</span>
+                </button>
+
+                <button class="google-account-item" data-google-email="alex.henderson.eng@gmail.com" data-google-name="Alex Henderson" data-google-role="Senior Structural &amp; Plinth Specialist">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&auto=format&fit=crop&q=80" alt="Alex" class="google-acc-avatar">
+                    <div style="text-align: left; flex: 1;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Alex Henderson</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">alex.henderson.eng@gmail.com</div>
+                    </div>
+                    <span class="section-badge" style="font-size: 10px;">Engineer</span>
+                </button>
+
+                <button class="google-account-item" data-google-email="priya.sen.relief@gmail.com" data-google-name="Ar. Priya Sen" data-google-role="Disaster Relief Architect">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&auto=format&fit=crop&q=80" alt="Priya" class="google-acc-avatar">
+                    <div style="text-align: left; flex: 1;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Ar. Priya Sen</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">priya.sen.relief@gmail.com</div>
+                    </div>
+                    <span class="section-badge" style="font-size: 10px;">Architect</span>
+                </button>
+            </div>
+
+            <!-- Custom Google Email Login Form -->
+            <div style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">Or use another Google account:</div>
+                <form id="form-custom-google-login" style="display: flex; flex-direction: column; gap: 8px;">
+                    <input type="email" id="custom-google-email" class="input-select" placeholder="Enter your Google email (e.g. name@gmail.com)" required>
+                    <input type="text" id="custom-google-name" class="input-select" placeholder="Your Full Name (optional)">
+                    <button type="submit" class="export-btn-primary" style="background: #1a73e8; justify-content: center;">
+                        Continue with Custom Google Account &rarr;
+                    </button>
+                </form>
+            </div>
+
+            <div style="margin-top: 14px; font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.4;">
+                To continue, Google will share your name, email address, and profile picture with BioShelter Studio. See BioShelter's Privacy Policy and Terms of Service.
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script Entry Point -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
