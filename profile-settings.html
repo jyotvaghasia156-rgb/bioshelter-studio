@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Details &amp; Account Settings &bull; BioShelter Studio</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- App Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Top Global Header -->
+    <header class="app-header">
+        <div class="brand-section">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+            </div>
+            <div>
+                <h1 class="brand-title">BioShelter Studio</h1>
+                <div class="brand-subtitle">Profile Details &amp; Engineering Settings</div>
+            </div>
+        </div>
+
+        <!-- Global Header Nav Links -->
+        <nav class="header-nav-links">
+            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
+            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
+            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
+            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
+            <a href="nearby-bunkers.html" class="nav-link-btn">🛡️ Nearby Bunkers</a>
+            <a href="weather-solar.html" class="nav-link-btn">☀️ Weather &amp; Solar</a>
+            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
+            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
+            <a href="bioclimatic-optimizer.html" class="nav-link-btn">⚡ Optimizer</a>
+            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
+            <a href="custom-materials.html" class="nav-link-btn">🧬 Custom Materials</a>
+            <a href="community.html" class="nav-link-btn">🤝 Community</a>
+            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
+            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
+            <a href="profile-settings.html" class="nav-link-btn active">👤 Profile Settings</a>
+            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
+        </nav>
+
+        <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
+            <!-- Dark / Light Theme Toggle -->
+            <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Light / Dark Mode">
+                <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                    <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
+                </svg>
+                <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.3 2a10 10 0 0 0-.19 20 10.04 10.04 0 0 0 9.8-7.9 1 1 0 0 0-1.12-1.22A8 8 0 1 1 11.1 3.21a1 1 0 0 0 1.2-1.21z"/>
+                </svg>
+            </button>
+
+            <a href="index.html" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                <span>Open 3D Studio &rarr;</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-container" style="padding: 24px; max-width: 1400px; margin: 0 auto;">
+        <!-- Top Profile Banner & Avatar Hero -->
+        <div class="assembly-card" style="padding: 24px; margin-bottom: 24px; background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(2,132,199,0.15)); border: 1px solid var(--border-glow);">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
+                <div style="display: flex; align-items: center; gap: 18px;">
+                    <!-- Avatar Badge -->
+                    <div id="profile-avatar-circle" style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #10b981); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 900; color: white; box-shadow: 0 0 25px rgba(56,189,248,0.4); border: 3px solid rgba(255,255,255,0.2);">
+                        SL
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <h2 id="profile-hero-name" style="font-size: 22px; font-weight: 800; color: var(--text-primary);">Dr. Sarah Lin, PhD</h2>
+                            <span id="profile-hero-role" class="section-badge" style="background: rgba(16,185,129,0.2); color: #10b981; font-weight: 800;">
+                                Bioclimatic Architect
+                            </span>
+                        </div>
+                        <div id="profile-hero-email" style="font-size: 13px; color: var(--accent-sky); margin-top: 2px;">sarah.lin@gmail.com</div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; font-family: 'JetBrains Mono';">
+                            Member ID: <span id="profile-hero-id" style="color: var(--text-secondary);">usr_lead_architect_01</span> &bull; Status: <span style="color: #10b981;">● Active Verified Engineer</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button id="btn-save-profile-top" class="export-btn-primary" style="padding: 10px 20px; font-size: 13px; background: linear-gradient(135deg, #0284c7, #10b981); cursor: pointer;">
+                        💾 Save Profile Settings
+                    </button>
+                    <a href="login.html" class="btn-resend-otp" style="text-decoration: none; padding: 10px 16px; font-size: 12px; font-weight: 700;">
+                        🔄 Switch Account
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3-Column Settings Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; margin-bottom: 24px;">
+            
+            <!-- Column 1: Personal & Organization Details -->
+            <div class="assembly-card" style="padding: 20px;">
+                <div class="chart-title" style="display: flex; align-items: center; gap: 8px;">
+                    <span>👤 Personal Information &amp; Affiliation</span>
+                </div>
+                
+                <form id="form-personal-details" style="display: flex; flex-direction: column; gap: 14px; margin-top: 12px;">
+                    <div>
+                        <label class="control-label">Full Display Name</label>
+                        <input type="text" id="input-prof-name" class="input-text" value="Dr. Sarah Lin, PhD" required style="width: 100%; margin-top: 4px;">
+                    </div>
+
+                    <div>
+                        <label class="control-label">Primary Email Address</label>
+                        <input type="email" id="input-prof-email" class="input-text" value="sarah.lin@gmail.com" required style="width: 100%; margin-top: 4px;">
+                    </div>
+
+                    <div>
+                        <label class="control-label">Emergency SMS Mobile Contact</label>
+                        <input type="tel" id="input-prof-phone" class="input-text" value="+1 (415) 555-8921" style="width: 100%; margin-top: 4px;">
+                    </div>
+
+                    <div>
+                        <label class="control-label">Professional Role / Specialty</label>
+                        <select id="select-prof-role" class="input-select" style="width: 100%; margin-top: 4px;">
+                            <option value="Bioclimatic Architect" selected>Lead Bioclimatic Architect</option>
+                            <option value="Structural & Thermal Engineer">Structural &amp; Thermal Engineer</option>
+                            <option value="Civil Defense Officer">Civil Defense &amp; Disaster Officer</option>
+                            <option value="Academic Researcher">Academic Climate Researcher</option>
+                            <option value="Permaculture Builder">Vernacular / Permaculture Builder</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="control-label">Institution / Organization</label>
+                        <input type="text" id="input-prof-inst" class="input-text" value="Earth-Sheltered Architecture Institute" style="width: 100%; margin-top: 4px;">
+                    </div>
+                </form>
+            </div>
+
+            <!-- Column 2: Simulation & Physics Engine Preferences -->
+            <div class="assembly-card" style="padding: 20px;">
+                <div class="chart-title" style="display: flex; align-items: center; gap: 8px;">
+                    <span>⚙️ Simulation &amp; Physics Preferences</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 12px;">
+                    <div>
+                        <label class="control-label">Default Temperature Scale</label>
+                        <select id="pref-temp-unit" class="input-select" style="width: 100%; margin-top: 4px;">
+                            <option value="C" selected>Celsius (°C) [International Metric]</option>
+                            <option value="F">Fahrenheit (°F) [Imperial Standard]</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="control-label">Default Wind Velocity Metric</label>
+                        <select id="pref-wind-unit" class="input-select" style="width: 100%; margin-top: 4px;">
+                            <option value="mps" selected>Meters per second (m/s) [Engineering]</option>
+                            <option value="kmh">Kilometers per hour (km/h)</option>
+                            <option value="mph">Miles per hour (mph)</option>
+                            <option value="kts">Knots (nautical)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="control-label">Thermal Comfort Reference Standard</label>
+                        <select id="pref-comfort-std" class="input-select" style="width: 100%; margin-top: 4px;">
+                            <option value="ashrae55" selected>ASHRAE Standard 55-2023 (Adaptive Model)</option>
+                            <option value="iso7730">ISO 7730 (Fanger PMV / PPD Model)</option>
+                            <option value="en16798">EN 16798-1 European Indoor Environmental Standard</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="control-label">Default Planetary Map Layer</label>
+                        <select id="pref-default-map" class="input-select" style="width: 100%; margin-top: 4px;">
+                            <option value="google_street" selected>Google Street Map</option>
+                            <option value="google_satellite">Google Satellite Imagery</option>
+                            <option value="carto_dark">Dark Thermal Radar Grid</option>
+                            <option value="google_terrain">Google Physical Terrain</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="control-label">Numerical Solver Precision</label>
+                        <select id="pref-solver-precision" class="input-select" style="width: 100%; margin-top: 4px;">
+                            <option value="transient_5min" selected>Multi-Node Transient Heat Transfer (5-Minute Timestep)</option>
+                            <option value="hourly_steady">Hourly Steady-Periodic Approximation (Fast)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 3: Security, Privacy & Cloud Sync -->
+            <div class="assembly-card" style="padding: 20px;">
+                <div class="chart-title" style="display: flex; align-items: center; gap: 8px;">
+                    <span>🛡️ Security, Credentials &amp; Cloud Backup</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 12px;">
+                    <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 11px; font-weight: 800; color: #10b981; text-transform: uppercase;">● Cloud Database Sync Active</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                            Your shelters, custom materials, and simulations persist securely in the backend store.
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="control-label">Change Password</label>
+                        <input type="password" id="input-change-pw" class="input-text" placeholder="Enter new password (optional)" style="width: 100%; margin-top: 4px;">
+                    </div>
+
+                    <div>
+                        <label class="control-label">Two-Factor Authentication (2FA)</label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(0,0,0,0.25); border-radius: 8px; border: 1px solid var(--border-glass); margin-top: 4px;">
+                            <span style="font-size: 12px; color: var(--text-primary); font-weight: 600;">SMS OTP / Biometric 2FA</span>
+                            <span style="font-size: 10px; font-weight: 800; color: #10b981; background: rgba(16,185,129,0.2); padding: 2px 8px; border-radius: 4px;">ENABLED</span>
+                        </div>
+                    </div>
+
+                    <div style="padding-top: 10px; border-top: 1px solid var(--border-glass);">
+                        <button id="btn-export-profile-json" class="btn-resend-otp" style="width: 100%; padding: 10px; font-size: 12px; font-weight: 700; text-align: center; cursor: pointer;">
+                            📦 Export Complete Engineering Archive (JSON)
+                        </button>
+                    </div>
+
+                    <button id="btn-logout-account" class="btn-panic-sos" style="animation: none; margin-top: 6px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center;">
+                        🚪 Log Out of BioShelter Studio
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Projects & Activity Portfolio -->
+        <div class="comparison-container">
+            <div class="chart-title">Your BioShelter Projects &amp; Contributions Portfolio</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 12px;">
+                <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px; text-align: center;">
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Shelters Created</div>
+                    <div id="stat-user-shelters" style="font-size: 24px; font-weight: 900; color: var(--accent-sky); margin-top: 4px;">4 Active</div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px; text-align: center;">
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Custom Materials</div>
+                    <div id="stat-user-materials" style="font-size: 24px; font-weight: 900; color: #10b981; margin-top: 4px;">6 Formulas</div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px; text-align: center;">
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Hazard Incident Reports</div>
+                    <div id="stat-user-hazards" style="font-size: 24px; font-weight: 900; color: #f59e0b; margin-top: 4px;">2 Verified</div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-glass); border-radius: 8px; padding: 14px; text-align: center;">
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">SOS Broadcast Test Logs</div>
+                    <div id="stat-user-sos" style="font-size: 24px; font-weight: 900; color: #ef4444; margin-top: 4px;">12 Dispatches</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Script Module -->
+    <script type="module">
+        import { authInstance } from './js/authEngine.js';
+        import { userDataStore } from './js/userDataStore.js';
+        import { themeManager } from './js/themeManager.js';
+
+        function loadUserProfile() {
+            const user = authInstance.getCurrentUser() || {
+                id: 'usr_lead_architect_01',
+                displayName: 'Dr. Sarah Lin, PhD',
+                email: 'sarah.lin@gmail.com',
+                phone: '+1 (415) 555-8921',
+                role: 'Bioclimatic Architect',
+                institution: 'Earth-Sheltered Architecture Institute'
+            };
+
+            const initials = user.displayName ? user.displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'SL';
+            document.getElementById('profile-avatar-circle').textContent = initials;
+            document.getElementById('profile-hero-name').textContent = user.displayName;
+            document.getElementById('profile-hero-role').textContent = user.role || 'Member Engineer';
+            document.getElementById('profile-hero-email').textContent = user.email || 'guest@bioshelter.org';
+            document.getElementById('profile-hero-id').textContent = user.id || 'guest_session';
+
+            document.getElementById('input-prof-name').value = user.displayName || '';
+            document.getElementById('input-prof-email').value = user.email || '';
+            document.getElementById('input-prof-phone').value = user.phone || '+1 (415) 555-8921';
+            document.getElementById('input-prof-inst').value = user.institution || '';
+            if (user.role) document.getElementById('select-prof-role').value = user.role;
+
+            // Portfolio stats
+            const shelters = userDataStore.getShelters();
+            const materials = userDataStore.getCustomMaterials();
+            const hazards = userDataStore.getHazards();
+            const sosLogs = userDataStore.getSosLogs();
+
+            document.getElementById('stat-user-shelters').textContent = `${shelters.length} Active`;
+            document.getElementById('stat-user-materials').textContent = `${materials.length} Formulas`;
+            document.getElementById('stat-user-hazards').textContent = `${hazards.length} Verified`;
+            document.getElementById('stat-user-sos').textContent = `${sosLogs.length} Dispatches`;
+        }
+
+        async function saveProfile() {
+            const name = document.getElementById('input-prof-name').value.trim();
+            const email = document.getElementById('input-prof-email').value.trim();
+            const phone = document.getElementById('input-prof-phone').value.trim();
+            const role = document.getElementById('select-prof-role').value;
+            const institution = document.getElementById('input-prof-inst').value.trim();
+
+            const cur = authInstance.getCurrentUser() || {};
+            cur.displayName = name;
+            cur.email = email;
+            cur.phone = phone;
+            cur.role = role;
+            cur.institution = institution;
+
+            localStorage.setItem('bioshelter_active_user', JSON.stringify(cur));
+
+            // Preferences
+            const prefs = {
+                tempUnit: document.getElementById('pref-temp-unit').value,
+                windUnit: document.getElementById('pref-wind-unit').value,
+                comfortStd: document.getElementById('pref-comfort-std').value,
+                defaultMap: document.getElementById('pref-default-map').value,
+                solverPrecision: document.getElementById('pref-solver-precision').value
+            };
+            localStorage.setItem('bioshelter_user_preferences', JSON.stringify(prefs));
+
+            alert('✅ Profile details and simulation preferences saved into backend database!');
+            loadUserProfile();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserProfile();
+
+            document.getElementById('btn-save-profile-top').addEventListener('click', saveProfile);
+            document.getElementById('form-personal-details').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveProfile();
+            });
+
+            document.getElementById('btn-export-profile-json').addEventListener('click', () => {
+                const data = userDataStore.exportAllData();
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `bioshelter-profile-backup-${Date.now()}.json`;
+                a.click();
+            });
+
+            document.getElementById('btn-logout-account').addEventListener('click', () => {
+                if (confirm('Are you sure you want to log out of your BioShelter Studio session?')) {
+                    authInstance.logout();
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

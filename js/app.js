@@ -3526,6 +3526,136 @@ class BioShelterApp {
         d.sliderOccupants.value = c.occupants;
         d.valOccupants.textContent = c.occupants;
     }
+
+    renderLoginPage() {
+        const container = document.getElementById('login-page-dynamic-container');
+        if (!container) return;
+
+        const user = (typeof authInstance !== 'undefined' ? authInstance.getCurrentUser() : null) || {
+            id: 'usr_lead_architect_01',
+            displayName: 'Dr. Sarah Lin, PhD',
+            email: 'sarah.lin@gmail.com',
+            phone: '+1 (415) 555-8921',
+            role: 'Bioclimatic Architect',
+            institution: 'Earth-Sheltered Architecture Institute'
+        };
+
+        const initials = user.displayName ? user.displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'SL';
+
+        container.innerHTML = `
+            <div style="max-width: 1100px; margin: 0 auto; padding: 10px 0;">
+                <!-- Profile Header Card -->
+                <div class="assembly-card" style="padding: 24px; margin-bottom: 20px; background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(2,132,199,0.15)); border: 1px solid var(--border-glow);">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #10b981); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; color: white; border: 3px solid rgba(255,255,255,0.2);">
+                                ${initials}
+                            </div>
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0;">${user.displayName}</h2>
+                                    <span class="section-badge" style="background: rgba(16,185,129,0.2); color: #10b981; font-weight: 800;">
+                                        ${user.role || 'Bioclimatic Architect'}
+                                    </span>
+                                </div>
+                                <div style="font-size: 12px; color: var(--accent-sky); margin-top: 2px;">${user.email || 'sarah.lin@gmail.com'}</div>
+                                <div style="font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono'; margin-top: 2px;">
+                                    ID: ${user.id} &bull; Status: <span style="color: #10b981;">● Active Verified Engineer</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="btn-save-inline-profile" class="export-btn-primary" style="padding: 8px 16px; font-size: 12px; background: linear-gradient(135deg, #0284c7, #10b981); cursor: pointer;">
+                                💾 Save Profile
+                            </button>
+                            <a href="profile-settings.html" target="_blank" class="btn-resend-otp" style="text-decoration: none; padding: 8px 14px; font-size: 11px; font-weight: 700;">
+                                ⚙️ Advanced Settings ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2-Column Profile & Settings Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; margin-bottom: 20px;">
+                    <div class="assembly-card" style="padding: 18px;">
+                        <div class="chart-title">👤 Personal Details</div>
+                        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+                            <div>
+                                <label class="control-label">Display Name</label>
+                                <input type="text" id="inline-prof-name" class="input-text" value="${user.displayName}" style="width: 100%; margin-top: 4px;">
+                            </div>
+                            <div>
+                                <label class="control-label">Email Address</label>
+                                <input type="email" id="inline-prof-email" class="input-text" value="${user.email}" style="width: 100%; margin-top: 4px;">
+                            </div>
+                            <div>
+                                <label class="control-label">Emergency SMS Mobile Phone</label>
+                                <input type="tel" id="inline-prof-phone" class="input-text" value="${user.phone || '+1 (415) 555-8921'}" style="width: 100%; margin-top: 4px;">
+                            </div>
+                            <div>
+                                <label class="control-label">Affiliation / Institution</label>
+                                <input type="text" id="inline-prof-inst" class="input-text" value="${user.institution || 'Earth-Sheltered Architecture Institute'}" style="width: 100%; margin-top: 4px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="assembly-card" style="padding: 18px;">
+                        <div class="chart-title">⚙️ Engineering Simulation Preferences</div>
+                        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+                            <div>
+                                <label class="control-label">Thermal Comfort Reference Standard</label>
+                                <select class="input-select" style="width: 100%; margin-top: 4px;">
+                                    <option selected>ASHRAE Standard 55-2023 (Adaptive Model)</option>
+                                    <option>ISO 7730 (Fanger PMV / PPD Model)</option>
+                                    <option>EN 16798-1 European Indoor Standard</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="control-label">Temperature Scale Unit</label>
+                                <select class="input-select" style="width: 100%; margin-top: 4px;">
+                                    <option selected>Celsius (°C) [International Metric]</option>
+                                    <option>Fahrenheit (°F) [Imperial Standard]</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="control-label">Simulation Precision</label>
+                                <select class="input-select" style="width: 100%; margin-top: 4px;">
+                                    <option selected>Multi-Node Transient (5-Min Timestep)</option>
+                                    <option>Hourly Steady-Periodic (Fast)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="control-label">Database Cloud Sync</label>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: rgba(16,185,129,0.1); border-radius: 6px; border: 1px solid rgba(16,185,129,0.3); margin-top: 4px;">
+                                    <span style="font-size: 11px; color: #10b981; font-weight: 700;">● Active REST Backend Sync</span>
+                                    <span style="font-size: 10px; color: var(--text-muted);">HTTP 200 OK</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const btnSave = document.getElementById('btn-save-inline-profile');
+        if (btnSave) {
+            btnSave.addEventListener('click', () => {
+                const name = (document.getElementById('inline-prof-name') || {}).value;
+                const email = (document.getElementById('inline-prof-email') || {}).value;
+                const phone = (document.getElementById('inline-prof-phone') || {}).value;
+                const inst = (document.getElementById('inline-prof-inst') || {}).value;
+
+                user.displayName = name || user.displayName;
+                user.email = email || user.email;
+                user.phone = phone || user.phone;
+                user.institution = inst || user.institution;
+
+                localStorage.setItem('bioshelter_active_user', JSON.stringify(user));
+                alert('✅ Profile details saved successfully!');
+                this.renderLoginPage();
+            });
+        }
+    }
 }
 
 // Instantiate on DOM ready
