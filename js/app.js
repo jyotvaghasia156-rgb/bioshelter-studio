@@ -15,7 +15,7 @@ import { PsychrometricBioclimaticChart } from './psychrometricChart.js';
 import { analyzeAndGenerateRecommendations } from './recommendationEngine.js';
 import { generatePythonSimulationScript, openPrintableEngineeringReport, exportBIMGeoJSON } from './exporter.js';
 import { SOIL_PROFILES, GLOBAL_SOIL_DIRECTORY, filterAndSearchSoilDirectory, calculateSoilDepthProfile } from './soilEngine.js';
-import { calculateAdvancedWeatherMetrics } from './weatherEngine.js';
+import { calculateAdvancedWeatherMetrics, fetchLiveTemperatureAndWeather, fetchLiveWeatherByCity, fetchLiveWeatherByGPS } from './weatherEngine.js';
 import { authInstance } from './authEngine.js';
 import { EMERGENCY_BUNKERS, getBunkersForZone } from './bunkerDatabase.js';
 import { userDataStore } from './userDataStore.js';
@@ -804,6 +804,9 @@ class BioShelterApp {
             });
         }
 
+        // Initialize Real-Time Live Online Temperature & GPS Integration
+        this.initLiveTemperatureFeatures();
+
         // Cloud Save Project Button
         const btnSaveProject = document.getElementById('btn-save-project');
         if (btnSaveProject) {
@@ -819,6 +822,103 @@ class BioShelterApp {
                 alert(`💾 BioShelter 3D Model & Parameters Saved to Cloud Workspace!`);
             });
         }
+    }
+
+    /* --- Real-Time Online Live Temperature Engine & GPS Integration --- */
+    initLiveTemperatureFeatures() {
+        const tempBadge = document.getElementById('live-weather-temp-badge');
+        const feelsVal = document.getElementById('live-weather-feels-val');
+        const conditionVal = document.getElementById('live-weather-condition-val');
+        const humidityVal = document.getElementById('live-weather-humidity-val');
+        const windVal = document.getElementById('live-weather-wind-val');
+        const wetbulbVal = document.getElementById('live-weather-wetbulb-val');
+        const cityText = document.getElementById('live-weather-city-text');
+        const searchInput = document.getElementById('input-live-city-search');
+        const searchBtn = document.getElementById('btn-live-city-search');
+        const gpsBtn = document.getElementById('btn-live-gps-temp');
+
+        const updateLiveUI = (weather) => {
+            if (!weather) return;
+            if (cityText) cityText.textContent = weather.locationLabel || weather.cityName || 'Live Weather Station';
+            if (tempBadge) {
+                tempBadge.textContent = `🌡️ ${weather.tempC}°C`;
+                if (weather.tempC >= 40) tempBadge.style.color = '#ef4444';
+                else if (weather.tempC <= 15) tempBadge.style.color = '#38bdf8';
+                else tempBadge.style.color = '#10b981';
+            }
+            if (feelsVal) feelsVal.textContent = `${weather.apparentTempC}°C`;
+            if (conditionVal) conditionVal.textContent = `${weather.weatherLabel || weather.weatherCondition || 'Clear ☀️'}`;
+            if (humidityVal) humidityVal.textContent = `${weather.humidity}%`;
+            if (windVal) windVal.textContent = `${weather.windSpeedMps} m/s ${weather.windCardinal || ''}`;
+            if (wetbulbVal) wetbulbVal.textContent = `${weather.wetBulbC}°C`;
+
+            // Apply live parameters to 3D Simulation Twin
+            const tMax = weather.tempMax || weather.tempC;
+            const tMin = weather.tempMin || Math.max(10, tMax - 12);
+            this.state.customClimateParams = {
+                tMax: tMax,
+                tMin: tMin,
+                rhDay: Math.max(10, weather.humidity - 15),
+                rhNight: Math.min(95, weather.humidity + 15),
+                windSpeedAvg: weather.windSpeedMps || 3.8,
+                ghiPeak: 950
+            };
+
+            // Set HUD location
+            const locNameEl = document.getElementById('hud-location-name');
+            if (locNameEl) locNameEl.textContent = `📍 ${weather.locationLabel || weather.cityName || 'Live Station'} (LIVE ONLINE)`;
+
+            const stmtEl = document.getElementById('hud-weather-statement');
+            if (stmtEl) {
+                stmtEl.textContent = `🔴 Live Real-Time Reading: Ambient ${weather.tempC}°C (Feels ${weather.apparentTempC}°C), RH ${weather.humidity}%, Wet-Bulb ${weather.wetBulbC}°C, Wind ${weather.windSpeedMps} m/s ${weather.windDirectionText || ''}. Bioclimatic envelope actively responding to live atmospheric flux.`;
+            }
+
+            this.updateSimulation();
+        };
+
+        // 1. Search by City / District name
+        const handleSearch = async () => {
+            const query = searchInput ? searchInput.value.trim() : '';
+            if (!query) return;
+            if (cityText) cityText.textContent = `Fetching live temp for "${query}"...`;
+            const weather = await fetchLiveWeatherByCity(query);
+            if (weather && weather.success) {
+                updateLiveUI(weather);
+            } else {
+                alert(`⚠️ Could not fetch live weather for "${query}". Please check spelling and internet connection.`);
+                if (cityText) cityText.textContent = 'Location not found';
+            }
+        };
+
+        if (searchBtn) searchBtn.addEventListener('click', handleSearch);
+        if (searchInput) {
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSearch();
+                }
+            });
+        }
+
+        // 2. 1-Click GPS Temperature
+        if (gpsBtn) {
+            gpsBtn.addEventListener('click', async () => {
+                if (cityText) cityText.textContent = 'Connecting to GPS Sensor...';
+                try {
+                    const weather = await fetchLiveWeatherByGPS();
+                    updateLiveUI(weather);
+                } catch (err) {
+                    alert(`GPS Error: ${err.message}`);
+                }
+            });
+        }
+
+        // 3. Initial Live Weather Fetch on load (Default to Kutch / Gujarat live temperature)
+        fetchLiveTemperatureAndWeather(23.2420, 69.6669, 'Kutch / Bhuj, Gujarat (Live Meteorological Station)').then(weather => {
+            if (weather && weather.success) {
+                updateLiveUI(weather);
+            }
+        }).catch(e => console.log('Initial live temp silent fallback', e));
     }
 
     onSelectWorldStation(station) {

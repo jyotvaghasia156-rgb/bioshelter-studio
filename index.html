@@ -515,6 +515,38 @@
 
         <!-- Right Main Viewport with Multi-Tab Interface & Standalone Launch Bar -->
         <main class="main-workspace">
+            <!-- Real-Time Online Live Temperature Intelligence Bar -->
+            <div id="live-online-temperature-bar" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 16px; background: linear-gradient(90deg, rgba(2,132,199,0.22), rgba(16,185,129,0.18)); border-bottom: 1px solid rgba(56,189,248,0.3); font-size: 12px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 12px; background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <span style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
+                        LIVE ONLINE WEATHER
+                    </span>
+                    <div id="live-weather-station-label" style="font-weight: 700; color: var(--text-primary);">
+                        📍 <span id="live-weather-city-text">Kutch / Bhuj, Gujarat</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-glass); flex-wrap: wrap;">
+                        <span id="live-weather-temp-badge" style="font-size: 14px; font-weight: 800; color: #f59e0b;">🌡️ 45.2°C</span>
+                        <span id="live-weather-feels-badge" style="color: var(--text-secondary); font-size: 11px;">Feels: <strong style="color: #cbd5e1;" id="live-weather-feels-val">46.8°C</strong></span>
+                        <span id="live-weather-condition-badge" style="color: var(--text-secondary); font-size: 11px;">Condition: <strong style="color: #38bdf8;" id="live-weather-condition-val">Clear Sky ☀️</strong></span>
+                        <span id="live-weather-humidity-badge" style="color: var(--text-secondary); font-size: 11px;">Humidity: <strong style="color: #10b981;" id="live-weather-humidity-val">18%</strong></span>
+                        <span id="live-weather-wind-badge" style="color: var(--text-secondary); font-size: 11px;">Wind: <strong style="color: #38bdf8;" id="live-weather-wind-val">4.8 m/s WSW</strong></span>
+                        <span id="live-weather-wetbulb-badge" style="color: var(--text-secondary); font-size: 11px;">Wet-Bulb: <strong style="color: #c084fc;" id="live-weather-wetbulb-val">23.5°C</strong></span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <!-- Live City Search Box -->
+                    <div style="display: flex; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid var(--border-glass); border-radius: 6px; padding: 2px 6px;">
+                        <input type="text" id="input-live-city-search" placeholder="Search City / District (e.g. Surat, Ahmedabad, London)..." style="background: transparent; border: none; outline: none; color: #fff; font-size: 11px; width: 220px; padding: 3px 4px;">
+                        <button type="button" id="btn-live-city-search" style="background: #0284c7; border: none; border-radius: 4px; color: #fff; padding: 4px 8px; font-size: 10px; font-weight: 700; cursor: pointer;">🔍 Live Temp</button>
+                    </div>
+                    <!-- 1-Click GPS Temperature Button -->
+                    <button type="button" id="btn-live-gps-temp" class="nav-page-pill" style="padding: 4px 10px; border-radius: 6px; background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; font-weight: 700; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                        🎯 Use My Live GPS
+                    </button>
+                </div>
+            </div>
+
             <!-- Dedicated Pages Direct Launch Hub -->
             <div class="dedicated-pages-nav-bar" style="display: flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border-glass); overflow-x: auto; font-size: 11px;">
                 <span style="color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 9px; white-space: nowrap;">Standalone Pages:</span>
