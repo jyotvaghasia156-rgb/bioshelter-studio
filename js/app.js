@@ -3220,6 +3220,10 @@ class BioShelterApp {
         } else if (tabId === 'tab-soil') {
             this.updateSoilSection();
             this.renderSoilDirectory();
+        } else if (tabId === 'tab-comfort-places') {
+            this.renderComfortPlaces();
+        } else if (tabId === 'tab-diurnal' || tabId === 'tab-weather') {
+            this.updateChartsData();
         } else if (tabId === 'tab-login') {
             this.renderLoginPage();
         } else if (tabId === 'tab-community') {
@@ -3228,7 +3232,7 @@ class BioShelterApp {
             this.renderHazardReports();
         } else if (tabId === 'tab-materials') {
             this.renderCustomMaterials();
-        } else if (tabId === 'tab-sos-broadcast') {
+        } else if (tabId === 'tab-sos-hub' || tabId === 'tab-sos-broadcast') {
             this.renderSOSDispatchLogs();
         }
     }
