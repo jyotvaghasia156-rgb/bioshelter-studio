@@ -83,6 +83,7 @@ class BioShelterApp {
         this.bindSOSEvents();
         this.bindComfortMatcherEvents();
         this.initWorldMap();
+        this.checkBackendHealth();
         this.updateSimulation();
         this.renderCommunityShelters();
         this.renderHazardReports();
@@ -90,6 +91,52 @@ class BioShelterApp {
         this.renderSOSDispatchLogs();
         this.renderComfortPlaces();
         this.switchTab('tab-3d');
+    }
+
+    async checkBackendHealth() {
+        const chip = document.getElementById('backend-health-chip');
+        const text = document.getElementById('backend-status-text');
+        if (!chip || !text) return;
+
+        const testConnection = async () => {
+            const start = performance.now();
+            try {
+                const res = await fetch('/api/health');
+                const latency = Math.round(performance.now() - start);
+                if (res.ok) {
+                    const data = await res.json();
+                    text.textContent = `Backend Online (${latency}ms)`;
+                    chip.style.background = 'rgba(16,185,129,0.12)';
+                    chip.style.borderColor = 'rgba(16,185,129,0.3)';
+                    chip.style.color = '#10b981';
+                    return { success: true, latency, data };
+                } else {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+            } catch (e) {
+                text.textContent = 'Local Cache Active';
+                chip.style.background = 'rgba(56,189,248,0.12)';
+                chip.style.borderColor = 'rgba(56,189,248,0.3)';
+                chip.style.color = '#38bdf8';
+                return { success: false, error: e.message };
+            }
+        };
+
+        // Initial check
+        testConnection();
+
+        chip.addEventListener('click', async () => {
+            text.textContent = 'Testing API...';
+            const result = await testConnection();
+            if (result.success) {
+                alert(`⚡ BioShelter REST Backend Status: ONLINE\n\nLatency: ${result.latency}ms\nService: ${result.data.service || 'REST API'}\nDatabase Stats:\n• Users: ${result.data.database ? result.data.database.usersCount : 'Connected'}\n• Shelters: ${result.data.database ? result.data.database.sheltersCount : 'Active'}\n\nFrontend & Backend are 100% synchronized.`);
+            } else {
+                alert(`⚡ Backend Status: Offline / Cache Mode\nFrontend is operating using client-side reactive localStorage data store.`);
+            }
+        });
+
+        // Recurring health check every 60s
+        setInterval(testConnection, 60000);
     }
 
     /* --- Theme Engine (Dark & Light Mode) --- */

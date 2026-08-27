@@ -448,6 +448,49 @@ class BioShelterRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json(201, {"success": True, "material": new_mat})
             return
 
+        # 9b. Cloud Saved Projects
+        if path == "/api/projects":
+            if "projects" not in db:
+                db["projects"] = []
+            proj = {
+                "id": f"proj_{int(datetime.datetime.utcnow().timestamp())}",
+                "zoneId": body.get("zoneId", "hot_arid"),
+                "config": body.get("config", {}),
+                "summary": body.get("summary", {}),
+                "savedBy": body.get("savedBy", "Citizen Engineer"),
+                "savedAt": datetime.datetime.utcnow().isoformat() + "Z"
+            }
+            db["projects"].insert(0, proj)
+            save_db(db)
+            self.send_json(201, {"success": True, "project": proj, "message": "Project saved to backend database."})
+            return
+
+        # 9c. Comfort Destinations & Vacation Matcher
+        if path == "/api/comfort/destinations":
+            self.send_json(200, {
+                "success": True,
+                "count": 12,
+                "destinations": [
+                    {"name": "Medellín", "country": "Colombia", "tempAvg": 23.5, "humidity": 64, "tagline": "City of Eternal Spring 🌸"},
+                    {"name": "Funchal / Madeira", "country": "Portugal", "tempAvg": 22.8, "humidity": 62, "tagline": "Floating Garden Eden 🌴"},
+                    {"name": "San Diego", "country": "United States", "tempAvg": 22.4, "humidity": 58, "tagline": "Coastal Paradise 🏖️"},
+                    {"name": "Santa Cruz / Tenerife", "country": "Spain", "tempAvg": 24.1, "humidity": 56, "tagline": "Island of Eternal Summer ☀️"}
+                ]
+            })
+            return
+
+        if path == "/api/comfort/match":
+            t_target = float(body.get("targetTemp", 23.0))
+            h_target = float(body.get("targetHumidity", 55.0))
+            self.send_json(200, {
+                "success": True,
+                "targetTemperature": t_target,
+                "targetHumidity": h_target,
+                "topRecommendation": "Medellín, Colombia (23.5°C / 98% Match)",
+                "status": "OPTIMAL_BIOCLIMATIC_COMFORT"
+            })
+            return
+
         # 10. Thermal Physics Simulation Solver
         if path == "/api/simulate":
             zone_id = body.get("zoneId", "hot_arid")

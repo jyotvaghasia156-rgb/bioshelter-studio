@@ -303,6 +303,12 @@
                 Save Model
             </button>
 
+            <!-- Live Backend API Status Chip -->
+            <div id="backend-health-chip" style="display: flex; align-items: center; gap: 6px; padding: 5px 11px; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); border-radius: 20px; font-size: 11px; color: #10b981; font-weight: 700; cursor: pointer;" title="Backend REST API &amp; Database Active (Click to test)">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                <span id="backend-status-text">Backend Connected</span>
+            </div>
+
             <!-- Authentication User Profile Section -->
             <div id="auth-header-section" style="display: flex; align-items: center; gap: 6px;">
                 <button id="btn-open-login-modal" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">

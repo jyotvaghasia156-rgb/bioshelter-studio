@@ -1,0 +1,24 @@
+{
+  "name": "bioshelter-studio",
+  "version": "2.5.0",
+  "description": "Full-Stack 3D Bioclimatic Shelter Studio, Disaster SOS Command Center, Google World Map & Vacation Comfort Matcher",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "serve:py": "python server.py",
+    "serve:ps": "powershell -ExecutionPolicy Bypass -File serve.ps1"
+  },
+  "keywords": [
+    "bioshelter",
+    "bioclimatic-architecture",
+    "threejs",
+    "thermal-simulation",
+    "disaster-sos",
+    "world-map",
+    "open-meteo",
+    "comfort-matcher"
+  ],
+  "author": "jyotvaghasia156-rgb",
+  "license": "MIT"
+}
