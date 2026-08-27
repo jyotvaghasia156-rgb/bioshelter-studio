@@ -495,6 +495,10 @@ export class WorldMapEngine {
         });
     }
 
+    switchLayer(layerKey) {
+        return this.setLayer(layerKey);
+    }
+
     setTheme(isDark) {
         this.isDark = isDark;
         if (!isDark && this.currentLayerKey === 'carto_dark') {
@@ -518,14 +522,27 @@ export class WorldMapEngine {
         });
     }
 
+    getFilteredStations() {
+        return GLOBAL_STATIONS.filter(s => {
+            if (!this.filterCategory || this.filterCategory === 'all') return true;
+            if (this.filterCategory === 'extreme_hot' || this.filterCategory === 'heatwave') {
+                return s.category === 'extreme_hot' || s.tempC >= 38;
+            }
+            if (this.filterCategory === 'paradise_comfort' || this.filterCategory === 'comfort_eden') {
+                return s.isParadise || (s.tempC >= 20 && s.tempC <= 28);
+            }
+            if (this.filterCategory === 'cold_alpine' || this.filterCategory === 'alpine') {
+                return s.category === 'cold_alpine' || s.tempC < 14;
+            }
+            return s.category === this.filterCategory;
+        });
+    }
+
     renderStationMarkers() {
         if (!this.markersLayer) return;
         this.markersLayer.clearLayers();
 
-        const filtered = GLOBAL_STATIONS.filter(s => {
-            if (this.filterCategory === 'all') return true;
-            return s.category === this.filterCategory;
-        });
+        const filtered = this.getFilteredStations();
 
         filtered.forEach(station => {
             const isHot = station.category === 'extreme_hot' || station.tempC >= 38;
@@ -641,16 +658,246 @@ export class WorldMapEngine {
         if (windDir) windDir.textContent = station.windDirectionText || 'Wind Vector';
         if (humidity) humidity.textContent = `${station.humidity || 50}%`;
         if (source) source.textContent = station.isLiveOnline ? '⚡ Live Online API' : '🛰️ Satellite Verified';
+
+        this.renderBioclimaticAnalysis(station);
+    }
+
+    generateBioclimaticAnalysis(station) {
+        const t = station.tempC;
+        const rh = station.humidity || 50;
+        const ws = station.windSpeedMps || 3.5;
+        const lat = Math.abs(station.lat);
+
+        // 1. Wet-bulb calculation (Stull formula)
+        const tw = t * Math.atan(0.151977 * Math.pow(rh + 8.313659, 0.5)) +
+            Math.atan(t + rh) -
+            Math.atan(rh - 1.676331) +
+            0.00391838 * Math.pow(rh, 1.5) * Math.atan(0.023101 * rh) - 4.686035;
+
+        // 2. Adaptive Comfort Temperature (ASHRAE 55)
+        const tComf = 17.8 + 0.31 * Math.min(35, Math.max(10, t));
+        const comfortDiff = Math.abs(t - tComf);
+        let comfortScore = Math.max(10, Math.round(100 - comfortDiff * 4.5));
+        if (tw >= 32) comfortScore = Math.min(comfortScore, 12);
+
+        // 3. Thermal Category & Givoni Strategies
+        let verdict = '';
+        let strategy = '';
+        let wallRecommendation = '';
+        let roofRecommendation = '';
+        let dampingReq = '';
+        let ventStrategy = '';
+        let solarOverhang = '';
+        let groundSink = '';
+        let analysisText = '';
+        let stressLevel = 'LOW';
+        let stressPercent = 20;
+
+        if (t >= 42 || tw >= 30) {
+            verdict = '🔥 CATASTROPHIC HEATWAVE / CRITICAL THERMAL THREAT';
+            strategy = 'Subterranean Earth-Berming + Kusuda Geothermal Heat Sink + High-Velocity Night Flush';
+            wallRecommendation = 'Rammed Earth (400mm) + Earthbag Berm (U = 0.52 W/m²·K, 12.5h lag)';
+            roofRecommendation = 'Heavy Terracotta Vault + Soil Vegetative Green Layer (300mm)';
+            dampingReq = 'High Thermal Mass (Damping Ratio > 82%, Time Lag > 12 hours)';
+            ventStrategy = 'Daytime Envelope Sealing with High-Velocity Night Purge (> 12 ACH)';
+            solarOverhang = `${(0.8 + lat * 0.015).toFixed(2)}m Deep Louvered Shading (Total Solar Cutoff)`;
+            groundSink = `Earth-Tube Geothermal Exchange at 3.5m depth (${(t - 16).toFixed(1)}°C stable soil sink)`;
+            stressLevel = 'CRITICAL SURVIVAL RISK';
+            stressPercent = 95;
+            analysisText = `This location is experiencing dangerous thermal stress. Ambient dry-bulb (${t.toFixed(1)}°C) and wet-bulb (${tw.toFixed(1)}°C) require high-mass earth coupling to prevent fatal indoor heat buildup. BioShelter subterranean berming reduces indoor peak operative temperatures by up to ${(t - 24.5).toFixed(1)}°C completely without electrical air conditioning.`;
+        } else if (t >= 32) {
+            if (rh >= 65) {
+                verdict = '🌴 TROPICAL HIGH-HUMIDITY / MONSOON HEAT';
+                strategy = 'Elevated Open Stilt Structure + Continuous Induced Cross-Ventilation';
+                wallRecommendation = 'Breathable Bamboo Lattice + Lime Plaster Render (Lightweight)';
+                roofRecommendation = 'Steep Pitched Thatched Straw with Ventilated Ridge Vent Cavity';
+                dampingReq = 'Low Thermal Mass (Rapid Heat Dissipation, Time Lag < 3 hours)';
+                ventStrategy = 'Continuous Natural Air Movement (Cross-Ventilation > 25 ACH)';
+                solarOverhang = `${(0.9 + lat * 0.01).toFixed(2)}m Extended Eaves for Monsoonal Rain & Sun Shading`;
+                groundSink = 'Elevated Floor Void to Prevent Ground Moisture Trapping';
+                stressLevel = 'HIGH HUMIDITY DISCOMFORT';
+                stressPercent = 75;
+                analysisText = `High relative humidity (${rh}%) restricts human evaporative sweating. The primary bioclimatic defense is maximising indoor airflow velocity with windward orientation (${station.windDirectionText || 'optimal vector'}) and steep convective roof venting.`;
+            } else {
+                verdict = '🏜️ HOT ARID DESERT / INTENSE SOLAR IRRADIANCE';
+                strategy = 'Heavy Thermal Mass + Solar Chimney Wind Scoop + Night Soil Purge';
+                wallRecommendation = 'Compressed Stabilized Earth Blocks (CSEB) 350mm';
+                roofRecommendation = 'Vaulted Nubian Earth Dome with Reflective White Lime Slurry';
+                dampingReq = 'High Thermal Inertia (Decrement Factor f ≤ 0.22, Lag > 10 hours)';
+                ventStrategy = 'Wind Tower (Badgir) with Evaporative Water Pitcher Cooling';
+                solarOverhang = `${(0.7 + lat * 0.01).toFixed(2)}m South-Facing Fixed Overhangs`;
+                groundSink = `Sub-Slab Geothermal Coupling (Earth temperature: 22°C)`;
+                stressLevel = 'MODERATE-HIGH HEAT';
+                stressPercent = 65;
+                analysisText = `Diurnal temperature swings are substantial. Heavy earth walls store nighttime coolness and release it across peak solar noon, damping indoor temperature swings by ${(t * 0.35).toFixed(1)}°C.`;
+            }
+        } else if (t >= 19 && t <= 28 && rh >= 35 && rh <= 70) {
+            verdict = '🟢 PARADISE COMFORT ZONE / GOLDILOCKS BIOCLIMATIC EDEN';
+            strategy = 'Pure Passive Vernacular + Operable Glazing + Biophilic Outdoor Living';
+            wallRecommendation = 'Timber Stud with Hemp-Lime Insulative Infill (U = 0.38 W/m²·K)';
+            roofRecommendation = 'Green Living Sedge Roof with Rainwater Harvesting Layer';
+            dampingReq = 'Balanced Thermal Mass (Decrement Factor f ≈ 0.45)';
+            ventStrategy = 'Operable High-Low Hopper Windows for Gentle Natural Airflow';
+            solarOverhang = '0.50m Standard Architectural Shading Overhang';
+            groundSink = 'Direct Slab-on-Grade with Radiant Thermal Buffer';
+            stressLevel = 'OPTIMAL ASHRAE 55 COMFORT';
+            stressPercent = 10;
+            analysisText = `This destination matches ideal human bioclimatic comfort. Ambient temperature (${t.toFixed(1)}°C) falls directly inside the ASHRAE 55 adaptive comfort polygon, requiring ZERO active heating or cooling energy.`;
+        } else if (t < 10) {
+            verdict = '❄️ SUB-ZERO / COLD ALPINE HEATING REGIME';
+            strategy = 'Super-Insulated Envelope + Trombe Solar Mass Wall + Direct Solar Glazing';
+            wallRecommendation = 'Straw Bale Infill (450mm) / Aerated Concrete (U = 0.18 W/m²·K)';
+            roofRecommendation = 'Double-Insulated Snow-Shedding High-Pitch Roof (R-50)';
+            dampingReq = 'High Insulation + Internal Dark Trombe Heat Storage Wall';
+            ventStrategy = 'Airtight Envelope with Heat-Recovery Ventilation (HRV)';
+            solarOverhang = 'Minimal Overhang (Maximize Winter Solar Heat Gain)';
+            groundSink = 'Frost-Protected Shallow Foundation with Perimeter Insulation';
+            stressLevel = 'COLD STRESS';
+            stressPercent = 70;
+            analysisText = `Cold ambient conditions (${t.toFixed(1)}°C) require minimizing thermal conduction envelope losses. Deep strawbale insulation and south-facing direct solar glazing keep indoor temperatures comfortable passively.`;
+        } else {
+            verdict = '⛅ TEMPERATE MARITIME / MILD MICROCLIMATE';
+            strategy = 'Moderate Thermal Envelope + Seasonal Shading + Night Flush';
+            wallRecommendation = 'Fired Clay Brick Cavity Wall with Wood-Fiber Board';
+            roofRecommendation = 'Timber Truss with Slate Tiles & Breathable Membrane';
+            dampingReq = 'Moderate Thermal Mass';
+            ventStrategy = 'Daylight Natural Cross-Breeze';
+            solarOverhang = '0.60m Fixed Eaves';
+            groundSink = 'Standard Insulated Perimeter Slab';
+            stressLevel = 'LOW';
+            stressPercent = 25;
+            analysisText = `Mild atmospheric conditions require standard bioclimatic tuning with seasonal cross-ventilation and daylight harvesting.`;
+        }
+
+        return {
+            stationName: station.name,
+            tempC: t,
+            twC: Math.round(tw * 10) / 10,
+            humidity: rh,
+            windSpeedMps: ws,
+            comfortScore,
+            verdict,
+            strategy,
+            wallRecommendation,
+            roofRecommendation,
+            dampingReq,
+            ventStrategy,
+            solarOverhang,
+            groundSink,
+            stressLevel,
+            stressPercent,
+            analysisText,
+            ashraeComfortable: comfortScore >= 75
+        };
+    }
+
+    renderBioclimaticAnalysis(station) {
+        const panels = document.querySelectorAll('#map-bioclimatic-analysis-panel');
+        if (!panels || panels.length === 0) return;
+
+        const analysis = this.generateBioclimaticAnalysis(station);
+        const scoreColor = analysis.comfortScore >= 70 ? '#10b981' : (analysis.comfortScore >= 40 ? '#f59e0b' : '#ef4444');
+
+        const html = `
+            <!-- Top Header & Verdict -->
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--border-glass); padding-bottom: 12px;">
+                <div>
+                    <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-sky); font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                        <span>🧠 Automated Bioclimatic Architectural Analysis &amp; Physics Solver</span>
+                    </div>
+                    <h4 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 4px 0 0 0;">
+                        ${analysis.verdict}
+                    </h4>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div style="text-align: right;">
+                        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">ASHRAE 55 Comfort Index</div>
+                        <div style="font-size: 20px; font-weight: 900; color: ${scoreColor};">
+                            ${analysis.comfortScore}% Match
+                        </div>
+                    </div>
+                    <div style="width: 44px; height: 44px; border-radius: 50%; background: ${scoreColor}22; border: 2px solid ${scoreColor}; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                        ${analysis.comfortScore >= 70 ? '🟢' : (analysis.comfortScore >= 40 ? '🟡' : '🔴')}
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI / Mathematical Physics Commentary -->
+            <div style="padding: 12px 16px; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 4px solid var(--accent-sky); margin-bottom: 16px; font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                <strong style="color: var(--text-primary);">Diagnostic Summary for ${station.name}:</strong> ${analysis.analysisText}
+            </div>
+
+            <!-- 4-Grid Bioclimatic Blueprint Recommendation Columns -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 10px; font-weight: 700; color: var(--accent-sky); text-transform: uppercase;">🧱 Recommended Wall &amp; Roof Physics</div>
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">${analysis.wallRecommendation}</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 3px;">Roof: ${analysis.roofRecommendation}</div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 10px; font-weight: 700; color: var(--accent-emerald); text-transform: uppercase;">🌬️ Passive Aerodynamics &amp; Ventilation</div>
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">${analysis.ventStrategy}</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 3px;">Vector: ${station.windDirectionText || 'Dynamic Flow'}</div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 10px; font-weight: 700; color: var(--accent-amber); text-transform: uppercase;">☀️ Solar Geometry &amp; Overhang Depth</div>
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">${analysis.solarOverhang}</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 3px;">Calculated for site latitude ${Math.abs(station.lat).toFixed(1)}°.</div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 10px; font-weight: 700; color: #a855f7; text-transform: uppercase;">🌍 Kusuda Geothermal Ground Coupling</div>
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">${analysis.groundSink}</div>
+                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 3px;">Wet-Bulb Temp: ${analysis.twC}°C &bull; Mass: ${analysis.dampingReq}</div>
+                </div>
+            </div>
+
+            <!-- Live Stress & Comfort Multi-Gauges -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; font-size: 11px;">
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="color: var(--text-secondary);">Thermal Stress Level</span>
+                        <span style="font-weight: 700; color: ${analysis.stressPercent > 70 ? '#ef4444' : '#10b981'};">${analysis.stressLevel} (${analysis.stressPercent}%)</span>
+                    </div>
+                    <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                        <div style="height: 100%; width: ${analysis.stressPercent}%; background: ${analysis.stressPercent > 70 ? '#ef4444' : (analysis.stressPercent > 40 ? '#f59e0b' : '#10b981')};"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="color: var(--text-secondary);">Passive Night Flush Feasibility</span>
+                        <span style="font-weight: 700; color: var(--accent-sky);">${station.humidity < 60 ? 'HIGH (88%)' : 'MODERATE (45%)'}</span>
+                    </div>
+                    <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                        <div style="height: 100%; width: ${station.humidity < 60 ? 88 : 45}%; background: #38bdf8;"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="color: var(--text-secondary);">Earth Tube Cooling Viability</span>
+                        <span style="font-weight: 700; color: var(--accent-emerald);">${Math.abs(station.tempC - 20) > 8 ? 'CRUCIAL (92%)' : 'SECONDARY (35%)'}</span>
+                    </div>
+                    <div style="height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                        <div style="height: 100%; width: ${Math.abs(station.tempC - 20) > 8 ? 92 : 35}%; background: #10b981;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        panels.forEach(p => {
+            p.innerHTML = html;
+        });
     }
 
     renderStationTable() {
         const container = document.getElementById('world-stations-table-container');
         if (!container) return;
 
-        const filtered = GLOBAL_STATIONS.filter(s => {
-            if (this.filterCategory === 'all') return true;
-            return s.category === this.filterCategory;
-        });
+        const filtered = this.getFilteredStations();
 
         container.innerHTML = `
             <table class="data-table" style="width: 100%; font-size: 11px;">
@@ -727,10 +974,10 @@ export class WorldMapEngine {
 
     /* --- Live Online Weather & Search Telemetry Integration --- */
     bindSearchAndLiveApi() {
-        const btnSearch = document.getElementById('btn-map-search-online');
+        const btnSearch = document.getElementById('btn-map-search-online') || document.getElementById('btn-map-city-search');
         const inputSearch = document.getElementById('input-map-city-search');
-        const btnGps = document.getElementById('btn-map-my-location');
-        const btnApplyStation = document.getElementById('btn-apply-selected-map-station');
+        const btnGps = document.getElementById('btn-map-my-location') || document.getElementById('btn-map-gps-locate');
+        const btnApplyStation = document.getElementById('btn-apply-selected-map-station') || document.getElementById('btn-apply-map-climate');
 
         if (btnSearch && inputSearch) {
             const doSearch = async () => {
@@ -751,14 +998,14 @@ export class WorldMapEngine {
                     alert('Geolocation is not supported by your browser.');
                     return;
                 }
-                const statusEl = document.getElementById('search-online-status');
-                if (statusEl) statusEl.innerHTML = '<span>⏳ Acquiring GPS satellite fix...</span>';
+                const statusEls = document.querySelectorAll('#search-online-status');
+                statusEls.forEach(s => { s.innerHTML = '<span>⏳ Acquiring GPS satellite fix...</span>'; });
 
                 navigator.geolocation.getCurrentPosition(
                     async (position) => {
                         const { latitude, longitude } = position.coords;
                         await this.fetchAndInspectLivePoint(latitude, longitude, 'Your Live GPS Location');
-                        if (statusEl) statusEl.innerHTML = `<span>📍 <strong>Acquired GPS:</strong> ${latitude.toFixed(4)}° N, ${longitude.toFixed(4)}° E (Live Online Weather Connected)</span>`;
+                        statusEls.forEach(s => { s.innerHTML = `<span>📍 <strong>Acquired GPS:</strong> ${latitude.toFixed(4)}° N, ${longitude.toFixed(4)}° E (Live Online Weather Connected)</span>`; });
                     },
                     (err) => {
                         alert(`Could not acquire GPS: ${err.message}. Using default world station.`);
