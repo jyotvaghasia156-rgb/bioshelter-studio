@@ -1,4 +1,4 @@
-﻿{
+{
     "users":  [
                   {
                       "registeredAt":  "2026-08-27T13:00:53.8784741+05:30",
@@ -46,6 +46,26 @@
 
                  },
     "shelters":  [
+                     {
+                         "authorRole":  "Community Builder",
+                         "id":  "shelter_1787861014",
+                         "typology":  "superadobe_dome",
+                         "coolingStrategy":  "Natural Cross-Flow \u0026 Soil Geothermics",
+                         "capacity":  40,
+                         "authorName":  "Citizen Architect",
+                         "createdAt":  "2026-08-27T20:03:33.6211070+05:30",
+                         "name":  "Superadobe Earth Refuge",
+                         "upvotes":  1,
+                         "status":  "Verified Community Refuge",
+                         "location":  "Regional Sector",
+                         "wallMaterial":  "Rammed Earth",
+                         "config":  {
+
+                                    },
+                         "climateZone":  "hot_arid",
+                         "roofMaterial":  "Bioclimatic Composite Roof",
+                         "emergencyContact":  "+91 98765 00000"
+                     },
                      {
                          "id":  "shelter_jaisalmer_vault",
                          "name":  "Thar Desert Thermal Vault Refuge",
@@ -133,6 +153,18 @@
                  ],
     "hazards":  [
                     {
+                        "id":  "haz_1787861014",
+                        "type":  "flash_flood",
+                        "reportedBy":  "Citizen Responder",
+                        "severity":  "critical",
+                        "description":  "Severe environmental stress.",
+                        "status":  "Active Alert",
+                        "location":  "Regional Basin",
+                        "title":  "Flash Flood Alert",
+                        "reportedAt":  "2026-08-27T20:03:33.6579259+05:30",
+                        "actionsRecommended":  "Seek nearest verified subterranean shelter immediately."
+                    },
+                    {
                         "id":  "haz_thar_heatwave_50",
                         "title":  "50.4°C Extreme Thermal Anomaly Active",
                         "type":  "heatwave",
@@ -169,6 +201,15 @@
                             }
                         ],
     "broadcastLogs":  [
-
+                          {
+                              "id":  "sos_2618",
+                              "smsDeliveryStatus":  "DISPATCHED_TO_ALL_VERIFIED_PHONES",
+                              "dispatchedAt":  "2026-08-27T20:03:33.6687343+05:30",
+                              "title":  "Severe Cyclone Warning",
+                              "totalSubscribers":  248,
+                              "deliveryRate":  "99.8%",
+                              "scenario":  "cyclone_shelter_warning",
+                              "epicenter":  "Regional Basin"
+                          }
                       ]
 }

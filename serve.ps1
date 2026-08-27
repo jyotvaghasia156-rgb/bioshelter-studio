@@ -25,7 +25,7 @@ function Save-DB($data) {
     $parent = Split-Path $dbPath
     if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
     $json = ConvertTo-Json $data -Depth 10
-    Set-Content -Path $dbPath -Value $json -Encoding UTF8
+    [System.IO.File]::WriteAllText($dbPath, $json, (New-Object System.Text.UTF8Encoding($false)))
 }
 
 $listener = New-Object System.Net.HttpListener
@@ -383,13 +383,23 @@ try {
                 }
             }
 
-            # 6. Disaster SOS Dispatcher
-            if ($rawPath -eq "/api/sos/trigger" -and $method -eq "POST") {
+            # 6. Disaster SOS Dispatcher & Broadcasts Log
+            if ($rawPath -eq "/api/sos/broadcasts" -and $method -eq "GET") {
+                $logs = $db.broadcastLogs
+                if (-not $logs) { $logs = @() }
+                $resObj = @{ success = $true; broadcasts = $logs }
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj -Depth 10))
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.OutputStream.Close()
+                continue
+            }
+
+            if (($rawPath -eq "/api/sos/trigger" -or $rawPath -eq "/api/sos/broadcast") -and $method -eq "POST") {
                 $broadcast = @{
                     id = "sos_" + (Get-Random -Minimum 1000 -Maximum 9999);
-                    scenario = if ($body.scenario) { $body.scenario } else { "catastrophe_critical" };
-                    title = if ($body.title) { $body.title } else { "Catastrophic Emergency Alert" };
-                    epicenter = if ($body.epicenter) { $body.epicenter } else { "Regional Basin" };
+                    scenario = if ($body -and $body.scenario) { $body.scenario } else { "catastrophe_critical" };
+                    title = if ($body -and $body.title) { $body.title } else { "Catastrophic Emergency Alert" };
+                    epicenter = if ($body -and $body.epicenter) { $body.epicenter } else { "Regional Basin" };
                     dispatchedAt = (Get-Date).ToString("o");
                     totalSubscribers = 248;
                     deliveryRate = "99.8%";
@@ -397,7 +407,24 @@ try {
                 }
                 $db.broadcastLogs = @($broadcast) + @($db.broadcastLogs)
                 Save-DB $db
-                $resObj = @{ success = $true; alert = $broadcast; message = "Emergency SOS alert dispatched to 248 citizen phones." }
+                $resObj = @{ success = $true; alert = $broadcast; broadcast = $broadcast; message = "Emergency SOS alert dispatched to 248 citizen phones." }
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj -Depth 10))
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.OutputStream.Close()
+                continue
+            }
+
+            # 6b. Weather Stations & Materials Endpoints
+            if ($rawPath -eq "/api/weather/stations" -and $method -eq "GET") {
+                $resObj = @{
+                    success = $true;
+                    stations = @(
+                        @{ id = "st_jaisalmer"; name = "Thar Desert Thermal Station"; lat = 26.9157; lon = 70.9083; temp = 48.2; humidity = 12; windSpeed = 18.5 },
+                        @{ id = "st_leh"; name = "Ladakh High Altitude Observatory"; lat = 34.1526; lon = 77.5771; temp = -8.4; humidity = 28; windSpeed = 24.0 },
+                        @{ id = "st_chennai"; name = "Coastal Tropical Buoy Station"; lat = 13.0827; lon = 80.2707; temp = 34.8; humidity = 86; windSpeed = 14.2 },
+                        @{ id = "st_phoenix"; name = "Sonoran Desert Grid"; lat = 33.4484; lon = -112.0740; temp = 46.5; humidity = 15; windSpeed = 11.0 }
+                    )
+                }
                 $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj -Depth 10))
                 $response.OutputStream.Write($bytes, 0, $bytes.Length)
                 $response.OutputStream.Close()

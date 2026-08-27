@@ -319,10 +319,6 @@ export class AuthEngine {
     verifyPhoneOtp(inputCode, name = 'Citizen Engineer') {
         return this.verifyOtp(inputCode, 'phone', '', name);
     }
-        } catch {}
-
-        return { success: true, user: phoneUser };
-    }
 
     /**
      * Account Verification Code Generator & Validator
