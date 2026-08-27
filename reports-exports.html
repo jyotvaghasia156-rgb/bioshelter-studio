@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bioclimatic Engineering Reports & Exporters - BioShelter Studio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <div class="logo-mark">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="header-title-group">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h1 class="app-title">BioShelter Studio</h1>
+                        <span class="app-badge" style="background: rgba(16,185,129,0.2); color: #10b981;">EXPORTS &amp; BIM</span>
+                    </div>
+                    <span class="app-subtitle">Engineering Reports, Python Simulator &amp; BIM GeoJSON Exporters</span>
+                </div>
+            </a>
+        </div>
+
+        <nav class="header-nav-links" style="display: flex; align-items: center; gap: 6px; overflow-x: auto;">
+            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
+            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
+            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
+            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
+            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
+            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
+            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
+            <a href="community.html" class="nav-link-btn">🤝 Community</a>
+            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
+            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
+            <a href="reports-exports.html" class="nav-link-btn active">📑 Exports</a>
+        </nav>
+
+        <div class="header-right">
+            <a href="index.html" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                <span>Open 3D Studio &rarr;</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
+        <div class="page-header-bar" style="margin-bottom: 24px;">
+            <div class="page-header-info">
+                <h2>Bioclimatic Engineering Documentation &amp; Code Synthesis</h2>
+                <p>Generate professional printable engineering reports, export standalone Python NumPy thermal simulation scripts, and download BIM GeoJSON models for GIS and CAD software.</p>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
+            <!-- Printable Report Card -->
+            <div class="assembly-card" style="padding: 24px;">
+                <div class="chart-title">📑 Printable Engineering Dossier</div>
+                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 12px 0;">
+                    Comprehensive engineering documentation formatted for municipal approval, disaster response agencies, and academic bioclimatic thesis submissions.
+                </p>
+                <button id="btn-open-report" class="export-btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 13px; cursor: pointer;">
+                    Printable Engineering Report &rarr;
+                </button>
+            </div>
+
+            <!-- Python Simulator Script -->
+            <div class="assembly-card" style="padding: 24px;">
+                <div class="chart-title">🐍 Python Numerical Simulation Code</div>
+                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 12px 0;">
+                    Self-contained Python script using NumPy and Matplotlib that reproduces the complete 24-hour diurnal energy balance offline on any machine.
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button id="btn-download-python" class="export-btn-primary" style="justify-content: center; padding: 10px; font-size: 12px; cursor: pointer;">
+                        Download .py File
+                    </button>
+                    <button id="btn-copy-python" class="btn-resend-otp" style="justify-content: center; padding: 10px; font-size: 12px; cursor: pointer;">
+                        Copy Script Code
+                    </button>
+                </div>
+            </div>
+
+            <!-- BIM GeoJSON Exporter -->
+            <div class="assembly-card" style="padding: 24px;">
+                <div class="chart-title">🌐 BIM GeoJSON &amp; GIS Geometry</div>
+                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 12px 0;">
+                    Export 3D volumetric vertices, envelope layer U-values, occupancy loads, and geographic site coordinates for QGIS, Blender, or Rhino.
+                </p>
+                <button id="btn-export-bim" class="export-btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 13px; background: linear-gradient(135deg, #8b5cf6, #0284c7); cursor: pointer;">
+                    Download BIM GeoJSON &rarr;
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Script Module -->
+    <script type="module">
+        import { generatePythonSimulationScript, openPrintableEngineeringReport, exportBIMGeoJSON } from './js/exporter.js';
+        import { generateDiurnalWeather } from './js/climateEngine.js';
+        import { ASSEMBLY_PRESETS } from './js/materialDatabase.js';
+        import { runThermalSimulation } from './js/thermalSolver.js';
+
+        const weather = generateDiurnalWeather('hot_arid');
+        const config = {
+            length: 6.0, width: 4.0, height: 3.0, roofPitch: 15,
+            wwr: 15, overhangDepth: 0.6, occupants: 3, ventMode: 'night_purge',
+            foundationType: 'slab',
+            wallAssembly: ASSEMBLY_PRESETS.walls.rammed_earth_300,
+            roofAssembly: ASSEMBLY_PRESETS.roofs.vaulted_earth_terracotta
+        };
+        const sim = runThermalSimulation(config, weather);
+
+        document.getElementById('btn-open-report').addEventListener('click', () => {
+            openPrintableEngineeringReport(config, weather, sim, []);
+        });
+
+        document.getElementById('btn-download-python').addEventListener('click', () => {
+            const pyCode = generatePythonSimulationScript(config, weather, sim);
+            const blob = new Blob([pyCode], { type: 'text/x-python' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `simulate_bioshelter_hot_arid.py`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('btn-copy-python').addEventListener('click', () => {
+            const pyCode = generatePythonSimulationScript(config, weather, sim);
+            navigator.clipboard.writeText(pyCode).then(() => alert('Python simulation script copied to clipboard!'));
+        });
+
+        document.getElementById('btn-export-bim').addEventListener('click', () => {
+            exportBIMGeoJSON(config, weather, sim);
+        });
+    </script>
+</body>
+</html>

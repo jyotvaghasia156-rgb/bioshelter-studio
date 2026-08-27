@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Emergency SOS Command Center - BioShelter Studio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <div class="logo-mark" style="background: rgba(239,68,68,0.2); border-color: #ef4444; color: #ef4444;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="header-title-group">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h1 class="app-title">BioShelter Studio</h1>
+                        <span class="app-badge" style="background: rgba(239,68,68,0.2); color: #ef4444;">SOS COMMAND</span>
+                    </div>
+                    <span class="app-subtitle">Universal Disaster SOS Command Center &amp; Siren Net</span>
+                </div>
+            </a>
+        </div>
+
+        <nav class="header-nav-links" style="display: flex; align-items: center; gap: 6px; overflow-x: auto;">
+            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
+            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
+            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
+            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
+            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
+            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
+            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
+            <a href="community.html" class="nav-link-btn">🤝 Community</a>
+            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
+            <a href="sos-command.html" class="nav-link-btn active" style="color: #ef4444;">🚨 SOS Command</a>
+            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
+        </nav>
+
+        <div class="header-right">
+            <a href="index.html" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                <span>Open 3D Studio &rarr;</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
+        <div class="page-header-bar" style="margin-bottom: 24px;">
+            <div class="page-header-info">
+                <h2>Universal Disaster SOS Command Center &amp; Emergency Net</h2>
+                <p>Web Audio API multi-tone emergency siren with live frequency modulation, flashing alert banner, and simulated SMS notification push toasts dispatched to all registered member phone numbers.</p>
+            </div>
+        </div>
+
+        <div class="grid-2-cols" style="gap: 24px; margin-bottom: 24px;">
+            <!-- Trigger Card -->
+            <div class="assembly-card" style="padding: 24px; border-color: rgba(239,68,68,0.4); background: linear-gradient(135deg, rgba(239,68,68,0.08), var(--bg-card));">
+                <div class="chart-title" style="color: #ef4444;">🚨 Trigger Universal Disaster Alert</div>
+                
+                <div class="control-group" style="margin-top: 14px;">
+                    <label class="control-label">Disaster Emergency Scenario</label>
+                    <select id="select-sos-scenario" class="input-select" style="font-weight: 700;">
+                        <option value="catastrophe_critical">🚨 Catastrophic Wet-Bulb Heatwave (> 48°C / 90% RH)</option>
+                        <option value="cyclone_surge">🌀 Super Cyclone &amp; Extreme Coastal Storm Surge</option>
+                        <option value="wildfire_front">🔥 Severe Wildfire Firestorm &amp; Ember Attack</option>
+                        <option value="haboob_sandstorm">🌪️ Dense Haboob Particulate Dust Storm</option>
+                        <option value="extreme_freeze">❄️ Arctic Polar Vortex &amp; Grid Failure</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button id="btn-trigger-sos-broadcast" class="export-btn-primary" style="flex: 1; padding: 14px; font-size: 14px; font-weight: 800; background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 0 20px rgba(239,68,68,0.4); cursor: pointer;">
+                        🚨 DISPATCH SOS EMERGENCY TO ALL USERS
+                    </button>
+                    <button id="btn-mute-siren" class="btn-resend-otp" style="padding: 14px; font-size: 12px; cursor: pointer;">
+                        🔇 Mute Siren
+                    </button>
+                </div>
+            </div>
+
+            <!-- Protocol Metrics -->
+            <div class="assembly-card" style="padding: 24px;">
+                <div class="chart-title">📡 Civil Defense Emergency Net Protocol</div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px;">
+                    <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid var(--border-glass);">
+                        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Active Subscribers</div>
+                        <div style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin: 4px 0;">248 Phones</div>
+                        <div style="font-size: 10px; color: #10b981;">100% Multi-Carrier Net</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; text-align: center; border: 1px solid var(--border-glass);">
+                        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Broadcast Latency</div>
+                        <div style="font-size: 22px; font-weight: 900; color: #10b981; margin: 4px 0;">180 ms</div>
+                        <div style="font-size: 10px; color: var(--text-muted);">Satellite Cellular Mesh</div>
+                    </div>
+                </div>
+
+                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-top: 14px;">
+                    When triggered, our system dispatches high-priority SMS notifications with coordinates to the nearest subterranean earth-sheltered refuge.
+                </p>
+            </div>
+        </div>
+
+        <!-- Live Dispatch Feed -->
+        <div class="assembly-card" style="padding: 24px;">
+            <div class="chart-title">📋 Live Emergency SOS Broadcast Logs</div>
+            <div id="sos-dispatch-feed" style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+    </main>
+
+    <!-- Script Module -->
+    <script type="module">
+        import { sosEngine, DISASTER_SCENARIOS } from './js/sosEngine.js';
+        import { userDataStore } from './js/userDataStore.js';
+
+        async function updateLogs() {
+            const logs = await userDataStore.getBroadcastLogs();
+            const feed = document.getElementById('sos-dispatch-feed');
+
+            feed.innerHTML = logs.map(l => `
+                <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 13px; font-weight: 800; color: #ef4444;">${l.title || '🚨 Catastrophic Emergency Alert'}</div>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">📍 Epicenter: ${l.epicenter || 'Regional Basin'} | Dispatched: ${new Date(l.dispatchedAt).toLocaleTimeString()}</div>
+                    </div>
+                    <span class="rec-priority-badge critical">DELIVERED TO ${l.totalSubscribers || 248} PHONES</span>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('btn-trigger-sos-broadcast').addEventListener('click', async () => {
+            const scKey = document.getElementById('select-sos-scenario').value;
+            const scenario = DISASTER_SCENARIOS[scKey] || DISASTER_SCENARIOS.catastrophe_critical;
+            sosEngine.triggerDisasterAlert(scenario);
+            alert(`🚨 EMERGENCY SOS DISPATCHED TO ALL REGISTERED MEMBER PHONES!\n\nAlert: ${scenario.title}\nRefuge Strategy: ${scenario.evacuationVector}`);
+            updateLogs();
+        });
+
+        document.getElementById('btn-mute-siren').addEventListener('click', () => {
+            sosEngine.stopSiren();
+            alert('🔇 Emergency Audio Siren Muted.');
+        });
+
+        document.addEventListener('DOMContentLoaded', updateLogs);
+    </script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community BioShelter Blueprints & Registry - BioShelter Studio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <div class="logo-mark">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="header-title-group">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h1 class="app-title">BioShelter Studio</h1>
+                        <span class="app-badge" style="background: rgba(16,185,129,0.2); color: #10b981;">COMMUNITY</span>
+                    </div>
+                    <span class="app-subtitle">Open-Source Community Blueprints &amp; Resilience Registry</span>
+                </div>
+            </a>
+        </div>
+
+        <nav class="header-nav-links" style="display: flex; align-items: center; gap: 6px; overflow-x: auto;">
+            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
+            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
+            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
+            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
+            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
+            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
+            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
+            <a href="community.html" class="nav-link-btn active">🤝 Community</a>
+            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
+            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
+            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
+        </nav>
+
+        <div class="header-right">
+            <a href="index.html" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                <span>Open 3D Studio &rarr;</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
+        <div class="page-header-bar" style="margin-bottom: 24px;">
+            <div class="page-header-info">
+                <h2>Open-Source Bioclimatic Shelter Registry &amp; Blueprints Hub</h2>
+                <p>Peer-reviewed community safe-havens, vernacular designs, and extreme weather refuges submitted by disaster relief architects worldwide.</p>
+            </div>
+            <div class="page-header-actions">
+                <a href="index.html" class="export-btn-primary" style="text-decoration: none; padding: 8px 16px; font-size: 12px;">
+                    + Submit Shelter Model
+                </a>
+            </div>
+        </div>
+
+        <div id="community-shelters-list" class="community-grid"></div>
+    </main>
+
+    <!-- Script Module -->
+    <script type="module">
+        import { userDataStore } from './js/userDataStore.js';
+
+        async function loadCommunity() {
+            const shelters = await userDataStore.getCommunityShelters();
+            const grid = document.getElementById('community-shelters-list');
+
+            grid.innerHTML = shelters.map(s => `
+                <div class="community-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div>
+                            <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">${s.name}</h3>
+                            <div style="font-size: 11px; color: var(--accent-sky); font-weight: 600; margin-top: 2px;">📍 ${s.location}</div>
+                        </div>
+                        <span class="rec-priority-badge low">Upvotes: ${s.upvotes || 1} 👍</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 6px; font-size: 11px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Zone</div>
+                            <div style="font-weight: 700; color: var(--text-primary);">${s.climateZone}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Typology</div>
+                            <div style="font-weight: 700; color: var(--accent-emerald);">${s.typology}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Capacity</div>
+                            <div style="font-weight: 700; color: #f59e0b;">${s.capacity} People</div>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
+                        Passive Strategy: <strong>${s.coolingStrategy || 'Natural Ventilation & Earth Berming'}</strong>.<br>
+                        Wall Assembly: ${s.wallMaterial}.
+                    </p>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: 10px;">
+                        <span style="font-size: 10px; color: var(--text-muted);">Author: ${s.authorName || 'Citizen Architect'}</span>
+                        <a href="index.html" class="export-btn-primary" style="text-decoration: none; padding: 6px 12px; font-size: 11px;">
+                            🚀 Open in 3D Twin &rarr;
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCommunity);
+    </script>
+</body>
+</html>

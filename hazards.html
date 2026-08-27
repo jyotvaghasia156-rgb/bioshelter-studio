@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citizen Disaster & Climate Hazard Crisis Feed - BioShelter Studio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <div class="logo-mark">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="header-title-group">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h1 class="app-title">BioShelter Studio</h1>
+                        <span class="app-badge" style="background: rgba(239,68,68,0.2); color: #ef4444;">HAZARD CRISIS NET</span>
+                    </div>
+                    <span class="app-subtitle">Citizen Disaster &amp; Climate Hazard Crisis Feed</span>
+                </div>
+            </a>
+        </div>
+
+        <nav class="header-nav-links" style="display: flex; align-items: center; gap: 6px; overflow-x: auto;">
+            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
+            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
+            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
+            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
+            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
+            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
+            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
+            <a href="community.html" class="nav-link-btn">🤝 Community</a>
+            <a href="hazards.html" class="nav-link-btn active">⚠️ Hazards</a>
+            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
+            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
+        </nav>
+
+        <div class="header-right">
+            <a href="index.html" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                <span>Open 3D Studio &rarr;</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
+        <div class="page-header-bar" style="margin-bottom: 24px;">
+            <div class="page-header-info">
+                <h2>Citizen Climate Crisis &amp; Extreme Disaster Hazard Feed</h2>
+                <p>Real-time citizen-reported climate anomalies, heatwave emergencies, flash flood warnings, and wildfire fronts with nearest subterranean shelter routing.</p>
+            </div>
+        </div>
+
+        <div id="hazard-reports-feed" class="community-grid"></div>
+    </main>
+
+    <!-- Script Module -->
+    <script type="module">
+        import { userDataStore } from './js/userDataStore.js';
+
+        async function loadHazards() {
+            const hazards = await userDataStore.getHazardReports();
+            const grid = document.getElementById('hazard-reports-feed');
+
+            grid.innerHTML = hazards.map(h => `
+                <div class="community-card" style="border-left: 4px solid ${h.severity === 'critical' ? '#ef4444' : (h.severity === 'high' ? '#f97316' : '#f59e0b')};">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                        <div>
+                            <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">${h.title}</h3>
+                            <div style="font-size: 11px; color: var(--accent-sky); font-weight: 600; margin-top: 2px;">📍 ${h.location}</div>
+                        </div>
+                        <span class="rec-priority-badge ${h.severity === 'critical' ? 'critical' : 'high'}">${h.severity.toUpperCase()}</span>
+                    </div>
+
+                    <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 10px 0;">
+                        ${h.description}
+                    </p>
+
+                    <div style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 8px; font-size: 11px; margin-bottom: 12px;">
+                        <span style="color: #ef4444; font-weight: 700;">Protocol Action:</span>
+                        <span style="color: var(--text-primary);">${h.actionsRecommended || 'Seek nearest subterranean thermal shelter.'}</span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted); border-top: 1px solid var(--border-glass); padding-top: 8px;">
+                        <span>Reported by: ${h.reportedBy || 'Citizen Responder'}</span>
+                        <a href="sos-command.html" style="color: #ef4444; font-weight: 700; text-decoration: none;">
+                            🚨 Broadcast SOS Alert &rarr;
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', loadHazards);
+    </script>
+</body>
+</html>

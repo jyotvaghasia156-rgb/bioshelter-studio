@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Comfort Havens & Vacation Matcher - BioShelter Studio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <div class="logo-mark">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="header-title-group">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h1 class="app-title">BioShelter Studio</h1>
+                        <span class="app-badge" style="background: rgba(16,185,129,0.2); color: #10b981;">LIFESTYLE HAVENS</span>
+                    </div>
+                    <span class="app-subtitle">Global Comfort Havens, Vacation Matcher &amp; Bioclimatic Analytics</span>
+                </div>
+            </a>
+        </div>
+
+        <nav class="header-nav-links" style="display: flex; align-items: center; gap: 6px; overflow-x: auto;">
+            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
+            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
+            <a href="comfort-places.html" class="nav-link-btn active">🌴 Comfort Havens</a>
+            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
+            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
+            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
+            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
+            <a href="community.html" class="nav-link-btn">🤝 Community</a>
+            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
+            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
+            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
+        </nav>
+
+        <div class="header-right">
+            <a href="index.html" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                <span>Open 3D Studio &rarr;</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
+        <div class="page-header-bar" style="margin-bottom: 24px;">
+            <div class="page-header-info">
+                <h2>Global Climate Havens &amp; Lifestyle Vacation Matcher</h2>
+                <p>Discover the world's most comfortable, enjoyable places to live and vacation based on bioclimatic data analysis. Set your ideal temperature, humidity, and lifestyle activities below, and our algorithm will rank the best destinations for you with Google Places integration!</p>
+            </div>
+            <div class="page-header-actions">
+                <button id="btn-reset-comfort-search" class="btn-resend-otp" style="font-size: 12px; padding: 8px 16px;">
+                    Reset to Default 23°C
+                </button>
+            </div>
+        </div>
+
+        <!-- Interactive User Preferences Card -->
+        <div class="assembly-card" style="padding: 24px; margin-bottom: 24px; background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(56,189,248,0.06)); border-color: rgba(16,185,129,0.3);">
+            <div style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#10b981"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                Customize Your Ideal Climate &amp; Lifestyle Criteria
+            </div>
+
+            <div class="grid-2-cols" style="gap: 20px;">
+                <!-- Preferred Temperature Slider -->
+                <div class="control-group">
+                    <label class="control-label" style="display: flex; justify-content: space-between;">
+                        <span>Target Daytime Temperature:</span>
+                        <span id="val-comfort-target-temp" class="control-value" style="color: var(--accent-emerald); font-size: 16px; font-weight: 800;">23.0°C</span>
+                    </label>
+                    <input type="range" id="slider-comfort-target-temp" class="input-slider" min="16" max="32" step="0.5" value="23.0">
+                    <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+                        <span>16°C (Crisp Mountain)</span>
+                        <span>23°C (Eternal Spring)</span>
+                        <span>32°C (Warm Beach)</span>
+                    </div>
+                </div>
+
+                <!-- Preferred Humidity Slider -->
+                <div class="control-group">
+                    <label class="control-label" style="display: flex; justify-content: space-between;">
+                        <span>Target Relative Humidity:</span>
+                        <span id="val-comfort-target-humidity" class="control-value" style="color: var(--accent-sky); font-size: 16px; font-weight: 800;">55%</span>
+                    </label>
+                    <input type="range" id="slider-comfort-target-humidity" class="input-slider" min="20" max="85" step="5" value="55">
+                    <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+                        <span>20% (Dry Desert Air)</span>
+                        <span>55% (Balanced Comfort)</span>
+                        <span>85% (Tropical Lush)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2-cols" style="gap: 20px; margin-top: 16px;">
+                <!-- Lifestyle Activity Selector -->
+                <div class="control-group">
+                    <label class="control-label">Favorite Lifestyle &amp; Vacation Setting:</label>
+                    <select id="select-comfort-lifestyle" class="input-select" style="font-weight: 600;">
+                        <option value="all">🌟 All Categories (Best Overall Bioclimates)</option>
+                        <option value="Eternal Spring">🌸 Eternal Spring &amp; Flower Cities</option>
+                        <option value="Coastal Paradise">🏖️ Coastal Paradise, Swimming &amp; Beaches</option>
+                        <option value="Mountain Retreat">🏔️ Mountain Retreat, Hiking &amp; Pine Forests</option>
+                        <option value="Cultural City">☕ Cultural Cities, Historic Cafés &amp; Parks</option>
+                        <option value="Tropical Wellness">🌿 Tropical Pura Vida &amp; Rain Forest Spas</option>
+                    </select>
+                </div>
+
+                <!-- Max Wind Speed -->
+                <div class="control-group">
+                    <label class="control-label" style="display: flex; justify-content: space-between;">
+                        <span>Max Preferred Wind Velocity:</span>
+                        <span id="val-comfort-max-wind" class="control-value" style="color: #f59e0b; font-size: 14px;">5.0 m/s (18 km/h)</span>
+                    </label>
+                    <input type="range" id="slider-comfort-max-wind" class="input-slider" min="2" max="10" step="0.5" value="5.0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Bioclimatic AI Analytics & Radar Chart Comparison Card -->
+        <div class="assembly-card" style="padding: 24px; margin-bottom: 24px; background: var(--bg-card);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div class="chart-title" style="margin-bottom: 0;">📊 Bioclimatic Data Analytics &amp; Life Enjoyment Radar (Google Places Integrated)</div>
+                <span class="section-badge" style="background: rgba(56,189,248,0.2); color: var(--accent-sky);">ASHRAE 55 Adaptive Analytics Engine</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; align-items: center;">
+                <!-- 6-Axis Spider / Radar Chart -->
+                <div style="position: relative; height: 320px; width: 100%; background: rgba(0,0,0,0.25); border-radius: 10px; padding: 12px; border: 1px solid var(--border-glass);">
+                    <canvas id="comfort-analytics-radar-chart"></canvas>
+                </div>
+
+                <!-- Dynamic AI Analytical Statement & Breakdown -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(56,189,248,0.1)); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 14px;">
+                        <div style="font-size: 11px; font-weight: 800; color: #10b981; text-transform: uppercase; margin-bottom: 4px;">🎯 AI Bioclimatic Optimization Match:</div>
+                        <div id="comfort-ai-summary-text" style="font-size: 14px; color: var(--text-primary); font-weight: 600; line-height: 1.5;">
+                            Based on your target of 23.0°C and 55% humidity, <strong>Medellín, Colombia</strong> and <strong>Funchal, Madeira</strong> offer a <strong>98% Bioclimatic Fit</strong> with over 330 days of natural comfort per year.
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-glass);">
+                            <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Thermal Stability (TSI)</div>
+                            <div id="analytics-tsi-val" style="font-size: 18px; font-weight: 800; color: #10b981;">96 / 100</div>
+                            <div style="font-size: 9px; color: var(--text-muted);">Diurnal Lag &lt; 5°C</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-glass);">
+                            <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Comfort Days/Yr</div>
+                            <div id="analytics-comfort-days-val" style="font-size: 18px; font-weight: 800; color: var(--accent-sky);">340 Days</div>
+                            <div style="font-size: 9px; color: var(--text-muted);">93% of Year</div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border-glass);">
+                            <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Life Enjoyment (LEI)</div>
+                            <div id="analytics-lei-val" style="font-size: 18px; font-weight: 800; color: #f59e0b;">97 / 100</div>
+                            <div style="font-size: 9px; color: var(--text-muted);">Optimal Biophilia</div>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                        Our analytics algorithm continuously evaluates <strong>diurnal stability, enthalpy deficit, negative ion maritime/alpine breezes, and annual sunshine hours</strong> from global meteorological satellite grids.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ranked Paradise Destinations Grid Container -->
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div class="chart-title" style="margin-bottom: 0;">Top Matched Global Climate Havens for You:</div>
+                <span id="comfort-results-count-badge" class="section-badge" style="background: rgba(16,185,129,0.2); color: #10b981; font-weight: 700;">8 Destinations Evaluated</span>
+            </div>
+            <div id="comfort-places-ranked-grid" class="community-grid"></div>
+        </div>
+    </main>
+
+    <!-- Script Module -->
+    <script type="module">
+        import { PARADISE_DESTINATIONS, analyzeAndRankComfortPlaces } from './js/comfortMatcherEngine.js';
+
+        let radarChart = null;
+
+        function renderComfortRadar(top3) {
+            const ctx = document.getElementById('comfort-analytics-radar-chart');
+            if (!ctx || !window.Chart) return;
+
+            const colors = [
+                { border: '#10b981', bg: 'rgba(16, 185, 129, 0.25)' },
+                { border: '#38bdf8', bg: 'rgba(56, 189, 248, 0.2)' },
+                { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' }
+            ];
+
+            const labels = ['Thermal Stability', 'Humidity Balance', 'Wind Comfort', 'Air Purity', 'Sunshine Vitality', 'Life Enjoyment'];
+            const datasets = top3.map((d, i) => ({
+                label: `${d.name} (${d.matchScore}% Match)`,
+                data: [
+                    d.analytics.thermalStability,
+                    d.analytics.humidityBalance,
+                    d.analytics.windComfort,
+                    d.analytics.airPurity,
+                    d.analytics.sunshineVitality,
+                    d.analytics.lifeEnjoymentScore
+                ],
+                borderColor: colors[i].border,
+                backgroundColor: colors[i].bg,
+                borderWidth: 2,
+                pointBackgroundColor: colors[i].border,
+                pointRadius: 3
+            }));
+
+            if (radarChart) {
+                radarChart.data.datasets = datasets;
+                radarChart.update();
+            } else {
+                radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(255,255,255,0.08)' },
+                                grid: { color: 'rgba(255,255,255,0.08)' },
+                                pointLabels: { color: '#94a3b8', font: { family: 'Inter', size: 10, weight: '600' } },
+                                ticks: { backdropColor: 'transparent', color: '#94a3b8', min: 50, max: 100, stepSize: 10 }
+                            }
+                        },
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { family: 'Inter', size: 10, weight: '700' } } } }
+                    }
+                });
+            }
+        }
+
+        function updateComfortView() {
+            const targetTemp = parseFloat(document.getElementById('slider-comfort-target-temp').value);
+            const targetHum = parseFloat(document.getElementById('slider-comfort-target-humidity').value);
+            const lifestyle = document.getElementById('select-comfort-lifestyle').value;
+            const maxWind = parseFloat(document.getElementById('slider-comfort-max-wind').value);
+
+            const ranked = analyzeAndRankComfortPlaces({ targetTemp, targetHumidity: targetHum, lifestyle, maxWind });
+
+            const top = ranked[0];
+            const second = ranked[1];
+            document.getElementById('comfort-ai-summary-text').innerHTML = `
+                Based on your target of <strong>${targetTemp.toFixed(1)}°C</strong> and <strong>${targetHum}% humidity</strong>, 
+                <strong>${top.name}, ${top.country}</strong> (${top.matchScore}% Match) and <strong>${second ? second.name : 'Madeira'}, ${second ? second.country : 'Portugal'}</strong> 
+                represent your optimal bioclimatic comfort zone with <strong>${top.comfortDaysPerYear} comfort days/year</strong>.
+            `;
+            document.getElementById('analytics-tsi-val').textContent = `${top.analytics.thermalStability} / 100`;
+            document.getElementById('analytics-comfort-days-val').textContent = `${top.comfortDaysPerYear} Days`;
+            document.getElementById('analytics-lei-val').textContent = `${top.analytics.lifeEnjoymentScore} / 100`;
+
+            renderComfortRadar(ranked.slice(0, 3));
+
+            const grid = document.getElementById('comfort-places-ranked-grid');
+            grid.innerHTML = ranked.map((d, index) => {
+                const isTop = index === 0;
+                const matchCol = d.matchScore >= 90 ? '#10b981' : (d.matchScore >= 75 ? '#38bdf8' : '#f59e0b');
+
+                return `
+                    <div class="community-card" style="border-color: ${isTop ? 'rgba(16,185,129,0.5)' : 'var(--border-glass)'}; background: ${isTop ? 'linear-gradient(135deg, rgba(16,185,129,0.06), var(--bg-card))' : 'var(--bg-card)'};">
+                        ${isTop ? `<div style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #10b981, #0284c7); color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; text-transform: uppercase;">🌟 #1 Top Bioclimatic Match</div>` : ''}
+                        
+                        <div style="display: flex; gap: 14px; align-items: flex-start;">
+                            <img src="${d.photoUrl}" alt="${d.name}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-glass);">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
+                                    <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">${d.name}</h3>
+                                    <span style="font-size: 14px; font-weight: 900; color: ${matchCol}; background: ${matchCol}18; padding: 2px 8px; border-radius: 6px; border: 1px solid ${matchCol}40;">${d.matchScore}% Match</span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--accent-sky); font-weight: 600;">${d.region}, ${d.country}</div>
+                                <div style="font-size: 11px; color: var(--text-secondary); font-style: italic; margin-top: 2px;">"${d.tagline}"</div>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Year-Round Temp</div>
+                                <div style="font-size: 14px; font-weight: 800; color: var(--accent-emerald);">${d.tempAvg}°C</div>
+                                <div style="font-size: 9px; color: var(--text-muted);">${d.tempMin}°C - ${d.tempMax}°C</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Humidity</div>
+                                <div style="font-size: 14px; font-weight: 800; color: var(--accent-sky);">${d.humidityAvg}%</div>
+                                <div style="font-size: 9px; color: var(--text-muted);">${d.airQuality}</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Wind Breeze</div>
+                                <div style="font-size: 14px; font-weight: 800; color: #f59e0b;">${d.windSpeedAvg} m/s</div>
+                                <div style="font-size: 9px; color: var(--text-muted);">${d.windDirection.split(' ')[0]}</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">
+                            <span>Elevation: <strong>${d.elevationMeters || 120}m</strong></span>
+                            <span>Sunshine: <strong>${d.sunshineHoursYear || 2400} hrs/yr</strong></span>
+                            <span>Comfort Days: <strong>${d.comfortDaysPerYear || 320} d/yr</strong></span>
+                        </div>
+
+                        <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.45; margin-bottom: 8px;">
+                            ${d.weatherStatement}
+                        </p>
+
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">
+                            ${d.idealFor.map(tag => `<span style="font-size: 10px; background: rgba(56,189,248,0.1); color: var(--accent-sky); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56,189,248,0.2);">${tag}</span>`).join('')}
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <a href="${d.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${d.lat},${d.lng}`}" target="_blank" rel="noopener noreferrer" class="btn-sign-in-nav" style="text-decoration: none; justify-content: center; font-size: 11px; padding: 7px; background: rgba(56,189,248,0.12); border-color: rgba(56,189,248,0.3); color: var(--accent-sky); font-weight: 700;">
+                                📍 Explore on Google Maps ↗
+                            </a>
+                            <a href="index.html" class="export-btn-primary" style="text-decoration: none; justify-content: center; font-size: 11px; padding: 7px; background: linear-gradient(135deg, #0284c7, #10b981); text-align: center;">
+                                🚀 Simulate in 3D &rarr;
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.getElementById('slider-comfort-target-temp').addEventListener('input', (e) => {
+            document.getElementById('val-comfort-target-temp').textContent = `${parseFloat(e.target.value).toFixed(1)}°C`;
+            updateComfortView();
+        });
+
+        document.getElementById('slider-comfort-target-humidity').addEventListener('input', (e) => {
+            document.getElementById('val-comfort-target-humidity').textContent = `${e.target.value}%`;
+            updateComfortView();
+        });
+
+        document.getElementById('select-comfort-lifestyle').addEventListener('change', updateComfortView);
+
+        document.getElementById('slider-comfort-max-wind').addEventListener('input', (e) => {
+            document.getElementById('val-comfort-max-wind').textContent = `${parseFloat(e.target.value).toFixed(1)} m/s (${Math.round(parseFloat(e.target.value)*3.6)} km/h)`;
+            updateComfortView();
+        });
+
+        document.getElementById('btn-reset-comfort-search').addEventListener('click', () => {
+            document.getElementById('slider-comfort-target-temp').value = 23.0;
+            document.getElementById('val-comfort-target-temp').textContent = '23.0°C';
+            document.getElementById('slider-comfort-target-humidity').value = 55;
+            document.getElementById('val-comfort-target-humidity').textContent = '55%';
+            document.getElementById('select-comfort-lifestyle').value = 'all';
+            document.getElementById('slider-comfort-max-wind').value = 5.0;
+            document.getElementById('val-comfort-max-wind').textContent = '5.0 m/s (18 km/h)';
+            updateComfortView();
+        });
+
+        document.addEventListener('DOMContentLoaded', updateComfortView);
+    </script>
+</body>
+</html>

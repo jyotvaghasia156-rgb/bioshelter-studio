@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bioclimatic Materials Laboratory & Assembly Builder - BioShelter Studio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <div class="logo-mark">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="header-title-group">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h1 class="app-title">BioShelter Studio</h1>
+                        <span class="app-badge" style="background: rgba(249,115,22,0.2); color: #f97316;">MATERIALS LAB</span>
+                    </div>
+                    <span class="app-subtitle">Bioclimatic Thermal Materials Laboratory &amp; Assembly Builder</span>
+                </div>
+            </a>
+        </div>
+
+        <nav class="header-nav-links" style="display: flex; align-items: center; gap: 6px; overflow-x: auto;">
+            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
+            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
+            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
+            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
+            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
+            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
+            <a href="materials-lab.html" class="nav-link-btn active">🧪 Materials Lab</a>
+            <a href="community.html" class="nav-link-btn">🤝 Community</a>
+            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
+            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
+            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
+        </nav>
+
+        <div class="header-right">
+            <a href="index.html" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                <span>Open 3D Studio &rarr;</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
+        <div class="page-header-bar" style="margin-bottom: 24px;">
+            <div class="page-header-info">
+                <h2>Envelope Multi-Layer Thermal Physics &amp; Biomaterials Laboratory</h2>
+                <p>Construct multi-layer wall and roof assemblies, compute exact steady-state U-values ($W/m^2\cdot K$), periodic thermal time lags ($hrs$), decrement factors ($f$), and synthesize custom low-carbon vernacular biomaterials.</p>
+            </div>
+        </div>
+
+        <div class="grid-2-cols" style="gap: 24px; margin-bottom: 24px;">
+            <!-- Wall Assembly Card -->
+            <div class="assembly-card">
+                <div class="assembly-header">
+                    <div>
+                        <div class="assembly-title">Exterior Wall Assembly Builder</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">Multi-layer conduction and thermal mass profile</div>
+                    </div>
+                    <div class="assembly-stats">
+                        <div class="stat-pill">
+                            <span class="stat-pill-label">U-Value:</span>
+                            <span id="wall-u-val" class="stat-pill-value">0.42 W/m²·K</span>
+                        </div>
+                        <div class="stat-pill">
+                            <span class="stat-pill-label">Time Lag:</span>
+                            <span id="wall-lag-val" class="stat-pill-value">11.4 hrs (f = 0.14)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layer-list" id="wall-layers-list">
+                    <div class="layer-row">
+                        <div class="layer-info">
+                            <span class="layer-name">Rammed Earth Monolith (Clay + Sand)</span>
+                            <span class="layer-meta">k: 1.10 W/m·K | ρ: 1950 kg/m³ | Cp: 1260 J/kg·K</span>
+                        </div>
+                        <span style="font-weight: 700; font-size: 13px; color: var(--accent-sky);">300 mm</span>
+                    </div>
+                    <div class="layer-row">
+                        <div class="layer-info">
+                            <span class="layer-name">Hemp-Lime Insulation Board</span>
+                            <span class="layer-meta">k: 0.045 W/m·K | ρ: 320 kg/m³ | Cp: 1800 J/kg·K</span>
+                        </div>
+                        <span style="font-weight: 700; font-size: 13px; color: var(--accent-emerald);">50 mm</span>
+                    </div>
+                    <div class="layer-row">
+                        <div class="layer-info">
+                            <span class="layer-name">Lime-Gypsum Internal Plaster</span>
+                            <span class="layer-meta">k: 0.70 W/m·K | ρ: 1400 kg/m³ | Cp: 1000 J/kg·K</span>
+                        </div>
+                        <span style="font-weight: 700; font-size: 13px; color: var(--text-primary);">20 mm</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roof Assembly Card -->
+            <div class="assembly-card">
+                <div class="assembly-header">
+                    <div>
+                        <div class="assembly-title">Bioclimatic Roof Assembly Builder</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">Solar reflectance, phase delay, and insulation</div>
+                    </div>
+                    <div class="assembly-stats">
+                        <div class="stat-pill">
+                            <span class="stat-pill-label">U-Value:</span>
+                            <span id="roof-u-val" class="stat-pill-value">0.31 W/m²·K</span>
+                        </div>
+                        <div class="stat-pill">
+                            <span class="stat-pill-label">Time Lag:</span>
+                            <span id="roof-lag-val" class="stat-pill-value">13.2 hrs (f = 0.08)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layer-list" id="roof-layers-list">
+                    <div class="layer-row">
+                        <div class="layer-info">
+                            <span class="layer-name">High-Albedo Terracotta Clay Tiles</span>
+                            <span class="layer-meta">k: 0.85 W/m·K | ρ: 1800 kg/m³ | Albedo: 0.75</span>
+                        </div>
+                        <span style="font-weight: 700; font-size: 13px; color: var(--accent-sky);">25 mm</span>
+                    </div>
+                    <div class="layer-row">
+                        <div class="layer-info">
+                            <span class="layer-name">Compressed Straw / Rice Husk Board</span>
+                            <span class="layer-meta">k: 0.055 W/m·K | ρ: 250 kg/m³ | Cp: 2000 J/kg·K</span>
+                        </div>
+                        <span style="font-weight: 700; font-size: 13px; color: var(--accent-emerald);">80 mm</span>
+                    </div>
+                    <div class="layer-row">
+                        <div class="layer-info">
+                            <span class="layer-name">Earthen Vault Masonry Core</span>
+                            <span class="layer-meta">k: 0.90 W/m·K | ρ: 1600 kg/m³ | Cp: 1100 J/kg·K</span>
+                        </div>
+                        <span style="font-weight: 700; font-size: 13px; color: var(--text-primary);">150 mm</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Material Synthesizer Form & Material Catalog -->
+        <div class="assembly-card" style="padding: 24px;">
+            <div class="chart-title">🔬 Vernacular Biomaterial Physical Properties Catalog</div>
+            <div style="overflow-x: auto; margin-top: 14px;">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Material Name</th>
+                            <th>Category</th>
+                            <th>Conductivity (k)</th>
+                            <th>Density (ρ)</th>
+                            <th>Specific Heat (Cp)</th>
+                            <th>Embodied Carbon</th>
+                            <th>Bio-Regenerative Source</th>
+                        </tr>
+                    </thead>
+                    <tbody id="materials-catalog-body">
+                        <tr>
+                            <td><strong>Rammed Earth (CEB)</strong></td>
+                            <td>Heavy Earthen Mass</td>
+                            <td>1.10 W/m·K</td>
+                            <td>1950 kg/m³</td>
+                            <td>1260 J/kg·K</td>
+                            <td>12 kg CO₂/m³</td>
+                            <td>100% Local Subsoil</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sun-Dried Straw Adobe</strong></td>
+                            <td>Tempered Earth</td>
+                            <td>0.60 W/m·K</td>
+                            <td>1500 kg/m³</td>
+                            <td>1100 J/kg·K</td>
+                            <td>8 kg CO₂/m³</td>
+                            <td>Local Clay + Agricultural Byproducts</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hemp-Lime Bio-Composite</strong></td>
+                            <td>Thermal Insulation</td>
+                            <td>0.045 W/m·K</td>
+                            <td>320 kg/m³</td>
+                            <td>1800 J/kg·K</td>
+                            <td>-108 kg CO₂/m³ (Carbon Negative)</td>
+                            <td>Industrial Hemp Shiv + Hydraulic Lime</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Thatched Rice Straw Thatch</strong></td>
+                            <td>Organic Roofing</td>
+                            <td>0.070 W/m·K</td>
+                            <td>180 kg/m³</td>
+                            <td>1900 J/kg·K</td>
+                            <td>-45 kg CO₂/m³</td>
+                            <td>Crop Residue Biomass</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

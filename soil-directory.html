@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Soil Directory & District Geotechnical Explorer - BioShelter Studio</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <div class="logo-mark">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <div class="header-title-group">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h1 class="app-title">BioShelter Studio</h1>
+                        <span class="app-badge" style="background: rgba(245,158,11,0.2); color: #f59e0b;">GEOTECHNICS</span>
+                    </div>
+                    <span class="app-subtitle">Global Soil Directory &amp; World District Geotechnical Explorer</span>
+                </div>
+            </a>
+        </div>
+
+        <nav class="header-nav-links" style="display: flex; align-items: center; gap: 6px; overflow-x: auto;">
+            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
+            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
+            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
+            <a href="soil-directory.html" class="nav-link-btn active">🌍 Soil Directory</a>
+            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
+            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
+            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
+            <a href="community.html" class="nav-link-btn">🤝 Community</a>
+            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
+            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
+            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
+        </nav>
+
+        <div class="header-right">
+            <a href="index.html" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; text-decoration: none;">
+                <span>Open 3D Studio &rarr;</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
+        <div class="page-header-bar" style="margin-bottom: 24px;">
+            <div class="page-header-info">
+                <h2>Global Soil Directory &amp; World District Geotechnical Explorer</h2>
+                <p>Comprehensive geotechnical soil taxonomy, thermal conductivity, and earth-sheltered suitability across worldwide countries and districts from Google Earth and ISRIC World Soil Grids.</p>
+            </div>
+        </div>
+
+        <!-- Soil Overview & Geothermal Attenuation Calculator -->
+        <div class="soil-overview-grid" style="margin-bottom: 24px;">
+            <div class="soil-props-card">
+                <div class="chart-title">Geotechnical Soil Profile &amp; Diffusivity</div>
+                <div class="control-group">
+                    <label class="control-label">Regional Soil Classification</label>
+                    <select id="select-soil-type" class="input-select">
+                        <option value="desert_sand">Desert Dune Sand (Coarse &amp; Dry)</option>
+                        <option value="black_cotton_clay">Black Cotton Soil (Expansive Clay)</option>
+                        <option value="alluvial_loam">Alluvial Loam (Agricultural Plain)</option>
+                        <option value="laterite_red_soil">Laterite &amp; Hard Red Bedrock</option>
+                        <option value="alpine_permafrost_scree">Alpine Scree &amp; Permafrost Subsoil</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Earth Berming Depth: <span id="val-soil-depth" class="control-value">3.0</span>m</label>
+                    <input type="range" id="slider-soil-depth" class="input-slider" min="0.5" max="6.0" step="0.5" value="3.0">
+                </div>
+
+                <div class="soil-metrics-grid">
+                    <div class="soil-metric-box">
+                        <span class="hud-metric-label">Thermal Conductivity (k)</span>
+                        <span id="soil-k-val" class="hud-metric-val" style="color: var(--accent-sky);">0.35 W/m·K</span>
+                    </div>
+                    <div class="soil-metric-box">
+                        <span class="hud-metric-label">Thermal Diffusivity (α)</span>
+                        <span id="soil-diffusivity-val" class="hud-metric-val" style="color: var(--accent-emerald);">0.022 m²/day</span>
+                    </div>
+                    <div class="soil-metric-box">
+                        <span class="hud-metric-label">Moisture Content</span>
+                        <span id="soil-moisture-val" class="hud-metric-val">3%</span>
+                    </div>
+                    <div class="soil-metric-box">
+                        <span class="hud-metric-label">Safe Bearing Capacity</span>
+                        <span id="soil-bearing-val" class="hud-metric-val">200 kN/m²</span>
+                    </div>
+                </div>
+
+                <div class="suitability-callout">
+                    <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Earthen Construction Suitability:</div>
+                    <div id="soil-suitability-text">Optimal compaction for Earthbag / Superadobe and rammed earth with local clay-silt stabilizer.</div>
+                </div>
+            </div>
+
+            <div class="soil-props-card">
+                <div class="chart-title">Subsurface Geothermal Passive Cooling</div>
+                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                    Earth-sheltering dampens extreme surface temperature swings using soil volumetric heat capacity. At 3.0m depth, ground temperature remains stable year-round without mechanical power.
+                </p>
+                <div class="hud-metric-box" style="padding: 14px; background: rgba(16,185,129,0.05); border-color: rgba(16,185,129,0.2); margin-top: 14px;">
+                    <div class="hud-metric-label">Steady Geothermal Temperature</div>
+                    <div id="soil-geothermal-benefit" class="hud-value-large" style="color: var(--accent-emerald); font-size: 22px; margin-top: 4px;">23.5°C (ΔT = 16.0°C cooling)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kusuda Subsurface Temperature Attenuation Chart -->
+        <div class="chart-container-card" style="margin-bottom: 24px;">
+            <div class="chart-card-header">
+                <div class="chart-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-5.33 0-8 3.2-8 7.14 0 2.36 1.4 4.54 3.8 6.55L12 20.5l4.2-4.81c2.4-2.01 3.8-4.19 3.8-6.55C20 5.2 17.33 2 12 2z"/></svg>
+                    Annual Ground Temperature vs. Depth Attenuation (Kusuda Formulation: z = 0m to 6m)
+                </div>
+            </div>
+            <div class="chart-canvas-wrapper" style="height: 280px;">
+                <canvas id="soil-depth-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Global Soil Directory Section -->
+        <div class="assembly-card" style="padding: 24px; background: var(--bg-card); border-color: rgba(56,189,248,0.3);">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <div>
+                    <div class="chart-title" style="margin-bottom: 2px;">🌍 Global District Geotechnical Database</div>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">Explore soil characteristics, mineral thermal diffusivity, and earthen building suitability across world districts.</p>
+                </div>
+                <span id="soil-directory-count-badge" class="section-badge" style="background: rgba(16,185,129,0.2); color: #10b981; font-weight: 700;">14 Districts Evaluated</span>
+            </div>
+
+            <!-- Live Search & Nature Filter Toolbar -->
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <div style="flex: 1; min-width: 260px; position: relative;">
+                        <input type="text" id="input-soil-search" class="input-text" placeholder="🔍 Search by Country, District, City, or Soil Name (e.g. Jaisalmer, Texas, Laterite, Clay, Desert Sand)..." style="width: 100%; padding: 10px 14px; font-size: 13px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); color: var(--text-primary);">
+                    </div>
+                    <select id="select-soil-country" class="input-select" style="min-width: 170px; font-size: 12px; font-weight: 600;">
+                        <option value="all">🌐 All Countries</option>
+                        <option value="India">🇮🇳 India (Thar, Deccan, Punjab...)</option>
+                        <option value="United States">🇺🇸 United States (Arizona, Texas, CA...)</option>
+                        <option value="United Arab Emirates">🇦🇪 UAE / Middle East</option>
+                        <option value="Egypt">🇪🇬 Egypt / North Africa</option>
+                        <option value="Spain">🇪🇸 Spain / Mediterranean</option>
+                        <option value="Portugal">🇵🇹 Portugal / Madeira</option>
+                        <option value="Colombia">🇨🇴 Colombia / Andes</option>
+                    </select>
+                    <button id="btn-reset-soil-filters" class="btn-resend-otp" style="font-size: 11px; padding: 6px 12px;">
+                        Reset Filters
+                    </button>
+                </div>
+
+                <!-- Filter Chips by Nature / Taxonomy -->
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <button class="soil-nature-chip active" data-soil-nature="all" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: var(--accent-emerald); color: white; border: none; font-weight: 700; cursor: pointer;">
+                        🌟 All Soil Natures
+                    </button>
+                    <button class="soil-nature-chip" data-soil-nature="arid_desert" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); color: #f59e0b; font-weight: 600; cursor: pointer;">
+                        🏜️ Desert Sands (High Thermal Damping)
+                    </button>
+                    <button class="soil-nature-chip" data-soil-nature="expansive_clay" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #ef4444; font-weight: 600; cursor: pointer;">
+                        🧱 Expansive Clays (High Thermal Mass)
+                    </button>
+                    <button class="soil-nature-chip" data-soil-nature="alluvial_loam" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); color: var(--accent-sky); font-weight: 600; cursor: pointer;">
+                        🌾 Alluvial Loams (Optimal Cohesion)
+                    </button>
+                    <button class="soil-nature-chip" data-soil-nature="tropical_laterite" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.4); color: #f97316; font-weight: 600; cursor: pointer;">
+                        🌲 Tropical Laterites (High Compressive)
+                    </button>
+                    <button class="soil-nature-chip" data-soil-nature="volcanic_ash" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4); color: #a855f7; font-weight: 600; cursor: pointer;">
+                        🌋 Volcanic Ash (Geothermal Balance)
+                    </button>
+                    <button class="soil-nature-chip" data-soil-nature="alpine_permafrost" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(129,140,248,0.15); border: 1px solid rgba(129,140,248,0.4); color: #818cf8; font-weight: 600; cursor: pointer;">
+                        ❄️ Alpine Scree &amp; Permafrost
+                    </button>
+                </div>
+            </div>
+
+            <!-- Soil Directory Results Grid -->
+            <div id="global-soil-directory-grid" class="community-grid"></div>
+        </div>
+    </main>
+
+    <!-- Script Module -->
+    <script type="module">
+        import { SOIL_PROFILES, GLOBAL_SOIL_DIRECTORY, filterAndSearchSoilDirectory, calculateSoilDepthProfile } from './js/soilEngine.js';
+
+        let soilDepthChart = null;
+
+        function updateSoilView() {
+            const soilId = document.getElementById('select-soil-type').value;
+            const depth = parseFloat(document.getElementById('slider-soil-depth').value);
+            const profile = SOIL_PROFILES[soilId] || SOIL_PROFILES.desert_sand;
+
+            document.getElementById('soil-k-val').textContent = `${profile.k} W/m·K`;
+            document.getElementById('soil-diffusivity-val').textContent = `${profile.diffusivityDay} m²/day`;
+            document.getElementById('soil-moisture-val').textContent = `${profile.moistureContent}%`;
+            document.getElementById('soil-bearing-val').textContent = `${profile.bearingCapacity} kN/m²`;
+            document.getElementById('soil-suitability-text').textContent = profile.description;
+
+            const depthData = calculateSoilDepthProfile(profile, 34.0, 14.0, depth);
+            if (depthData && depthData.coolingAtSelectedDepth) {
+                document.getElementById('soil-geothermal-benefit').textContent = `${depthData.coolingAtSelectedDepth.summerTemp}°C (ΔT = ${depthData.coolingAtSelectedDepth.earthTubeCoolingDelta}°C passive cooling)`;
+            }
+
+            renderChart(depthData);
+        }
+
+        function renderChart(depthData) {
+            const ctx = document.getElementById('soil-depth-chart');
+            if (!ctx || !window.Chart) return;
+
+            const labels = depthData.depthTemps.map(d => `${d.depth}m`);
+            const summerTemps = depthData.depthTemps.map(d => d.summerTemp);
+            const winterTemps = depthData.depthTemps.map(d => d.winterTemp);
+
+            if (soilDepthChart) {
+                soilDepthChart.data.labels = labels;
+                soilDepthChart.data.datasets[0].data = summerTemps;
+                soilDepthChart.data.datasets[1].data = winterTemps;
+                soilDepthChart.update();
+            } else {
+                soilDepthChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [
+                            { label: 'Summer Peak Subsurface Temp (°C)', data: summerTemps, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', tension: 0.35, fill: false, borderWidth: 2.5 },
+                            { label: 'Winter Peak Subsurface Temp (°C)', data: winterTemps, borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', tension: 0.35, fill: false, borderWidth: 2.5 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#94a3b8' }, title: { display: true, text: 'Subterranean Depth (Meters)', color: '#38bdf8' } },
+                            y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#94a3b8' }, title: { display: true, text: 'Ground Temperature (°C)', color: '#10b981' } }
+                        },
+                        plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11, weight: '600' } } } }
+                    }
+                });
+            }
+        }
+
+        function renderDirectory() {
+            const query = document.getElementById('input-soil-search').value;
+            const country = document.getElementById('select-soil-country').value;
+            const activeChip = document.querySelector('.soil-nature-chip.active');
+            const nature = activeChip ? activeChip.getAttribute('data-soil-nature') : 'all';
+
+            const soils = filterAndSearchSoilDirectory(query, nature, country);
+            document.getElementById('soil-directory-count-badge').textContent = `${soils.length} Districts Found`;
+
+            const grid = document.getElementById('global-soil-directory-grid');
+            grid.innerHTML = soils.map(s => `
+                <div class="community-card">
+                    <div style="display: flex; gap: 14px; align-items: flex-start;">
+                        <img src="${s.photoUrl || 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=600&auto=format&fit=crop&q=80'}" alt="${s.name}" style="width: 75px; height: 75px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-glass);">
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px;">
+                                <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">${s.name}</h3>
+                                <span style="font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: rgba(56,189,248,0.15); color: var(--accent-sky); border: 1px solid rgba(56,189,248,0.3);">${s.natureTitle ? s.natureTitle.split(' ')[0] : '🌍'} ${s.country}</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--accent-sky); font-weight: 600;">📍 ${s.district}, ${s.country}</div>
+                            <div style="font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px;">Taxonomy: ${s.taxonomy}</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 12px 0; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 6px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Conductivity</div>
+                            <div style="font-size: 12px; font-weight: 800; color: var(--accent-sky);">${s.k} W/m·K</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Density</div>
+                            <div style="font-size: 12px; font-weight: 800; color: var(--text-primary);">${s.rho} kg/m³</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Moisture</div>
+                            <div style="font-size: 12px; font-weight: 800; color: var(--accent-emerald);">${s.moistureContent}%</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Bearing Cap.</div>
+                            <div style="font-size: 12px; font-weight: 800; color: #f59e0b;">${s.bearingCapacity} kN/m²</div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 6px; padding: 7px 10px; margin-bottom: 8px; font-size: 11px;">
+                        <span style="color: #10b981; font-weight: 700;">Earth Cooling Potential:</span>
+                        <span style="color: var(--text-secondary);">${s.earthTubeCoolingPotential || '-8.5°C at 3m'}</span>
+                    </div>
+
+                    <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.45; margin-bottom: 10px;">
+                        ${s.description}
+                    </p>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">
+                        ${(s.bestTechniques || ['Rammed Earth', 'SuperAdobe Earthbag', 'Adobe']).map(t => `<span style="font-size: 9px; background: rgba(56,189,248,0.1); color: var(--accent-sky); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56,189,248,0.2);">${t}</span>`).join('')}
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <a href="${s.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`}" target="_blank" rel="noopener noreferrer" class="btn-sign-in-nav" style="text-decoration: none; justify-content: center; font-size: 11px; padding: 7px; background: rgba(56,189,248,0.12); border-color: rgba(56,189,248,0.3); color: var(--accent-sky); font-weight: 700;">
+                            📍 Explore on Google Maps ↗
+                        </a>
+                        <a href="index.html" class="export-btn-primary" style="text-decoration: none; justify-content: center; font-size: 11px; padding: 7px; background: linear-gradient(135deg, #0284c7, #10b981); text-align: center;">
+                            🚀 Apply to 3D Twin &rarr;
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('select-soil-type').addEventListener('change', updateSoilView);
+        document.getElementById('slider-soil-depth').addEventListener('input', (e) => {
+            document.getElementById('val-soil-depth').textContent = e.target.value;
+            updateSoilView();
+        });
+
+        document.getElementById('input-soil-search').addEventListener('input', renderDirectory);
+        document.getElementById('select-soil-country').addEventListener('change', renderDirectory);
+        document.querySelectorAll('.soil-nature-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.soil-nature-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                renderDirectory();
+            });
+        });
+
+        document.getElementById('btn-reset-soil-filters').addEventListener('click', () => {
+            document.getElementById('input-soil-search').value = '';
+            document.getElementById('select-soil-country').value = 'all';
+            document.querySelectorAll('.soil-nature-chip').forEach(c => c.classList.remove('active'));
+            document.querySelector('.soil-nature-chip[data-soil-nature="all"]').classList.add('active');
+            renderDirectory();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSoilView();
+            renderDirectory();
+        });
+    </script>
+</body>
+</html>
