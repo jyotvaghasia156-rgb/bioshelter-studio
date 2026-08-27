@@ -1,6 +1,20 @@
 {
     "users":  [
                   {
+                      "registeredAt":  "2026-08-27T23:14:49.8402561+05:30",
+                      "id":  "usr_goog_8932",
+                      "email":  "jyot@gmail.com",
+                      "avatarUrl":  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120\u0026auto=format\u0026fit=crop\u0026q=80",
+                      "verifiedPhone":  true,
+                      "institution":  "Sustainable Habitat \u0026 Bioclimatic Lab",
+                      "verifiedAccount":  true,
+                      "role":  "Lead Thermal Modeling Physicist",
+                      "providerName":  "Google Account Verified",
+                      "provider":  "google",
+                      "phone":  "+1 (415) 555-0192",
+                      "displayName":  "Jyot Vaghasia"
+                  },
+                  {
                       "registeredAt":  "2026-08-27T21:28:15.3911720+05:30",
                       "id":  "usr_signup_1787866095_968",
                       "email":  "priya.sen@disaster-resilience.in",
