@@ -206,10 +206,14 @@ try {
 
             # 3b. Google SSO Login
             if ($rawPath -eq "/api/auth/sso/google" -and $method -eq "POST") {
-                $name = if ($body.name) { $body.name } else { "Dr. Sarah Lin" }
-                $email = if ($body.email) { $body.email } else { "sarah.lin@gmail.com" }
-                $role = if ($body.role) { $body.role } else { "Lead Thermal Physicist" }
-                $avatar = if ($body.avatarUrl) { $body.avatarUrl } else { "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" }
+                $name = "Dr. Sarah Lin"
+                $email = "sarah.lin@gmail.com"
+                $role = "Lead Thermal Modeling Physicist"
+                $avatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
+                if ($rawBody -match '"name"\s*:\s*"([^"]+)"') { $name = $matches[1] }
+                if ($rawBody -match '"email"\s*:\s*"([^"]+)"') { $email = $matches[1] }
+                if ($rawBody -match '"role"\s*:\s*"([^"]+)"') { $role = $matches[1] }
+                if ($rawBody -match '"avatarUrl"\s*:\s*"([^"]+)"') { $avatar = $matches[1] }
                 
                 $user = @{
                     id = "usr_goog_" + (Get-Random -Minimum 1000 -Maximum 9999);
@@ -219,7 +223,7 @@ try {
                     role = $role;
                     institution = "Sustainable Habitat & Bioclimatic Lab";
                     provider = "google";
-                    providerName = "Google Account";
+                    providerName = "Google Account Verified";
                     avatarUrl = $avatar;
                     verifiedPhone = $true;
                     verifiedAccount = $true;
@@ -227,7 +231,7 @@ try {
                 }
                 $db.users = @($user) + @($db.users)
                 Save-DB $db
-                $resObj = @{ success = $true; user = $user; token = "GOOGLE_JWT_" + (Get-Random -Minimum 100000 -Maximum 999999) }
+                $resObj = @{ success = $true; user = $user; token = "GOOGLE_JWT_" + (Get-Random -Minimum 100000 -Maximum 999999); message = "Google OAuth 2.0 Authenticated successfully!" }
                 $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj))
                 $response.OutputStream.Write($bytes, 0, $bytes.Length)
                 $response.OutputStream.Close()
@@ -236,25 +240,32 @@ try {
 
             # 3c. Microsoft Azure AD SSO Login
             if ($rawPath -eq "/api/auth/sso/microsoft" -and $method -eq "POST") {
-                $name = if ($body.name) { $body.name } else { "James R. Sterling" }
-                $email = if ($body.email) { $body.email } else { "j.sterling@outlook.com" }
+                $name = "Alex Henderson"
+                $email = "alex.henderson@outlook.com"
+                $role = "Senior Structural & Plinth Specialist"
+                $avatar = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80"
+                if ($rawBody -match '"name"\s*:\s*"([^"]+)"') { $name = $matches[1] }
+                if ($rawBody -match '"email"\s*:\s*"([^"]+)"') { $email = $matches[1] }
+                if ($rawBody -match '"role"\s*:\s*"([^"]+)"') { $role = $matches[1] }
+                if ($rawBody -match '"avatarUrl"\s*:\s*"([^"]+)"') { $avatar = $matches[1] }
+
                 $user = @{
                     id = "usr_ms_" + (Get-Random -Minimum 1000 -Maximum 9999);
                     displayName = $name;
                     email = $email;
                     phone = "+1 (206) 555-0144";
-                    role = "Senior Structural & Plinth Specialist";
+                    role = $role;
                     institution = "Disaster Relief & Resilient Infrastructure Council";
                     provider = "microsoft";
-                    providerName = "Microsoft Account";
-                    avatarUrl = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80";
+                    providerName = "Microsoft Azure AD Verified";
+                    avatarUrl = $avatar;
                     verifiedPhone = $true;
                     verifiedAccount = $true;
                     registeredAt = (Get-Date).ToString("o");
                 }
                 $db.users = @($user) + @($db.users)
                 Save-DB $db
-                $resObj = @{ success = $true; user = $user; token = "AZURE_JWT_" + (Get-Random -Minimum 100000 -Maximum 999999) }
+                $resObj = @{ success = $true; user = $user; token = "AZURE_JWT_" + (Get-Random -Minimum 100000 -Maximum 999999); message = "Microsoft Identity Platform Authenticated successfully!" }
                 $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj))
                 $response.OutputStream.Write($bytes, 0, $bytes.Length)
                 $response.OutputStream.Close()

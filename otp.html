@@ -323,11 +323,26 @@
             <p id="success-desc" style="font-size: 13px; color: #94a3b8;">Connecting authenticated session with 3D Simulation Twin &amp; Disaster Crisis Net...</p>
         </div>
 
+        <!-- Google & Microsoft 1-Click SSO Buttons -->
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; text-align: center;">Or Direct Single Sign-On (1-Click):</div>
+            <div style="display: flex; gap: 8px;">
+                <button id="btn-otp-google-sso" style="flex: 1; padding: 11px 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid rgba(234, 67, 53, 0.4); background: rgba(234, 67, 53, 0.08); color: #fca5a5; cursor: pointer; border-radius: 10px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 12.713L1.043 4.225A2.001 2.001 0 013 3h18c.737 0 1.393.4 1.748 1L12 12.713z"/><path fill="#4285F4" d="M1.043 4.225C1.015 4.314 1 4.406 1 4.5V19a2 2 0 002 2h4V10.713L1.043 4.225z"/><path fill="#34A853" d="M23 4.5c0-.094-.015-.186-.043-.275L17 10.713V21h4a2 2 0 002-2V4.5z"/><path fill="#FBBC05" d="M7 21h10v-9.287L12 15.5l-5-3.787V21z"/></svg>
+                    Google Sign-In
+                </button>
+                <button id="btn-otp-ms-sso" style="flex: 1; padding: 11px 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid rgba(0, 164, 239, 0.4); background: rgba(0, 164, 239, 0.08); color: #7dd3fc; cursor: pointer; border-radius: 10px;">
+                    <svg width="15" height="15" viewBox="0 0 21 21"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>
+                    Microsoft Sign-In
+                </button>
+            </div>
+        </div>
+
         <!-- Guest Explorer Bypass -->
-        <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; text-align: center;">
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; text-align: center;">
             <button id="btn-guest-bypass" style="background: none; border: none; color: #38bdf8; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0 auto;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                👤 Continue as Guest Mode (1-Click Instant Unlock) &rarr;
+                👤 Continue as Guest Mode (Instant Unlock) &rarr;
             </button>
         </div>
     </div>
@@ -506,6 +521,24 @@
             step1.style.display = 'flex';
             step2.style.display = 'none';
         });
+
+        // Google SSO 1-Click
+        const btnOtpGoogle = document.getElementById('btn-otp-google-sso');
+        if (btnOtpGoogle) {
+            btnOtpGoogle.addEventListener('click', async () => {
+                const user = await authInstance.loginWithGoogle();
+                connectToMainPage(user);
+            });
+        }
+
+        // Microsoft SSO 1-Click
+        const btnOtpMs = document.getElementById('btn-otp-ms-sso');
+        if (btnOtpMs) {
+            btnOtpMs.addEventListener('click', async () => {
+                const user = await authInstance.loginWithMicrosoft();
+                connectToMainPage(user);
+            });
+        }
 
         // Guest Mode
         document.getElementById('btn-guest-bypass').addEventListener('click', () => {

@@ -1,6 +1,62 @@
 {
     "users":  [
                   {
+                      "registeredAt":  "2026-08-27T20:54:53.4360415+05:30",
+                      "id":  "usr_ms_8111",
+                      "email":  "elena.rostova@un-habitat.org",
+                      "avatarUrl":  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120\u0026auto=format\u0026fit=crop\u0026q=80",
+                      "verifiedPhone":  true,
+                      "institution":  "Disaster Relief \u0026 Resilient Infrastructure Council",
+                      "verifiedAccount":  true,
+                      "role":  "UN-Habitat Disaster Coordinator",
+                      "providerName":  "Microsoft Azure AD Verified",
+                      "provider":  "microsoft",
+                      "phone":  "+1 (206) 555-0144",
+                      "displayName":  "Elena Rostova"
+                  },
+                  {
+                      "registeredAt":  "2026-08-27T20:54:53.3417333+05:30",
+                      "id":  "usr_ms_4038",
+                      "email":  "alex.henderson@outlook.com",
+                      "avatarUrl":  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120\u0026auto=format\u0026fit=crop\u0026q=80",
+                      "verifiedPhone":  true,
+                      "institution":  "Disaster Relief \u0026 Resilient Infrastructure Council",
+                      "verifiedAccount":  true,
+                      "role":  "Senior Structural \u0026 Plinth Specialist",
+                      "providerName":  "Microsoft Azure AD Verified",
+                      "provider":  "microsoft",
+                      "phone":  "+1 (206) 555-0144",
+                      "displayName":  "Alex Henderson"
+                  },
+                  {
+                      "registeredAt":  "2026-08-27T20:54:53.3347954+05:30",
+                      "id":  "usr_goog_7284",
+                      "email":  "alex.henderson.eng@gmail.com",
+                      "avatarUrl":  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120\u0026auto=format\u0026fit=crop\u0026q=80",
+                      "verifiedPhone":  true,
+                      "institution":  "Sustainable Habitat \u0026 Bioclimatic Lab",
+                      "verifiedAccount":  true,
+                      "role":  "Senior Structural Engineer",
+                      "providerName":  "Google Account Verified",
+                      "provider":  "google",
+                      "phone":  "+1 (415) 555-0192",
+                      "displayName":  "Alex Henderson"
+                  },
+                  {
+                      "registeredAt":  "2026-08-27T20:54:53.2767434+05:30",
+                      "id":  "usr_goog_3506",
+                      "email":  "sarah.lin@gmail.com",
+                      "avatarUrl":  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120\u0026auto=format\u0026fit=crop\u0026q=80",
+                      "verifiedPhone":  true,
+                      "institution":  "Sustainable Habitat \u0026 Bioclimatic Lab",
+                      "verifiedAccount":  true,
+                      "role":  "Lead Thermal Physicist",
+                      "providerName":  "Google Account Verified",
+                      "provider":  "google",
+                      "phone":  "+1 (415) 555-0192",
+                      "displayName":  "Dr. Sarah Lin"
+                  },
+                  {
                       "registeredAt":  "2026-08-27T13:00:53.8784741+05:30",
                       "id":  "usr_goog_7956",
                       "email":  "sarah.lin@gmail.com",

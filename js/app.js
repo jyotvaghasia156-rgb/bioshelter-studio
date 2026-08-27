@@ -929,20 +929,14 @@ class BioShelterApp {
 
             if (btnCloseGoogleModal) {
                 btnCloseGoogleModal.addEventListener('click', () => {
-                    googleModal.classList.remove('active');
+                    if (googleModal) googleModal.classList.remove('active');
                 });
             }
 
             // Gate Google SSO Buttons
-            const btnGateGoogle = document.getElementById('btn-gate-login-google');
+            const btnGateGoogle = document.getElementById('btn-gate-sso-google') || document.getElementById('btn-gate-login-google');
             if (btnGateGoogle) {
                 btnGateGoogle.addEventListener('click', () => {
-                    openGoogleModal();
-                });
-            }
-            const btnGateCustomGoogle = document.getElementById('btn-gate-open-google-custom');
-            if (btnGateCustomGoogle) {
-                btnGateCustomGoogle.addEventListener('click', () => {
                     openGoogleModal();
                 });
             }
@@ -955,12 +949,7 @@ class BioShelterApp {
                     const role = item.getAttribute('data-google-role');
                     const user = await authInstance.loginWithGoogle(email, name, role);
                     if (googleModal) googleModal.classList.remove('active');
-                    if (gate && !gate.classList.contains('unlocked')) {
-                        unlockStudioWithAnimation('Google Identity Verified!', `Welcome back, ${user.displayName}! Unlocking BioShelter Studio.`);
-                    } else {
-                        alert(`Welcome, ${user.displayName}! Signed in with Google.`);
-                        this.renderLoginPage();
-                    }
+                    unlockStudioWithAnimation('Google Account Verified!', `Welcome, ${user.displayName}! Connecting with 3D Simulation Twin.`);
                 });
             });
 
@@ -974,21 +963,54 @@ class BioShelterApp {
                     const user = await authInstance.loginWithGoogle(email, name, 'Verified Climatological Engineer');
                     if (googleModal) googleModal.classList.remove('active');
                     formCustomGoogle.reset();
-                    if (gate && !gate.classList.contains('unlocked')) {
-                        unlockStudioWithAnimation('Google Identity Verified!', `Welcome, ${user.displayName}! Unlocking BioShelter Studio.`);
-                    } else {
-                        alert(`Welcome, ${user.displayName}! Signed in with Google.`);
-                        this.renderLoginPage();
-                    }
+                    unlockStudioWithAnimation('Google Account Verified!', `Welcome, ${user.displayName}! Connecting with 3D Simulation Twin.`);
                 });
             }
 
-            // Gate Microsoft SSO
-            const btnGateMs = document.getElementById('btn-gate-login-microsoft');
+            // Microsoft SSO Modal Triggers
+            const msModal = document.getElementById('microsoft-auth-modal');
+            const btnCloseMsModal = document.getElementById('btn-close-ms-modal');
+            const openMsModal = () => {
+                if (msModal) msModal.classList.add('active');
+            };
+
+            if (btnCloseMsModal) {
+                btnCloseMsModal.addEventListener('click', () => {
+                    if (msModal) msModal.classList.remove('active');
+                });
+            }
+
+            // Gate Microsoft SSO Button
+            const btnGateMs = document.getElementById('btn-gate-sso-microsoft') || document.getElementById('btn-gate-login-microsoft');
             if (btnGateMs) {
-                btnGateMs.addEventListener('click', async () => {
-                    const user = await authInstance.loginWithMicrosoft();
-                    unlockStudioWithAnimation('Microsoft Enterprise Verified!', `Welcome back, ${user.displayName}! Unlocking BioShelter Studio.`);
+                btnGateMs.addEventListener('click', () => {
+                    openMsModal();
+                });
+            }
+
+            // Handle Click on Pre-configured Microsoft Account Items
+            document.querySelectorAll('.ms-account-item').forEach(item => {
+                item.addEventListener('click', async () => {
+                    const email = item.getAttribute('data-ms-email');
+                    const name = item.getAttribute('data-ms-name');
+                    const role = item.getAttribute('data-ms-role');
+                    const user = await authInstance.loginWithMicrosoft(email, name, role);
+                    if (msModal) msModal.classList.remove('active');
+                    unlockStudioWithAnimation('Microsoft Account Verified!', `Welcome, ${user.displayName}! Connecting with 3D Simulation Twin.`);
+                });
+            });
+
+            // Handle Custom Microsoft Form Login
+            const formCustomMs = document.getElementById('form-custom-ms-login');
+            if (formCustomMs) {
+                formCustomMs.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('custom-ms-email').value.trim();
+                    const name = document.getElementById('custom-ms-name').value.trim() || email.split('@')[0];
+                    const user = await authInstance.loginWithMicrosoft(email, name, 'Senior Structural & Plinth Specialist');
+                    if (msModal) msModal.classList.remove('active');
+                    formCustomMs.reset();
+                    unlockStudioWithAnimation('Microsoft Account Verified!', `Welcome, ${user.displayName}! Connecting with 3D Simulation Twin.`);
                 });
             }
 

@@ -169,12 +169,26 @@
                 <p id="gate-success-msg" style="font-size: 13px; color: var(--text-secondary);">Connecting identity with 3D Bioclimatic Studio &amp; Disaster Crisis Net...</p>
             </div>
 
+            <!-- Google & Microsoft 1-Click SSO Buttons -->
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px; border-top: 1px solid var(--border-glass); padding-top: 14px;">
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; text-align: center;">Or Direct Single Sign-On (1-Click):</div>
+                <div style="display: flex; gap: 8px;">
+                    <button id="btn-gate-sso-google" class="export-btn-secondary" style="flex: 1; padding: 11px 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; border-color: rgba(234, 67, 53, 0.4); background: rgba(234, 67, 53, 0.08); color: #fca5a5; cursor: pointer; border-radius: var(--radius-md);">
+                        <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 12.713L1.043 4.225A2.001 2.001 0 013 3h18c.737 0 1.393.4 1.748 1L12 12.713z"/><path fill="#4285F4" d="M1.043 4.225C1.015 4.314 1 4.406 1 4.5V19a2 2 0 002 2h4V10.713L1.043 4.225z"/><path fill="#34A853" d="M23 4.5c0-.094-.015-.186-.043-.275L17 10.713V21h4a2 2 0 002-2V4.5z"/><path fill="#FBBC05" d="M7 21h10v-9.287L12 15.5l-5-3.787V21z"/></svg>
+                        Google Login
+                    </button>
+                    <button id="btn-gate-sso-microsoft" class="export-btn-secondary" style="flex: 1; padding: 11px 8px; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; border-color: rgba(0, 164, 239, 0.4); background: rgba(0, 164, 239, 0.08); color: #7dd3fc; cursor: pointer; border-radius: var(--radius-md);">
+                        <svg width="15" height="15" viewBox="0 0 21 21"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>
+                        Microsoft Login
+                    </button>
+                </div>
+            </div>
+
             <!-- Guest Mode Direct 1-Click Access Card -->
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 8px; border-top: 1px solid var(--border-glass); padding-top: 14px;">
-                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Or Instant Quick Access:</div>
-                <button id="btn-gate-guest-access" class="export-btn-secondary" style="width: 100%; padding: 12px; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; border-color: rgba(56, 189, 248, 0.4); color: var(--accent-sky); background: rgba(56, 189, 248, 0.08); cursor: pointer; border-radius: var(--radius-md);">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                    👤 Continue as Guest Mode (1-Click Instant Unlock) &rarr;
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 4px;">
+                <button id="btn-gate-guest-access" class="export-btn-secondary" style="width: 100%; padding: 11px; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; border-color: rgba(56, 189, 248, 0.4); color: var(--accent-sky); background: rgba(56, 189, 248, 0.08); cursor: pointer; border-radius: var(--radius-md);">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                    👤 Continue as Guest Mode (Instant Unlock) &rarr;
                 </button>
             </div>
         </div>
@@ -1381,6 +1395,62 @@
 
             <div style="margin-top: 14px; font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.4;">
                 To continue, Google will share your name, email address, and profile picture with BioShelter Studio. See BioShelter's Privacy Policy and Terms of Service.
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL 5: MICROSOFT AZURE AD / OUTLOOK LOGIN CHOOSER PAGE
+         ========================================================================== -->
+    <div id="microsoft-auth-modal" class="modal-backdrop">
+        <div class="modal-card" style="max-width: 440px; padding: 28px; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-glow); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+            <button id="btn-close-ms-modal" class="modal-close-btn" title="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+            
+            <div style="text-align: center; margin-bottom: 20px;">
+                <svg width="36" height="36" viewBox="0 0 21 21" style="margin-bottom: 8px;">
+                    <path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/>
+                </svg>
+                <h3 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">Sign in with Microsoft</h3>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Choose an account to continue to <strong>BioShelter Studio</strong></p>
+            </div>
+
+            <!-- List of Clickable Microsoft Profiles -->
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                <button class="ms-account-item" data-ms-email="alex.henderson@outlook.com" data-ms-name="Alex Henderson" data-ms-role="Senior Structural &amp; Plinth Specialist">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" alt="Alex" class="ms-acc-avatar">
+                    <div style="text-align: left; flex: 1;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Alex Henderson</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">alex.henderson@outlook.com</div>
+                    </div>
+                    <span class="section-badge" style="font-size: 10px;">Engineer</span>
+                </button>
+
+                <button class="ms-account-item" data-ms-email="elena.rostova@un-habitat.org" data-ms-name="Elena Rostova" data-ms-role="UN-Habitat Disaster Relief Specialist">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80&auto=format&fit=crop&q=80" alt="Elena" class="ms-acc-avatar">
+                    <div style="text-align: left; flex: 1;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Elena Rostova</div>
+                        <div style="font-size: 11px; color: var(--text-secondary);">elena.rostova@un-habitat.org</div>
+                    </div>
+                    <span class="section-badge" style="font-size: 10px;">UN-Habitat</span>
+                </button>
+            </div>
+
+            <!-- Custom Microsoft Email Login Form -->
+            <div style="border-top: 1px solid var(--border-glass); padding-top: 14px;">
+                <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px;">Or use another Microsoft account:</div>
+                <form id="form-custom-ms-login" style="display: flex; flex-direction: column; gap: 8px;">
+                    <input type="email" id="custom-ms-email" class="input-select" placeholder="Enter your Microsoft email (e.g. name@outlook.com)" required>
+                    <input type="text" id="custom-ms-name" class="input-select" placeholder="Your Full Name (optional)">
+                    <button type="submit" class="export-btn-primary" style="background: linear-gradient(135deg, #00a4ef, #0284c7); justify-content: center;">
+                        Continue with Custom Microsoft Account &rarr;
+                    </button>
+                </form>
+            </div>
+
+            <div style="margin-top: 14px; font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.4;">
+                To continue, Microsoft Identity Platform will share your name and email with BioShelter Studio.
             </div>
         </div>
     </div>

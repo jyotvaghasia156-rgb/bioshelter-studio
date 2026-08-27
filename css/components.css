@@ -1894,6 +1894,39 @@
     border: 2px solid #4285F4;
 }
 
+.ms-account-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+}
+
+[data-theme="light"] .ms-account-item {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+
+.ms-account-item:hover {
+    background: rgba(0, 164, 239, 0.12);
+    border-color: #00a4ef;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0, 164, 239, 0.25);
+}
+
+.ms-acc-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #00a4ef;
+}
+
 
 
 
