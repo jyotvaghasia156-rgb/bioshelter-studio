@@ -24,20 +24,21 @@
     <div class="ambient-glow-2"></div>
 
     <!-- ==========================================================================
-         FULL-SCREEN SECURITY GATE & ACCOUNT VERIFICATION PORTAL (FIRST PAGE UNLOCK)
+         OPTIONAL SECURITY MODAL & ACCOUNT VERIFICATION PORTAL (OPENABLE VIA HEADER)
          ========================================================================== -->
-    <div id="auth-landing-gate" class="auth-landing-gate">
-        <div class="gate-card-container" style="max-width: 520px; padding: 32px 28px;">
+    <div id="auth-landing-gate" class="auth-landing-gate unlocked" style="display: none;">
+        <div class="gate-card-container" style="max-width: 520px; padding: 32px 28px; position: relative;">
+            <button id="btn-close-gate-modal" style="position: absolute; top: 14px; right: 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; z-index: 10;" title="Close &amp; Return to Home Page">&times;</button>
             <div class="gate-header">
                 <div class="brand-logo" style="width: 48px; height: 48px; margin: 0 auto;">
                     <svg viewBox="0 0 24 24" style="width: 28px; height: 28px;"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.84L18 11.2V18h-2v-6H8v6H6v-6.8l6-5.36z"/></svg>
                 </div>
                 <div class="gate-badge-security">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-                    BioShelter Unified Member Security Portal
+                    BioShelter Member Security Portal
                 </div>
                 <h1 class="gate-title" style="font-size: 20px;">BioShelter Studio</h1>
-                <p class="gate-desc" style="font-size: 12px;">Sign in, register your citizen ID, or verify with 6-digit OTP to access the 3D Bioclimatic Studio.</p>
+                <p class="gate-desc" style="font-size: 12px;">Sign in, register your citizen ID, or verify with 6-digit OTP to manage your cloud workspace.</p>
             </div>
 
             <!-- Unified Master Tabs (Sign In / Sign Up / 6-Digit OTP) -->

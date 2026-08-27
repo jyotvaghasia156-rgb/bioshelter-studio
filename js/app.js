@@ -765,11 +765,17 @@ class BioShelterApp {
             let activeTarget = '+91 98765 43210';
             let activeName = 'Alex Henderson';
 
-            // Check initial auth state
-            if (authInstance.isAuthenticated()) {
-                gate.classList.add('unlocked');
-            } else {
-                gate.classList.remove('unlocked');
+            // Direct Home Page Access: Always keep studio unlocked and gate hidden on load!
+            gate.classList.add('unlocked');
+            gate.style.display = 'none';
+
+            // Close Gate Modal Button
+            const btnCloseGate = document.getElementById('btn-close-gate-modal');
+            if (btnCloseGate) {
+                btnCloseGate.addEventListener('click', () => {
+                    gate.style.display = 'none';
+                    gate.classList.add('unlocked');
+                });
             }
 
             // Master Unified Gate Tabs (Sign In / Sign Up / 6-Digit OTP)
@@ -884,13 +890,15 @@ class BioShelterApp {
                 }
                 setTimeout(() => {
                     gate.classList.add('unlocked');
+                    gate.style.display = 'none';
+                    if (gateSuccessOverlay) gateSuccessOverlay.classList.remove('active');
                     this.switchTab('tab-3d');
                     if (this.visualizer3D) {
                         setTimeout(() => this.visualizer3D.onWindowResize(), 50);
                     }
                     this.updateSimulation();
                     this.renderLoginPage();
-                }, 700);
+                }, 600);
             };
 
             const gateOtpStep1 = document.getElementById('gate-otp-step-1');
@@ -1183,6 +1191,7 @@ class BioShelterApp {
         if (d.btnOpenLoginModal) {
             d.btnOpenLoginModal.addEventListener('click', () => {
                 if (gate) {
+                    gate.style.display = 'flex';
                     gate.classList.remove('unlocked');
                     const tabsBar = document.querySelectorAll('.gate-nav-tabs');
                     tabsBar.forEach(t => { t.style.display = 'flex'; });
