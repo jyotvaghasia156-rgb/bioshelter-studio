@@ -144,6 +144,113 @@ try {
                 continue
             }
 
+            # 3b. Google SSO Login
+            if ($rawPath -eq "/api/auth/sso/google" -and $method -eq "POST") {
+                $name = if ($body.name) { $body.name } else { "Dr. Sarah Lin" }
+                $email = if ($body.email) { $body.email } else { "sarah.lin@gmail.com" }
+                $role = if ($body.role) { $body.role } else { "Lead Thermal Physicist" }
+                $avatar = if ($body.avatarUrl) { $body.avatarUrl } else { "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" }
+                
+                $user = @{
+                    id = "usr_goog_" + (Get-Random -Minimum 1000 -Maximum 9999);
+                    displayName = $name;
+                    email = $email;
+                    phone = "+1 (415) 555-0192";
+                    role = $role;
+                    institution = "Sustainable Habitat & Bioclimatic Lab";
+                    provider = "google";
+                    providerName = "Google Account";
+                    avatarUrl = $avatar;
+                    verifiedPhone = $true;
+                    verifiedAccount = $true;
+                    registeredAt = (Get-Date).ToString("o");
+                }
+                $db.users = @($user) + @($db.users)
+                Save-DB $db
+                $resObj = @{ success = $true; user = $user; token = "GOOGLE_JWT_" + (Get-Random -Minimum 100000 -Maximum 999999) }
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj))
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.OutputStream.Close()
+                continue
+            }
+
+            # 3c. Microsoft Azure AD SSO Login
+            if ($rawPath -eq "/api/auth/sso/microsoft" -and $method -eq "POST") {
+                $name = if ($body.name) { $body.name } else { "James R. Sterling" }
+                $email = if ($body.email) { $body.email } else { "j.sterling@outlook.com" }
+                $user = @{
+                    id = "usr_ms_" + (Get-Random -Minimum 1000 -Maximum 9999);
+                    displayName = $name;
+                    email = $email;
+                    phone = "+1 (206) 555-0144";
+                    role = "Senior Structural & Plinth Specialist";
+                    institution = "Disaster Relief & Resilient Infrastructure Council";
+                    provider = "microsoft";
+                    providerName = "Microsoft Account";
+                    avatarUrl = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80";
+                    verifiedPhone = $true;
+                    verifiedAccount = $true;
+                    registeredAt = (Get-Date).ToString("o");
+                }
+                $db.users = @($user) + @($db.users)
+                Save-DB $db
+                $resObj = @{ success = $true; user = $user; token = "AZURE_JWT_" + (Get-Random -Minimum 100000 -Maximum 999999) }
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj))
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.OutputStream.Close()
+                continue
+            }
+
+            # 3d. Guest Account Session Generator
+            if ($rawPath -eq "/api/auth/guest" -and $method -eq "POST") {
+                $guestNum = (Get-Random -Minimum 1000 -Maximum 9999)
+                $user = @{
+                    id = "guest_$guestNum";
+                    displayName = "Guest Engineer #$guestNum";
+                    email = "guest_$guestNum@bioshelter.preview";
+                    phone = "";
+                    role = "Guest Bioclimatic Engineer";
+                    institution = "BioShelter Open Access Explorer";
+                    provider = "guest";
+                    providerName = "Guest Explorer";
+                    avatarUrl = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80";
+                    verifiedPhone = $false;
+                    verifiedAccount = $false;
+                    registeredAt = (Get-Date).ToString("o");
+                }
+                $resObj = @{ success = $true; user = $user; token = "GUEST_SESSION_" + (Get-Random -Minimum 10000 -Maximum 99999) }
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj))
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.OutputStream.Close()
+                continue
+            }
+
+            # 3e. Verify Certification / License Token PIN
+            if ($rawPath -eq "/api/auth/verify-token" -and $method -eq "POST") {
+                $token = "849201"
+                if ($body -and $body.token) { $token = "$($body.token)".Trim() }
+                $user = @{
+                    id = "lic_$token";
+                    displayName = "Certified Resilient Engineer";
+                    email = "engineer.certified@bioshelter.org";
+                    phone = "+91 98765 43210";
+                    role = "Certified Bioclimatic Engineer (PIN #$token)";
+                    institution = "Civil Engineering & Disaster Council";
+                    provider = "license_token";
+                    providerName = "Engineering License Token";
+                    avatarUrl = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80";
+                    verifiedPhone = $true;
+                    verifiedAccount = $true;
+                    registeredAt = (Get-Date).ToString("o");
+                }
+                $resObj = @{ success = $true; user = $user; message = "License Token #$token Verified! Unlocking BioShelter Studio." }
+                $response.StatusCode = 200
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj))
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.OutputStream.Close()
+                continue
+            }
+
             # 4. Community Shelters (GET & POST)
             if ($rawPath -eq "/api/shelters") {
                 if ($method -eq "GET") {

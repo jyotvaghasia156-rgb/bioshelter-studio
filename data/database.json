@@ -1,142 +1,174 @@
-{
-  "users": [
-    {
-      "id": "usr_dr_jordan",
-      "displayName": "Dr. Jordan Lee",
-      "phone": "+91 98765 43210",
-      "email": "jordan.lee@bioshelter.org",
-      "role": "Principal Thermal Physicist",
-      "institution": "International Passive Refuge Council",
-      "provider": "phone_otp",
-      "providerName": "Mobile Phone SMS OTP",
-      "verifiedPhone": true,
-      "verifiedAccount": true,
-      "registeredAt": "2026-08-20T10:00:00.000Z"
-    }
-  ],
-  "otpCodes": {},
-  "shelters": [
-    {
-      "id": "shelter_jaisalmer_vault",
-      "name": "Thar Desert Thermal Vault Refuge",
-      "climateZone": "hot_arid",
-      "typology": "earthen_vault",
-      "location": "Jaisalmer Basin, Rajasthan",
-      "capacity": 45,
-      "wallMaterial": "Compressed Stabilized Earth Brick (CSEB 300mm)",
-      "roofMaterial": "Terracotta Vault with Lime Render",
-      "emergencyContact": "+91 2992 252 011",
-      "authorName": "Dr. Jordan Lee",
-      "authorRole": "Principal Thermal Physicist",
-      "status": "Verified Community Refuge",
-      "coolingStrategy": "Harmonic Ground Thermal Lag + Night Flushed Mass",
-      "upvotes": 28,
-      "createdAt": "2026-08-22T08:30:00.000Z",
-      "config": {
-        "typology": "earthen_vault",
-        "length": 8.0,
-        "width": 5.0,
-        "height": 3.2,
-        "roofPitch": 20,
-        "wwr": 10,
-        "overhangDepth": 0.9,
-        "ventMode": "night_purge",
-        "occupants": 6
-      }
-    },
-    {
-      "id": "shelter_sundarbans_cyclone",
-      "name": "Sundarbans Elevated Stilt Refuge",
-      "climateZone": "warm_humid",
-      "typology": "stilt_tropical",
-      "location": "Gosaba Delta, West Bengal",
-      "capacity": 80,
-      "wallMaterial": "Treated Bamboo Lattice + Mud Mortar",
-      "roofMaterial": "Aerodynamic Double-Skin High Pitch Thatch",
-      "emergencyContact": "+91 3218 255 108",
-      "authorName": "Ar. Priya Sen",
-      "authorRole": "Disaster Relief Architect",
-      "status": "Verified Community Refuge",
-      "coolingStrategy": "Continuous Cross-Ventilation + High Stack Buoyancy",
-      "upvotes": 34,
-      "createdAt": "2026-08-24T14:15:00.000Z",
-      "config": {
-        "typology": "stilt_tropical",
-        "length": 10.0,
-        "width": 6.0,
-        "height": 3.8,
-        "roofPitch": 35,
-        "wwr": 28,
-        "overhangDepth": 1.2,
-        "ventMode": "continuous_cross",
-        "occupants": 12
-      }
-    },
-    {
-      "id": "shelter_ladakh_trombe",
-      "name": "Leh High-Altitude Solar Haven",
-      "climateZone": "cold_mountainous",
-      "typology": "solar_trombe",
-      "location": "Choglamsar Valley, Ladakh (3,500m)",
-      "capacity": 25,
-      "wallMaterial": "Heavy Granite Fieldstone + Strawboard (400mm)",
-      "roofMaterial": "High-R Insulated Flat Earth Roof",
-      "emergencyContact": "+91 1982 252 010",
-      "authorName": "Tsering Norbu",
-      "authorRole": "Indigenous Himalayan Builder",
-      "status": "Verified Community Refuge",
-      "coolingStrategy": "Glazed South Trombe Heat Storage & Night Damper Isolation",
-      "upvotes": 19,
-      "createdAt": "2026-08-25T11:00:00.000Z",
-      "config": {
-        "typology": "solar_trombe",
-        "length": 7.0,
-        "width": 4.5,
-        "height": 2.8,
-        "roofPitch": 5,
-        "wwr": 20,
-        "overhangDepth": 0.4,
-        "ventMode": "minimum_airtight",
-        "occupants": 4
-      }
-    }
-  ],
-  "hazards": [
-    {
-      "id": "haz_thar_heatwave_50",
-      "title": "50.4°C Extreme Thermal Anomaly Active",
-      "type": "heatwave",
-      "severity": "critical",
-      "location": "Jaisalmer & Bikaner Corridor",
-      "description": "Ambient wet-bulb temp reaching 32.5°C with severe thermal stress. Immediate subterranean or heavy earthen shelter required.",
-      "reportedBy": "National Climatological Center & Citizen Spotters",
-      "actionsRecommended": "Evacuate to earth-sheltered refuges (depth > 2.0m). Maintain hydration and close exterior shutters between 09:00-19:00.",
-      "status": "Active Alert",
-      "reportedAt": "2026-08-27T08:15:00.000Z"
-    },
-    {
-      "id": "haz_sundarbans_surge",
-      "title": "Category 4 Cyclone Storm Surge Threat",
-      "type": "flood",
-      "severity": "high",
-      "location": "Coastal Bay of Bengal / Sundarbans",
-      "description": "Predicted 3.8m storm surge overtopping mud embankments with 140 km/h wind gusts.",
-      "reportedBy": "Disaster Response Volunteer Net",
-      "actionsRecommended": "Move immediately to elevated stilt refuges with plinth height >= 3.0m.",
-      "status": "Active Alert",
-      "reportedAt": "2026-08-27T09:40:00.000Z"
-    }
-  ],
-  "customMaterials": [
-    {
-      "id": "custom_mat_bio_hemp_clay",
-      "name": "Aerated Clay Hemp-Fiber Bio-Composite",
-      "k": 0.18,
-      "rho": 620,
-      "cp": 1350,
-      "embodiedCarbon": 12,
-      "createdAt": "2026-08-26T15:00:00.000Z"
-    }
-  ],
-  "broadcastLogs": []
+﻿{
+    "users":  [
+                  {
+                      "registeredAt":  "2026-08-27T13:00:53.8784741+05:30",
+                      "id":  "usr_goog_7956",
+                      "email":  "sarah.lin@gmail.com",
+                      "avatarUrl":  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120\u0026auto=format\u0026fit=crop\u0026q=80",
+                      "verifiedPhone":  true,
+                      "institution":  "Sustainable Habitat \u0026 Bioclimatic Lab",
+                      "verifiedAccount":  true,
+                      "role":  "Lead Thermal Physicist",
+                      "providerName":  "Google Account",
+                      "provider":  "google",
+                      "phone":  "+1 (415) 555-0192",
+                      "displayName":  "Dr. Sarah Lin"
+                  },
+                  {
+                      "registeredAt":  "2026-08-27T12:59:21.5991495+05:30",
+                      "id":  "usr_goog_5843",
+                      "email":  "sarah.lin@gmail.com",
+                      "avatarUrl":  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120\u0026auto=format\u0026fit=crop\u0026q=80",
+                      "verifiedPhone":  true,
+                      "institution":  "Sustainable Habitat \u0026 Bioclimatic Lab",
+                      "verifiedAccount":  true,
+                      "role":  "Lead Thermal Physicist",
+                      "providerName":  "Google Account",
+                      "provider":  "google",
+                      "phone":  "+1 (415) 555-0192",
+                      "displayName":  "Dr. Sarah Lin"
+                  },
+                  {
+                      "id":  "usr_dr_jordan",
+                      "displayName":  "Dr. Jordan Lee",
+                      "phone":  "+91 98765 43210",
+                      "email":  "jordan.lee@bioshelter.org",
+                      "role":  "Principal Thermal Physicist",
+                      "institution":  "International Passive Refuge Council",
+                      "provider":  "phone_otp",
+                      "providerName":  "Mobile Phone SMS OTP",
+                      "verifiedPhone":  true,
+                      "verifiedAccount":  true,
+                      "registeredAt":  "2026-08-20T10:00:00.000Z"
+                  }
+              ],
+    "otpCodes":  {
+
+                 },
+    "shelters":  [
+                     {
+                         "id":  "shelter_jaisalmer_vault",
+                         "name":  "Thar Desert Thermal Vault Refuge",
+                         "climateZone":  "hot_arid",
+                         "typology":  "earthen_vault",
+                         "location":  "Jaisalmer Basin, Rajasthan",
+                         "capacity":  45,
+                         "wallMaterial":  "Compressed Stabilized Earth Brick (CSEB 300mm)",
+                         "roofMaterial":  "Terracotta Vault with Lime Render",
+                         "emergencyContact":  "+91 2992 252 011",
+                         "authorName":  "Dr. Jordan Lee",
+                         "authorRole":  "Principal Thermal Physicist",
+                         "status":  "Verified Community Refuge",
+                         "coolingStrategy":  "Harmonic Ground Thermal Lag + Night Flushed Mass",
+                         "upvotes":  28,
+                         "createdAt":  "2026-08-22T08:30:00.000Z",
+                         "config":  {
+                                        "typology":  "earthen_vault",
+                                        "length":  8.0,
+                                        "width":  5.0,
+                                        "height":  3.2,
+                                        "roofPitch":  20,
+                                        "wwr":  10,
+                                        "overhangDepth":  0.9,
+                                        "ventMode":  "night_purge",
+                                        "occupants":  6
+                                    }
+                     },
+                     {
+                         "id":  "shelter_sundarbans_cyclone",
+                         "name":  "Sundarbans Elevated Stilt Refuge",
+                         "climateZone":  "warm_humid",
+                         "typology":  "stilt_tropical",
+                         "location":  "Gosaba Delta, West Bengal",
+                         "capacity":  80,
+                         "wallMaterial":  "Treated Bamboo Lattice + Mud Mortar",
+                         "roofMaterial":  "Aerodynamic Double-Skin High Pitch Thatch",
+                         "emergencyContact":  "+91 3218 255 108",
+                         "authorName":  "Ar. Priya Sen",
+                         "authorRole":  "Disaster Relief Architect",
+                         "status":  "Verified Community Refuge",
+                         "coolingStrategy":  "Continuous Cross-Ventilation + High Stack Buoyancy",
+                         "upvotes":  34,
+                         "createdAt":  "2026-08-24T14:15:00.000Z",
+                         "config":  {
+                                        "typology":  "stilt_tropical",
+                                        "length":  10.0,
+                                        "width":  6.0,
+                                        "height":  3.8,
+                                        "roofPitch":  35,
+                                        "wwr":  28,
+                                        "overhangDepth":  1.2,
+                                        "ventMode":  "continuous_cross",
+                                        "occupants":  12
+                                    }
+                     },
+                     {
+                         "id":  "shelter_ladakh_trombe",
+                         "name":  "Leh High-Altitude Solar Haven",
+                         "climateZone":  "cold_mountainous",
+                         "typology":  "solar_trombe",
+                         "location":  "Choglamsar Valley, Ladakh (3,500m)",
+                         "capacity":  25,
+                         "wallMaterial":  "Heavy Granite Fieldstone + Strawboard (400mm)",
+                         "roofMaterial":  "High-R Insulated Flat Earth Roof",
+                         "emergencyContact":  "+91 1982 252 010",
+                         "authorName":  "Tsering Norbu",
+                         "authorRole":  "Indigenous Himalayan Builder",
+                         "status":  "Verified Community Refuge",
+                         "coolingStrategy":  "Glazed South Trombe Heat Storage \u0026 Night Damper Isolation",
+                         "upvotes":  19,
+                         "createdAt":  "2026-08-25T11:00:00.000Z",
+                         "config":  {
+                                        "typology":  "solar_trombe",
+                                        "length":  7.0,
+                                        "width":  4.5,
+                                        "height":  2.8,
+                                        "roofPitch":  5,
+                                        "wwr":  20,
+                                        "overhangDepth":  0.4,
+                                        "ventMode":  "minimum_airtight",
+                                        "occupants":  4
+                                    }
+                     }
+                 ],
+    "hazards":  [
+                    {
+                        "id":  "haz_thar_heatwave_50",
+                        "title":  "50.4°C Extreme Thermal Anomaly Active",
+                        "type":  "heatwave",
+                        "severity":  "critical",
+                        "location":  "Jaisalmer \u0026 Bikaner Corridor",
+                        "description":  "Ambient wet-bulb temp reaching 32.5°C with severe thermal stress. Immediate subterranean or heavy earthen shelter required.",
+                        "reportedBy":  "National Climatological Center \u0026 Citizen Spotters",
+                        "actionsRecommended":  "Evacuate to earth-sheltered refuges (depth \u003e 2.0m). Maintain hydration and close exterior shutters between 09:00-19:00.",
+                        "status":  "Active Alert",
+                        "reportedAt":  "2026-08-27T08:15:00.000Z"
+                    },
+                    {
+                        "id":  "haz_sundarbans_surge",
+                        "title":  "Category 4 Cyclone Storm Surge Threat",
+                        "type":  "flood",
+                        "severity":  "high",
+                        "location":  "Coastal Bay of Bengal / Sundarbans",
+                        "description":  "Predicted 3.8m storm surge overtopping mud embankments with 140 km/h wind gusts.",
+                        "reportedBy":  "Disaster Response Volunteer Net",
+                        "actionsRecommended":  "Move immediately to elevated stilt refuges with plinth height \u003e= 3.0m.",
+                        "status":  "Active Alert",
+                        "reportedAt":  "2026-08-27T09:40:00.000Z"
+                    }
+                ],
+    "customMaterials":  [
+                            {
+                                "id":  "custom_mat_bio_hemp_clay",
+                                "name":  "Aerated Clay Hemp-Fiber Bio-Composite",
+                                "k":  0.18,
+                                "rho":  620,
+                                "cp":  1350,
+                                "embodiedCarbon":  12,
+                                "createdAt":  "2026-08-26T15:00:00.000Z"
+                            }
+                        ],
+    "broadcastLogs":  [
+
+                      ]
 }

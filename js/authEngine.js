@@ -68,62 +68,94 @@ export class AuthEngine {
     /**
      * Google Account Single Sign-On (Simulated OAuth 2.0 Handshake)
      */
+    /**
+     * Google Account Single Sign-On
+     */
     async loginWithGoogle(customEmail = null, customName = null, customRole = null, customAvatar = null) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const name = customName || 'Dr. Sarah Lin';
-                const email = customEmail || 'sarah.lin@gmail.com';
-                const role = customRole || 'Lead Thermal Modeling Physicist';
-                const avatar = customAvatar || (email.includes('alex') ? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80' : (email.includes('priya') ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&auto=format&fit=crop&q=80' : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80'));
-                
-                const googleUser = {
-                    provider: 'google',
-                    providerName: 'Google Account',
-                    uid: 'goog_' + Math.random().toString(36).substr(2, 9),
-                    displayName: name,
-                    email: email,
-                    phone: '+1 (415) 555-0192',
-                    verifiedPhone: true,
-                    verifiedAccount: true,
-                    avatarUrl: avatar,
-                    institution: 'Sustainable Habitat & Bioclimatic Lab',
-                    role: role,
-                    tokenExpiry: Date.now() + 3600 * 1000 * 24 * 7,
-                    authTimestamp: new Date().toISOString()
-                };
-                this.saveSession(googleUser);
-                resolve(googleUser);
-            }, 500);
-        });
+        const name = customName || 'Dr. Sarah Lin';
+        const email = customEmail || 'sarah.lin@gmail.com';
+        const role = customRole || 'Lead Thermal Modeling Physicist';
+        const avatar = customAvatar || (email.includes('alex') ? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80' : (email.includes('priya') ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&auto=format&fit=crop&q=80' : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80'));
+
+        try {
+            const resp = await fetch('/api/auth/sso/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, role, avatarUrl: avatar })
+            });
+            if (resp.ok) {
+                const data = await resp.json();
+                if (data.user) {
+                    this.saveSession(data.user);
+                    return data.user;
+                }
+            }
+        } catch {
+            // Local fallback
+        }
+
+        const googleUser = {
+            provider: 'google',
+            providerName: 'Google Account',
+            uid: 'goog_' + Math.random().toString(36).substr(2, 9),
+            displayName: name,
+            email: email,
+            phone: '+1 (415) 555-0192',
+            verifiedPhone: true,
+            verifiedAccount: true,
+            avatarUrl: avatar,
+            institution: 'Sustainable Habitat & Bioclimatic Lab',
+            role: role,
+            tokenExpiry: Date.now() + 3600 * 1000 * 24 * 7,
+            authTimestamp: new Date().toISOString()
+        };
+        this.saveSession(googleUser);
+        return googleUser;
     }
 
     /**
      * Microsoft Account / Azure AD Single Sign-On
      */
     async loginWithMicrosoft(customEmail = null, customName = null) {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const name = customName || 'James R. Sterling';
-                const email = customEmail || 'j.sterling@outlook.com';
-                const msUser = {
-                    provider: 'microsoft',
-                    providerName: 'Microsoft Account',
-                    uid: 'msft_' + Math.random().toString(36).substr(2, 9),
-                    displayName: name,
-                    email: email,
-                    phone: '+1 (206) 555-0144',
-                    verifiedPhone: true,
-                    verifiedAccount: true,
-                    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
-                    institution: 'Disaster Relief & Resilient Infrastructure Council',
-                    role: 'Senior Structural & Plinth Specialist',
-                    tokenExpiry: Date.now() + 3600 * 1000 * 24 * 7,
-                    authTimestamp: new Date().toISOString()
-                };
-                this.saveSession(msUser);
-                resolve(msUser);
-            }, 600);
-        });
+        const name = customName || 'James R. Sterling';
+        const email = customEmail || 'j.sterling@outlook.com';
+
+        try {
+            const resp = await fetch('/api/auth/sso/microsoft', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email })
+            });
+            if (resp.ok) {
+                const data = await resp.json();
+                if (data.user) {
+                    this.saveSession(data.user);
+                    return data.user;
+                }
+            }
+        } catch {
+            // Local fallback
+        }
+
+        const msUser = {
+            provider: 'microsoft',
+            providerName: 'Microsoft Account',
+            uid: 'msft_' + Math.random().toString(36).substr(2, 9),
+            displayName: name,
+            email: email,
+            phone: '+1 (206) 555-0144',
+            verifiedPhone: true,
+            verifiedAccount: true,
+            avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
+            institution: 'Disaster Relief & Resilient Infrastructure Council',
+            role: 'Senior Structural & Plinth Specialist',
+            tokenExpiry: Date.now() + 3600 * 1000 * 24 * 7,
+            authTimestamp: new Date().toISOString()
+        };
+        this.saveSession(msUser);
+        return msUser;
+    }
+
     /**
      * Guest Account Quick Access Session
      */
@@ -145,6 +177,12 @@ export class AuthEngine {
             authTimestamp: new Date().toISOString()
         };
         this.saveSession(guestUser);
+
+        // Async notify backend
+        try {
+            fetch('/api/auth/guest', { method: 'POST' }).catch(() => {});
+        } catch {}
+
         return guestUser;
     }
 
@@ -161,6 +199,15 @@ export class AuthEngine {
             sentAt: Date.now(),
             expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes
         };
+
+        // Async dispatch to backend REST API
+        try {
+            fetch('/api/auth/otp/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: phoneNumber, countryCode })
+            }).catch(() => {});
+        } catch {}
 
         return {
             success: true,
@@ -208,6 +255,16 @@ export class AuthEngine {
         };
 
         this.saveSession(phoneUser);
+
+        // Async notify backend
+        try {
+            fetch('/api/auth/otp/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: inputCode, phone: verifiedPhone, name })
+            }).catch(() => {});
+        } catch {}
+
         return { success: true, user: phoneUser };
     }
 
@@ -237,12 +294,32 @@ export class AuthEngine {
                 authTimestamp: new Date().toISOString()
             };
             this.saveSession(engineerUser);
+
+            // Async notify backend
+            try {
+                fetch('/api/auth/verify-token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: code.trim() })
+                }).catch(() => {});
+            } catch {}
+
             return { success: true, user: engineerUser, message: `License Token #${code.trim()} Verified! Unlocking BioShelter Studio.` };
         }
         
         this.currentUser.verifiedAccount = true;
         this.currentUser.role = this.currentUser.role || 'Certified Resilient Engineer';
         this.saveSession(this.currentUser);
+
+        // Async notify backend
+        try {
+            fetch('/api/auth/verify-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: code.trim() })
+            }).catch(() => {});
+        } catch {}
+
         return { success: true, user: this.currentUser, message: `License Token #${code.trim()} verified & certified successfully!` };
     }
 
