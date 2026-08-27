@@ -486,6 +486,11 @@
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
                     World Temp Map
                 </button>
+                <!-- NEW: GLOBAL COMFORT HAVENS & VACATION CLIMATE MATCHER (ENJOY LIFE) -->
+                <button class="tab-btn" data-tab="tab-comfort-places" style="color: #10b981; font-weight: 700;">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                    🌴 Comfort Havens (Enjoy Life)
+                </button>
                 <button class="tab-btn" data-tab="tab-soil">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-5.33 0-8 3.2-8 7.14 0 2.36 1.4 4.54 3.8 6.55L12 20.5l4.2-4.81c2.4-2.01 3.8-4.19 3.8-6.55C20 5.2 17.33 2 12 2zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
                     Soil &amp; Geothermics
@@ -538,11 +543,49 @@
                 <div id="tab-3d" class="tab-pane active">
                     <div id="three-canvas-container"></div>
 
-                    <!-- Floating HUD Metrics (Top Left) -->
-                    <div class="hud-overlay-top-left">
+                    <!-- Floating HUD Metrics (Top Left & Center Location/Wind/Weather Banner) -->
+                    <div class="hud-overlay-top-left" style="max-width: 480px; width: 100%;">
+                        <!-- Real-Time Location & Microclimate Vector Header -->
+                        <div class="hud-card" style="margin-bottom: 8px; border-left: 3px solid var(--accent-emerald);">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                                <div>
+                                    <div style="font-size: 10px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px; font-weight: 700;">Active Microclimate Location:</div>
+                                    <div id="hud-location-name" style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">📍 Jaisalmer / Thar Desert, India</div>
+                                </div>
+                                <span id="hud-climate-badge" class="section-badge" style="background: rgba(239,68,68,0.15); color: #ef4444; font-size: 11px;">Hot-Arid Desert</span>
+                            </div>
+
+                            <!-- Live Weather Statement Synopsis -->
+                            <div id="hud-weather-statement" style="font-size: 11px; color: var(--text-secondary); line-height: 1.45; margin-top: 6px; padding: 6px 10px; background: rgba(0,0,0,0.25); border-radius: 6px; border: 1px solid var(--border-glass);">
+                                ☀️ Extreme Solar Heatwave: Direct normal solar flux 980 W/m². High diurnal range. Rammed-earth thermal mass (8.5h lag) &amp; passive wind-tower ventilation in full effect.
+                            </div>
+
+                            <!-- Wind Velocity & Direction Vector Row -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-glass);">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <!-- Animated Wind Compass Icon -->
+                                    <div id="hud-wind-compass-circle" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(56,189,248,0.15); border: 1.5px solid var(--accent-sky); display: flex; align-items: center; justify-content: center; position: relative;" title="Live Wind Direction Vector">
+                                        <svg id="hud-wind-compass-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(245deg); transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                                            <line x1="12" y1="19" x2="12" y2="5"></line>
+                                            <polyline points="5 12 12 5 19 12"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Wind Speed &amp; Vector</div>
+                                        <div id="hud-wind-speed-val" style="font-size: 12px; font-weight: 700; color: var(--accent-sky);">5.4 m/s (19.4 km/h)</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Direction (From ➔ To)</div>
+                                    <div id="hud-wind-dir-text" style="font-size: 12px; font-weight: 700; color: #38bdf8;">WSW (245°) ➔ ENE (65°)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thermal Comfort & Temperature Matrix -->
                         <div class="hud-card">
                             <div class="hud-header">
-                                <span class="hud-title">Operative Comfort Temp</span>
+                                <span class="hud-title">Indoor BioShelter vs. Outdoor Ambient</span>
                             </div>
                             <div class="hud-grid-metrics">
                                 <div class="hud-metric-box">
@@ -551,15 +594,15 @@
                                 </div>
                                 <div class="hud-metric-box">
                                     <div class="hud-metric-label">Ambient Outdoor</div>
-                                    <div id="hud-ambient-temp" class="hud-metric-val">39.2°C</div>
+                                    <div id="hud-ambient-temp" class="hud-metric-val">44.0°C</div>
                                 </div>
                                 <div class="hud-metric-box">
                                     <div class="hud-metric-label">Surface MRT</div>
                                     <div id="hud-surface-mrt" class="hud-metric-val">27.1°C</div>
                                 </div>
                                 <div class="hud-metric-box">
-                                    <div class="hud-metric-label">Air Velocity</div>
-                                    <div id="hud-air-velocity" class="hud-metric-val">0.82 m/s</div>
+                                    <div class="hud-metric-label">Thermal Damping (ΔT)</div>
+                                    <div id="hud-cooling-delta" class="hud-metric-val" style="color: var(--accent-emerald); font-weight: 800;">-18.2°C Cooling</div>
                                 </div>
                             </div>
                         </div>
@@ -689,14 +732,30 @@
                         <div class="page-header-bar">
                             <div class="page-header-info">
                                 <h2>Interactive Global Climate &amp; Surface Temperature Map</h2>
-                                <p>Planetary thermal radar and climate anomaly monitor. Click on any city or station across the globe to inspect real-time temperature, wet-bulb metrics, and heatwave hazards, or synchronize that climate directly into the 3D shelter simulator.</p>
+                                <p>Planetary thermal radar and climate anomaly monitor. Color-coded heat signatures: <strong style="color: #ef4444;">🔴 Red for Extreme Heatwaves</strong>, <strong style="color: #10b981;">🟢 Green for Paradise Comfort Havens</strong>, and <strong style="color: #818cf8;">🟣 Purple for Cold Alpine</strong>. Click on any city or station across the globe to inspect real-time temperature, wind speed &amp; direction, or synchronize that climate directly into the 3D shelter simulator.</p>
                             </div>
                             <div class="page-header-actions">
                                 <button id="btn-apply-map-climate" class="export-btn-primary">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                                    Apply Selected Region to Shelter Studio
+                                    Apply Selected Region to 3D Shelter Studio
                                 </button>
                             </div>
+                        </div>
+
+                        <!-- Map Station Filter Bar -->
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                            <button class="map-filter-chip active" data-map-filter="all" style="padding: 6px 14px; font-size: 12px; border-radius: 20px; background: rgba(56,189,248,0.2); border: 1px solid var(--accent-sky); color: var(--text-primary); cursor: pointer; font-weight: 600;">
+                                🌐 All Global Stations
+                            </button>
+                            <button class="map-filter-chip" data-map-filter="extreme_hot" style="padding: 6px 14px; font-size: 12px; border-radius: 20px; background: rgba(239,68,68,0.15); border: 1px solid #ef4444; color: #ef4444; cursor: pointer; font-weight: 600;">
+                                🔥 Extreme Heatwave Hotspots (Red)
+                            </button>
+                            <button class="map-filter-chip" data-map-filter="paradise_comfort" style="padding: 6px 14px; font-size: 12px; border-radius: 20px; background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #10b981; cursor: pointer; font-weight: 600;">
+                                🌴 Paradise Comfort Havens (Green)
+                            </button>
+                            <button class="map-filter-chip" data-map-filter="cold_alpine" style="padding: 6px 14px; font-size: 12px; border-radius: 20px; background: rgba(129,140,248,0.15); border: 1px solid #818cf8; color: #818cf8; cursor: pointer; font-weight: 600;">
+                                ❄️ Cold Alpine Mountains (Purple)
+                            </button>
                         </div>
 
                         <!-- Canvas Map Card -->
@@ -709,10 +768,10 @@
                                 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
                                     <span style="color: #818cf8; font-weight: 600;">&le; 10°C (Alpine/Cold)</span>
                                     <span style="color: #38bdf8; font-weight: 600;">10°C - 20°C (Cool)</span>
-                                    <span style="color: #10b981; font-weight: 600;">20°C - 30°C (Comfort)</span>
-                                    <span style="color: #f59e0b; font-weight: 600;">30°C - 38°C (Warm)</span>
+                                    <span style="color: #10b981; font-weight: 700;">20°C - 28°C (Paradise Comfort 🟢)</span>
+                                    <span style="color: #f59e0b; font-weight: 600;">28°C - 38°C (Warm)</span>
                                     <span style="color: #f97316; font-weight: 600;">38°C - 45°C (Extreme)</span>
-                                    <span style="color: #ef4444; font-weight: 700;">&gt; 45°C+ (Catastrophic Heatwave)</span>
+                                    <span style="color: #ef4444; font-weight: 800;">&gt; 45°C+ (Catastrophic Heatwave 🔴)</span>
                                 </div>
                             </div>
                         </div>
@@ -721,6 +780,94 @@
                         <div class="comparison-container">
                             <div class="chart-title">Global Weather Stations &amp; Bioclimatic Telemetry Grid</div>
                             <div id="world-stations-table-container"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: GLOBAL COMFORT HAVENS & VACATION CLIMATE MATCHER (WHERE TO ENJOY LIFE) -->
+                <div id="tab-comfort-places" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div class="page-header-bar">
+                            <div class="page-header-info">
+                                <h2>Global Climate Havens &amp; Lifestyle Vacation Matcher</h2>
+                                <p>Discover the world's most comfortable, enjoyable places to live and vacation based on bioclimatic data analysis. Set your ideal temperature, humidity, and lifestyle activities below, and our algorithm will rank the best destinations for you!</p>
+                            </div>
+                            <div class="page-header-actions">
+                                <button id="btn-reset-comfort-search" class="btn-resend-otp" style="font-size: 12px; padding: 6px 14px;">
+                                    Reset to Default 23°C
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Interactive User Preferences Card -->
+                        <div class="assembly-card" style="padding: 20px; margin-bottom: 20px; background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(56,189,248,0.06)); border-color: rgba(16,185,129,0.3);">
+                            <div style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="#10b981"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                                Customize Your Ideal Climate &amp; Lifestyle Criteria
+                            </div>
+
+                            <div class="grid-2-cols" style="gap: 16px;">
+                                <!-- Preferred Temperature Slider -->
+                                <div class="control-group">
+                                    <label class="control-label" style="display: flex; justify-content: space-between;">
+                                        <span>Target Daytime Temperature:</span>
+                                        <span id="val-comfort-target-temp" class="control-value" style="color: var(--accent-emerald); font-size: 15px; font-weight: 800;">23.0°C</span>
+                                    </label>
+                                    <input type="range" id="slider-comfort-target-temp" class="input-slider" min="16" max="32" step="0.5" value="23.0">
+                                    <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 2px;">
+                                        <span>16°C (Crisp Mountain)</span>
+                                        <span>23°C (Eternal Spring)</span>
+                                        <span>32°C (Warm Beach)</span>
+                                    </div>
+                                </div>
+
+                                <!-- Preferred Humidity Slider -->
+                                <div class="control-group">
+                                    <label class="control-label" style="display: flex; justify-content: space-between;">
+                                        <span>Target Relative Humidity:</span>
+                                        <span id="val-comfort-target-humidity" class="control-value" style="color: var(--accent-sky); font-size: 15px; font-weight: 800;">55%</span>
+                                    </label>
+                                    <input type="range" id="slider-comfort-target-humidity" class="input-slider" min="20" max="85" step="5" value="55">
+                                    <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 2px;">
+                                        <span>20% (Dry Desert Air)</span>
+                                        <span>55% (Balanced Comfort)</span>
+                                        <span>85% (Tropical Lush)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid-2-cols" style="gap: 16px; margin-top: 12px;">
+                                <!-- Lifestyle / Vacation Activity Selector -->
+                                <div class="control-group">
+                                    <label class="control-label">Favorite Lifestyle &amp; Vacation Setting:</label>
+                                    <select id="select-comfort-lifestyle" class="input-select" style="font-weight: 600;">
+                                        <option value="all">🌟 All Categories (Best Overall Bioclimates)</option>
+                                        <option value="Eternal Spring">🌸 Eternal Spring &amp; Flower Cities</option>
+                                        <option value="Coastal Paradise">🏖️ Coastal Paradise, Swimming &amp; Beaches</option>
+                                        <option value="Mountain Retreat">🏔️ Mountain Retreat, Hiking &amp; Pine Forests</option>
+                                        <option value="Cultural City">☕ Cultural Cities, Historic Cafés &amp; Parks</option>
+                                        <option value="Tropical Wellness">🌿 Tropical Pura Vida &amp; Rain Forest Spas</option>
+                                    </select>
+                                </div>
+
+                                <!-- Max Tolerable Wind Speed -->
+                                <div class="control-group">
+                                    <label class="control-label" style="display: flex; justify-content: space-between;">
+                                        <span>Max Preferred Wind Velocity:</span>
+                                        <span id="val-comfort-max-wind" class="control-value" style="color: #f59e0b; font-size: 14px;">5.0 m/s (18 km/h)</span>
+                                    </label>
+                                    <input type="range" id="slider-comfort-max-wind" class="input-slider" min="2" max="10" step="0.5" value="5.0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ranked Paradise Destinations Grid Container -->
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div class="chart-title" style="margin-bottom: 0;">Top Matched Global Climate Havens for You:</div>
+                                <span id="comfort-results-count-badge" class="section-badge" style="background: rgba(16,185,129,0.2); color: #10b981;">12 Destinations Evaluated</span>
+                            </div>
+                            <div id="comfort-places-ranked-grid" class="community-grid"></div>
                         </div>
                     </div>
                 </div>

@@ -21,6 +21,7 @@ import { EMERGENCY_BUNKERS, getBunkersForZone } from './bunkerDatabase.js';
 import { userDataStore } from './userDataStore.js';
 import { sosEngine, DISASTER_SCENARIOS } from './sosEngine.js';
 import { WorldMapEngine, GLOBAL_STATIONS } from './worldMapEngine.js';
+import { analyzeAndRankComfortPlaces, PARADISE_DESTINATIONS } from './comfortMatcherEngine.js';
 
 class BioShelterApp {
     constructor() {
@@ -80,11 +81,13 @@ class BioShelterApp {
         this.bindAuthEvents();
         this.bindUserDataEvents();
         this.bindSOSEvents();
+        this.bindComfortMatcherEvents();
         this.updateSimulation();
         this.renderCommunityShelters();
         this.renderHazardReports();
         this.renderCustomMaterials();
         this.renderSOSDispatchLogs();
+        this.renderComfortPlaces();
         this.switchTab('tab-3d');
     }
 
@@ -726,19 +729,24 @@ class BioShelterApp {
 
     onSelectWorldStation(station) {
         this.selectedWorldStation = station;
-        if (station.zone && CLIMATE_ZONES[station.zone]) {
-            this.state.zoneId = station.zone;
-            if (this.dom.zoneSelect) this.dom.zoneSelect.value = station.zone;
+        const targetZone = station.zone || (station.tempC >= 38 ? 'hot_arid' : (station.tempC <= 14 ? 'cold_mountainous' : (station.humidity >= 70 ? 'warm_humid' : 'temperate')));
+        if (CLIMATE_ZONES[targetZone]) {
+            this.state.zoneId = targetZone;
+            if (this.dom.zoneSelect) this.dom.zoneSelect.value = targetZone;
         }
-        if (station.tempMax && station.tempMin) {
-            this.state.customClimateParams = {
-                tMax: station.tempMax,
-                tMin: station.tempMin,
-                rhAvg: station.humidity || 45,
-                windSpeed: station.windSpeed || 3.8,
-                solarPeak: station.solarPeak || 980
-            };
-        }
+        
+        const tMax = station.tempMax || station.tempC || 44;
+        const tMin = station.tempMin || Math.max(8, tMax - 14);
+
+        this.state.customClimateParams = {
+            tMax: tMax,
+            tMin: tMin,
+            rhDay: Math.max(12, station.humidity ? station.humidity - 15 : 25),
+            rhNight: Math.min(95, station.humidity ? station.humidity + 15 : 60),
+            windSpeedAvg: station.windSpeedMps || station.windSpeed || 3.8,
+            solarPeak: station.solarGhi || 950
+        };
+
         this.updateSimulation();
     }
 
@@ -2573,7 +2581,64 @@ class BioShelterApp {
             this.visualizer3D.updateSunPosition(h, weatherHour);
         }
 
-        // Update HUD Values
+        // Update Location, Wind, and Climatological Statement in HUD
+        const station = this.selectedWorldStation || {
+            name: this.climateData.zone.name,
+            country: 'Regional Simulation Model',
+            status: 'Hot-Arid Desert Active',
+            tempC: this.climateData.params.tMax,
+            windSpeedMps: this.climateData.params.windSpeedAvg || 3.8,
+            windSpeedKmh: Math.round((this.climateData.params.windSpeedAvg || 3.8) * 3.6 * 10) / 10,
+            windDirectionDeg: 245,
+            windDirectionText: 'WSW (245°) ➔ ENE (65°)',
+            weatherStatement: this.climateData.zone.description
+        };
+
+        const locNameEl = document.getElementById('hud-location-name');
+        if (locNameEl) locNameEl.textContent = `📍 ${station.name}, ${station.country || ''}`;
+
+        const badgeEl = document.getElementById('hud-climate-badge');
+        if (badgeEl) {
+            badgeEl.textContent = station.status || this.climateData.zone.name;
+            if (station.tempC >= 40) {
+                badgeEl.style.background = 'rgba(239,68,68,0.2)';
+                badgeEl.style.color = '#ef4444';
+            } else if (station.isParadise || (station.tempC >= 20 && station.tempC <= 28)) {
+                badgeEl.style.background = 'rgba(16,185,129,0.2)';
+                badgeEl.style.color = '#10b981';
+            } else {
+                badgeEl.style.background = 'rgba(56,189,248,0.2)';
+                badgeEl.style.color = '#38bdf8';
+            }
+        }
+
+        const stmtEl = document.getElementById('hud-weather-statement');
+        if (stmtEl) stmtEl.textContent = station.weatherStatement || this.climateData.zone.description;
+
+        const windSpeedEl = document.getElementById('hud-wind-speed-val');
+        if (windSpeedEl) windSpeedEl.textContent = `${station.windSpeedMps || 3.8} m/s (${station.windSpeedKmh || 13.7} km/h)`;
+
+        const windDirEl = document.getElementById('hud-wind-dir-text');
+        if (windDirEl) windDirEl.textContent = station.windDirectionText || 'NW ➔ SE';
+
+        const compassArrowEl = document.getElementById('hud-wind-compass-arrow');
+        if (compassArrowEl) {
+            compassArrowEl.style.transform = `rotate(${station.windDirectionDeg || 245}deg)`;
+        }
+
+        const coolingDeltaEl = document.getElementById('hud-cooling-delta');
+        if (coolingDeltaEl) {
+            const delta = (simHour.indoorTemp - simHour.ambientTemp).toFixed(1);
+            if (delta < 0) {
+                coolingDeltaEl.textContent = `${delta}°C Cooling`;
+                coolingDeltaEl.style.color = '#10b981';
+            } else {
+                coolingDeltaEl.textContent = `+${delta}°C Gain`;
+                coolingDeltaEl.style.color = '#f59e0b';
+            }
+        }
+
+        // Update HUD Core Values
         this.dom.hudIndoorTemp.textContent = `${simHour.indoorTemp.toFixed(1)}°C`;
         this.dom.hudOperativeTemp.textContent = `${simHour.operativeTemp.toFixed(1)}°C`;
         this.dom.hudAmbientTemp.textContent = `${simHour.ambientTemp.toFixed(1)}°C`;
@@ -2598,6 +2663,174 @@ class BioShelterApp {
         this.dom.hudDampingRatio.textContent = `${this.simulationData.summary.thermalDampingRatio}%`;
 
         this.updateWeatherSection();
+    }
+
+    bindComfortMatcherEvents() {
+        const sliderTemp = document.getElementById('slider-comfort-target-temp');
+        const valTemp = document.getElementById('val-comfort-target-temp');
+        const sliderHum = document.getElementById('slider-comfort-target-humidity');
+        const valHum = document.getElementById('val-comfort-target-humidity');
+        const selLifestyle = document.getElementById('select-comfort-lifestyle');
+        const sliderWind = document.getElementById('slider-comfort-max-wind');
+        const valWind = document.getElementById('val-comfort-max-wind');
+        const btnReset = document.getElementById('btn-reset-comfort-search');
+
+        const triggerRecalc = () => {
+            this.renderComfortPlaces();
+        };
+
+        if (sliderTemp && valTemp) {
+            sliderTemp.addEventListener('input', (e) => {
+                valTemp.textContent = `${parseFloat(e.target.value).toFixed(1)}°C`;
+                triggerRecalc();
+            });
+        }
+
+        if (sliderHum && valHum) {
+            sliderHum.addEventListener('input', (e) => {
+                valHum.textContent = `${e.target.value}%`;
+                triggerRecalc();
+            });
+        }
+
+        if (selLifestyle) {
+            selLifestyle.addEventListener('change', () => {
+                triggerRecalc();
+            });
+        }
+
+        if (sliderWind && valWind) {
+            sliderWind.addEventListener('input', (e) => {
+                valWind.textContent = `${parseFloat(e.target.value).toFixed(1)} m/s (${Math.round(parseFloat(e.target.value) * 3.6)} km/h)`;
+                triggerRecalc();
+            });
+        }
+
+        if (btnReset) {
+            btnReset.addEventListener('click', () => {
+                if (sliderTemp) sliderTemp.value = 23.0;
+                if (valTemp) valTemp.textContent = '23.0°C';
+                if (sliderHum) sliderHum.value = 55;
+                if (valHum) valHum.textContent = '55%';
+                if (selLifestyle) selLifestyle.value = 'all';
+                if (sliderWind) sliderWind.value = 5.0;
+                if (valWind) valWind.textContent = '5.0 m/s (18 km/h)';
+                triggerRecalc();
+            });
+        }
+
+        // World map filter chips
+        document.querySelectorAll('.map-filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.map-filter-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                const cat = chip.getAttribute('data-map-filter');
+                if (this.worldMapEngine) {
+                    this.worldMapEngine.setFilter(cat);
+                }
+            });
+        });
+    }
+
+    renderComfortPlaces() {
+        const grid = document.getElementById('comfort-places-ranked-grid');
+        if (!grid) return;
+
+        const targetTemp = parseFloat((document.getElementById('slider-comfort-target-temp') || {}).value || 23.0);
+        const targetHum = parseFloat((document.getElementById('slider-comfort-target-humidity') || {}).value || 55);
+        const lifestyle = (document.getElementById('select-comfort-lifestyle') || {}).value || 'all';
+        const maxWind = parseFloat((document.getElementById('slider-comfort-max-wind') || {}).value || 5.0);
+
+        const ranked = analyzeAndRankComfortPlaces({
+            targetTemp,
+            targetHumidity: targetHum,
+            lifestyle,
+            maxWind
+        });
+
+        const badgeCount = document.getElementById('comfort-results-count-badge');
+        if (badgeCount) badgeCount.textContent = `${ranked.length} Paradise Destinations Ranked`;
+
+        grid.innerHTML = ranked.map((d, index) => {
+            const isTop = index === 0;
+            const matchCol = d.matchScore >= 90 ? '#10b981' : (d.matchScore >= 75 ? '#38bdf8' : '#f59e0b');
+
+            return `
+                <div class="community-card" style="border-color: ${isTop ? 'rgba(16,185,129,0.5)' : 'var(--border-glass)'}; background: ${isTop ? 'linear-gradient(135deg, rgba(16,185,129,0.06), var(--bg-card))' : 'var(--bg-card)'};">
+                    ${isTop ? `<div style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #10b981, #0284c7); color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; text-transform: uppercase;">🌟 #1 Top Bioclimatic Match</div>` : ''}
+                    
+                    <div style="display: flex; gap: 14px; align-items: flex-start;">
+                        <img src="${d.photoUrl}" alt="${d.name}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-glass);">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px;">
+                                <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary);">${d.name}</h3>
+                                <span style="font-size: 14px; font-weight: 900; color: ${matchCol}; background: ${matchCol}18; padding: 2px 8px; border-radius: 6px; border: 1px solid ${matchCol}40;">${d.matchScore}% Match</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--accent-sky); font-weight: 600;">${d.region}, ${d.country}</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); font-style: italic; margin-top: 2px;">"${d.tagline}"</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Year-Round Temp</div>
+                            <div style="font-size: 14px; font-weight: 800; color: var(--accent-emerald);">${d.tempAvg}°C</div>
+                            <div style="font-size: 9px; color: var(--text-muted);">${d.tempMin}°C - ${d.tempMax}°C</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Humidity</div>
+                            <div style="font-size: 14px; font-weight: 800; color: var(--accent-sky);">${d.humidityAvg}%</div>
+                            <div style="font-size: 9px; color: var(--text-muted);">${d.airQuality}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Wind Breeze</div>
+                            <div style="font-size: 14px; font-weight: 800; color: #f59e0b;">${d.windSpeedAvg} m/s</div>
+                            <div style="font-size: 9px; color: var(--text-muted);">${d.windDirection.split(' ')[0]}</div>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.45; margin-bottom: 8px;">
+                        ${d.weatherStatement}
+                    </p>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">
+                        ${d.idealFor.map(tag => `<span style="font-size: 10px; background: rgba(56,189,248,0.1); color: var(--accent-sky); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56,189,248,0.2);">${tag}</span>`).join('')}
+                    </div>
+
+                    <button class="export-btn-primary btn-simulate-paradise" data-dest-id="${d.id}" style="width: 100%; justify-content: center; font-size: 12px; padding: 8px; background: linear-gradient(135deg, #0284c7, #10b981);">
+                        🚀 Simulate BioShelter in ${d.name} &rarr;
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        grid.querySelectorAll('.btn-simulate-paradise').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const destId = btn.getAttribute('data-dest-id');
+                const dest = PARADISE_DESTINATIONS.find(x => x.id === destId);
+                if (dest) {
+                    this.onSelectWorldStation({
+                        name: dest.name,
+                        country: dest.country,
+                        status: `Paradise Comfort Eden 🟢 (${dest.matchScore || 98}% Match)`,
+                        tempC: dest.tempAvg,
+                        tempMax: dest.tempMax,
+                        tempMin: dest.tempMin,
+                        humidity: dest.humidityAvg,
+                        windSpeed: dest.windSpeedAvg,
+                        windSpeedMps: dest.windSpeedAvg,
+                        windSpeedKmh: Math.round(dest.windSpeedAvg * 3.6 * 10) / 10,
+                        windDirectionDeg: 45,
+                        windDirectionText: dest.windDirection,
+                        weatherStatement: dest.weatherStatement,
+                        zone: dest.zoneId,
+                        isParadise: true
+                    });
+                    this.switchTab('tab-3d');
+                    alert(`🌴 Loaded ${dest.name}, ${dest.country} into BioShelter 3D Simulation Twin!\n\nAverage Temp: ${dest.tempAvg}°C\nHumidity: ${dest.humidityAvg}%\nWind: ${dest.windSpeedAvg} m/s (${dest.windDirection})\n\nEnjoy exploring your ideal bioclimatic living environment!`);
+                }
+            });
+        });
     }
 
     updateChartsData() {
