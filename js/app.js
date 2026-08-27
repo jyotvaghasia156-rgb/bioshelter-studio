@@ -853,10 +853,16 @@ class BioShelterApp {
                 });
             }
 
-            // Gate Google SSO Button
+            // Gate Google SSO Buttons
             const btnGateGoogle = document.getElementById('btn-gate-login-google');
             if (btnGateGoogle) {
                 btnGateGoogle.addEventListener('click', () => {
+                    openGoogleModal();
+                });
+            }
+            const btnGateCustomGoogle = document.getElementById('btn-gate-open-google-custom');
+            if (btnGateCustomGoogle) {
+                btnGateCustomGoogle.addEventListener('click', () => {
                     openGoogleModal();
                 });
             }

@@ -1198,7 +1198,7 @@
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 200;
+    z-index: 20000;
     padding: 16px;
 }
 
@@ -1419,7 +1419,7 @@
     border: 1px solid var(--accent-emerald);
     border-radius: var(--radius-md);
     padding: 14px 18px;
-    z-index: 300;
+    z-index: 30000;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     max-width: 320px;
     animation: toastSlide 0.3s ease-out;
