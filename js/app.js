@@ -14,7 +14,7 @@ import { Shelter3DVisualizer } from './threeVisualizer.js';
 import { PsychrometricBioclimaticChart } from './psychrometricChart.js';
 import { analyzeAndGenerateRecommendations } from './recommendationEngine.js';
 import { generatePythonSimulationScript, openPrintableEngineeringReport, exportBIMGeoJSON } from './exporter.js';
-import { SOIL_PROFILES, calculateSoilDepthProfile } from './soilEngine.js';
+import { SOIL_PROFILES, GLOBAL_SOIL_DIRECTORY, filterAndSearchSoilDirectory, calculateSoilDepthProfile } from './soilEngine.js';
 import { calculateAdvancedWeatherMetrics } from './weatherEngine.js';
 import { authInstance } from './authEngine.js';
 import { EMERGENCY_BUNKERS, getBunkersForZone } from './bunkerDatabase.js';
@@ -82,9 +82,12 @@ class BioShelterApp {
         this.bindUserDataEvents();
         this.bindSOSEvents();
         this.bindComfortMatcherEvents();
+        this.bindSoilDirectoryEvents();
         this.initWorldMap();
         this.checkBackendHealth();
         this.updateSimulation();
+        this.updateSoilSection();
+        this.renderSoilDirectory();
         this.renderCommunityShelters();
         this.renderHazardReports();
         this.renderCustomMaterials();
@@ -3214,6 +3217,9 @@ class BioShelterApp {
             if (this.psychroChart && typeof this.psychroChart.render === 'function') {
                 setTimeout(() => this.psychroChart.render(), 50);
             }
+        } else if (tabId === 'tab-soil') {
+            this.updateSoilSection();
+            this.renderSoilDirectory();
         } else if (tabId === 'tab-login') {
             this.renderLoginPage();
         } else if (tabId === 'tab-community') {
@@ -3225,6 +3231,217 @@ class BioShelterApp {
         } else if (tabId === 'tab-sos-broadcast') {
             this.renderSOSDispatchLogs();
         }
+    }
+
+    bindSoilDirectoryEvents() {
+        const inputSearch = document.getElementById('input-soil-search');
+        const selectCountry = document.getElementById('select-soil-country');
+        const btnReset = document.getElementById('btn-reset-soil-filters');
+
+        if (inputSearch) {
+            inputSearch.addEventListener('input', () => {
+                this.renderSoilDirectory();
+            });
+        }
+
+        if (selectCountry) {
+            selectCountry.addEventListener('change', () => {
+                this.renderSoilDirectory();
+            });
+        }
+
+        if (btnReset) {
+            btnReset.addEventListener('click', () => {
+                if (inputSearch) inputSearch.value = '';
+                if (selectCountry) selectCountry.value = 'all';
+                document.querySelectorAll('.soil-nature-chip').forEach(c => c.classList.remove('active'));
+                const firstChip = document.querySelector('.soil-nature-chip[data-soil-nature="all"]');
+                if (firstChip) firstChip.classList.add('active');
+                this.renderSoilDirectory();
+            });
+        }
+
+        document.querySelectorAll('.soil-nature-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.soil-nature-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                this.renderSoilDirectory();
+            });
+        });
+    }
+
+    updateSoilSection() {
+        const profile = SOIL_PROFILES[this.state.soilId] || SOIL_PROFILES.desert_sand;
+        const depth = this.state.selectedSoilDepth || 3.0;
+
+        const elK = document.getElementById('soil-k-val');
+        const elDiff = document.getElementById('soil-diffusivity-val');
+        const elMoist = document.getElementById('soil-moisture-val');
+        const elBearing = document.getElementById('soil-bearing-val');
+        const elSuit = document.getElementById('soil-suitability-text');
+        const elBenefit = document.getElementById('soil-geothermal-benefit');
+
+        if (elK) elK.textContent = `${profile.k} W/m·K`;
+        if (elDiff) elDiff.textContent = `${profile.diffusivityDay} m²/day`;
+        if (elMoist) elMoist.textContent = `${profile.moistureContent}%`;
+        if (elBearing) elBearing.textContent = `${profile.bearingCapacity} kN/m²`;
+        if (elSuit) elSuit.textContent = profile.description || 'Optimal earthbag compaction and subterranean thermal insulation.';
+
+        const depthData = calculateSoilDepthProfile(profile, 34.0, 14.0, depth);
+        if (elBenefit && depthData && depthData.coolingAtSelectedDepth) {
+            elBenefit.textContent = `${depthData.coolingAtSelectedDepth.summerTemp}°C (ΔT = ${depthData.coolingAtSelectedDepth.earthTubeCoolingDelta}°C passive cooling)`;
+        }
+
+        this.renderSoilDepthChart(depthData);
+    }
+
+    renderSoilDepthChart(depthData) {
+        const ctx = document.getElementById('soil-depth-chart');
+        if (!ctx || !window.Chart) return;
+
+        const isDark = this.theme === 'dark';
+        const textColor = isDark ? '#94a3b8' : '#475569';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.08)';
+
+        const profile = SOIL_PROFILES[this.state.soilId] || SOIL_PROFILES.desert_sand;
+        const data = depthData || calculateSoilDepthProfile(profile, 34.0, 14.0, this.state.selectedSoilDepth || 3.0);
+
+        const labels = data.depthTemps.map(d => `${d.depth}m`);
+        const summerTemps = data.depthTemps.map(d => d.summerTemp);
+        const winterTemps = data.depthTemps.map(d => d.winterTemp);
+
+        if (this.soilDepthChart) {
+            this.soilDepthChart.data.labels = labels;
+            this.soilDepthChart.data.datasets[0].data = summerTemps;
+            this.soilDepthChart.data.datasets[1].data = winterTemps;
+            this.soilDepthChart.update();
+        } else {
+            this.soilDepthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Summer Peak Subsurface Temp (°C)', data: summerTemps, borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', tension: 0.35, fill: false, borderWidth: 2.5 },
+                        { label: 'Winter Peak Subsurface Temp (°C)', data: winterTemps, borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', tension: 0.35, fill: false, borderWidth: 2.5 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { color: gridColor }, ticks: { color: textColor }, title: { display: true, text: 'Subterranean Depth (Meters)', color: '#38bdf8' } },
+                        y: { grid: { color: gridColor }, ticks: { color: textColor }, title: { display: true, text: 'Ground Temperature (°C)', color: '#10b981' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: textColor, font: { family: 'Inter', size: 11, weight: '600' } } }
+                    }
+                }
+            });
+        }
+    }
+
+    renderSoilDirectory() {
+        const grid = document.getElementById('global-soil-directory-grid');
+        if (!grid) return;
+
+        const query = (document.getElementById('input-soil-search') || {}).value || '';
+        const country = (document.getElementById('select-soil-country') || {}).value || 'all';
+        const activeChip = document.querySelector('.soil-nature-chip.active');
+        const nature = activeChip ? activeChip.getAttribute('data-soil-nature') : 'all';
+
+        const soils = filterAndSearchSoilDirectory(query, nature, country);
+
+        const badge = document.getElementById('soil-directory-count-badge');
+        if (badge) badge.textContent = `${soils.length} Districts Found`;
+
+        if (soils.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                    <div style="font-size: 32px; margin-bottom: 8px;">🏜️</div>
+                    <h3>No Soil Profiles Found for "${query}"</h3>
+                    <p style="font-size: 12px; margin-top: 4px;">Try searching by country (e.g. "India", "USA", "Spain") or selecting a different soil nature chip.</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = soils.map(s => {
+            const isCurrent = this.state.soilId === s.id;
+            return `
+                <div class="community-card" style="border-color: ${isCurrent ? 'var(--accent-emerald)' : 'var(--border-glass)'}; background: ${isCurrent ? 'linear-gradient(135deg, rgba(16,185,129,0.08), var(--bg-card))' : 'var(--bg-card)'};">
+                    <div style="display: flex; gap: 14px; align-items: flex-start;">
+                        <img src="${s.photoUrl || 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=600&auto=format&fit=crop&q=80'}" alt="${s.name}" style="width: 75px; height: 75px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-glass);">
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px;">
+                                <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">${s.name}</h3>
+                                <span style="font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px; background: rgba(56,189,248,0.15); color: var(--accent-sky); border: 1px solid rgba(56,189,248,0.3);">${s.natureTitle ? s.natureTitle.split(' ')[0] : '🌍'} ${s.country}</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--accent-sky); font-weight: 600;">📍 ${s.district}, ${s.country}</div>
+                            <div style="font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px;">Taxonomy: ${s.taxonomy}</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 12px 0; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 6px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Conductivity</div>
+                            <div style="font-size: 12px; font-weight: 800; color: var(--accent-sky);">${s.k} W/m·K</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Density</div>
+                            <div style="font-size: 12px; font-weight: 800; color: var(--text-primary);">${s.rho} kg/m³</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Moisture</div>
+                            <div style="font-size: 12px; font-weight: 800; color: var(--accent-emerald);">${s.moistureContent}%</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Bearing Cap.</div>
+                            <div style="font-size: 12px; font-weight: 800; color: #f59e0b;">${s.bearingCapacity} kN/m²</div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 6px; padding: 7px 10px; margin-bottom: 8px; font-size: 11px;">
+                        <span style="color: #10b981; font-weight: 700;">Earth Cooling Potential:</span>
+                        <span style="color: var(--text-secondary);">${s.earthTubeCoolingPotential || '-8.5°C at 3m'}</span>
+                    </div>
+
+                    <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.45; margin-bottom: 10px;">
+                        ${s.description}
+                    </p>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">
+                        ${(s.bestTechniques || ['Rammed Earth', 'SuperAdobe Earthbag', 'Adobe']).map(t => `<span style="font-size: 9px; background: rgba(56,189,248,0.1); color: var(--accent-sky); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56,189,248,0.2);">${t}</span>`).join('')}
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <a href="${s.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`}" target="_blank" rel="noopener noreferrer" class="btn-sign-in-nav" style="text-decoration: none; justify-content: center; font-size: 11px; padding: 7px; background: rgba(56,189,248,0.12); border-color: rgba(56,189,248,0.3); color: var(--accent-sky); font-weight: 700;">
+                            📍 Explore on Google Maps ↗
+                        </a>
+                        <button class="export-btn-primary btn-apply-soil-profile" data-soil-id="${s.id}" style="justify-content: center; font-size: 11px; padding: 7px; background: linear-gradient(135deg, #0284c7, #10b981);">
+                            🚀 Apply to 3D Twin &rarr;
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        grid.querySelectorAll('.btn-apply-soil-profile').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const sId = btn.getAttribute('data-soil-id');
+                const soil = GLOBAL_SOIL_DIRECTORY.find(x => x.id === sId);
+                if (soil) {
+                    this.state.soilId = sId;
+                    const selectSoil = document.getElementById('select-soil-type');
+                    if (selectSoil && selectSoil.querySelector(`option[value="${sId}"]`)) {
+                        selectSoil.value = sId;
+                    }
+                    this.updateSoilSection();
+                    this.renderSoilDirectory();
+                    this.updateSimulation();
+                    alert(`🌍 Applied Soil Profile of ${soil.name} (${soil.district}, ${soil.country}) to 3D Simulation Twin!\n\nThermal Conductivity (k): ${soil.k} W/m·K\nDensity: ${soil.rho} kg/m³\nEarth Cooling Potential: ${soil.earthTubeCoolingPotential}\n\nSubterranean geothermics and plinth physics updated!`);
+                }
+            });
+        });
     }
 
     initWorldMap() {

@@ -1059,7 +1059,7 @@
                         </div>
 
                         <!-- Kusuda Subsurface Temperature Attenuation Chart -->
-                        <div class="chart-container-card">
+                        <div class="chart-container-card" style="margin-bottom: 24px;">
                             <div class="chart-card-header">
                                 <div class="chart-title">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-5.33 0-8 3.2-8 7.14 0 2.36 1.4 4.54 3.8 6.55L12 20.5l4.2-4.81c2.4-2.01 3.8-4.19 3.8-6.55C20 5.2 17.33 2 12 2z"/></svg>
@@ -1069,6 +1069,67 @@
                             <div class="chart-canvas-wrapper">
                                 <canvas id="soil-depth-chart"></canvas>
                             </div>
+                        </div>
+
+                        <!-- NEW: GLOBAL SOIL DIRECTORY ACROSS ALL COUNTRIES & DISTRICTS (GOOGLE & ISRIC INTEGRATED) -->
+                        <div class="assembly-card" style="padding: 22px; background: var(--bg-card); border-color: rgba(56,189,248,0.3);">
+                            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                <div>
+                                    <div class="chart-title" style="margin-bottom: 2px;">🌍 Global Soil Directory &amp; World District Geotechnical Explorer</div>
+                                    <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">Comprehensive geotechnical soil taxonomy, thermal conductivity, and earth-sheltered suitability across worldwide countries and districts.</p>
+                                </div>
+                                <span id="soil-directory-count-badge" class="section-badge" style="background: rgba(16,185,129,0.2); color: #10b981; font-weight: 700;">14 Districts Evaluated</span>
+                            </div>
+
+                            <!-- Live Search & Nature Filter Toolbar -->
+                            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                    <div style="flex: 1; min-width: 260px; position: relative;">
+                                        <input type="text" id="input-soil-search" class="input-text" placeholder="🔍 Search by Country, District, City, or Soil Name (e.g. Jaisalmer, Texas, Laterite, Clay, Desert Sand)..." style="width: 100%; padding: 10px 14px; font-size: 13px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-glass); color: var(--text-primary);">
+                                    </div>
+                                    <select id="select-soil-country" class="input-select" style="min-width: 170px; font-size: 12px; font-weight: 600;">
+                                        <option value="all">🌐 All Countries</option>
+                                        <option value="India">🇮🇳 India (Thar, Deccan, Punjab...)</option>
+                                        <option value="United States">🇺🇸 United States (Arizona, Texas, CA...)</option>
+                                        <option value="United Arab Emirates">🇦🇪 UAE / Middle East</option>
+                                        <option value="Egypt">🇪🇬 Egypt / North Africa</option>
+                                        <option value="Spain">🇪🇸 Spain / Mediterranean</option>
+                                        <option value="Portugal">🇵🇹 Portugal / Madeira</option>
+                                        <option value="Colombia">🇨🇴 Colombia / Andes</option>
+                                    </select>
+                                    <button id="btn-reset-soil-filters" class="btn-resend-otp" style="font-size: 11px; padding: 6px 12px;">
+                                        Reset Filters
+                                    </button>
+                                </div>
+
+                                <!-- Filter Chips by Nature / Taxonomy -->
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                    <button class="soil-nature-chip active" data-soil-nature="all" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: var(--accent-emerald); color: white; border: none; font-weight: 700; cursor: pointer;">
+                                        🌟 All Soil Natures
+                                    </button>
+                                    <button class="soil-nature-chip" data-soil-nature="arid_desert" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); color: #f59e0b; font-weight: 600; cursor: pointer;">
+                                        🏜️ Desert Sands (High Thermal Damping)
+                                    </button>
+                                    <button class="soil-nature-chip" data-soil-nature="expansive_clay" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #ef4444; font-weight: 600; cursor: pointer;">
+                                        🧱 Expansive Clays (High Thermal Mass)
+                                    </button>
+                                    <button class="soil-nature-chip" data-soil-nature="alluvial_loam" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); color: var(--accent-sky); font-weight: 600; cursor: pointer;">
+                                        🌾 Alluvial Loams (Optimal Cohesion)
+                                    </button>
+                                    <button class="soil-nature-chip" data-soil-nature="tropical_laterite" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.4); color: #f97316; font-weight: 600; cursor: pointer;">
+                                        🌲 Tropical Laterites (High Compressive)
+                                    </button>
+                                    <button class="soil-nature-chip" data-soil-nature="volcanic_ash" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4); color: #a855f7; font-weight: 600; cursor: pointer;">
+                                        🌋 Volcanic Ash (Geothermal Balance)
+                                    </button>
+                                    <button class="soil-nature-chip" data-soil-nature="alpine_permafrost" style="padding: 5px 12px; font-size: 11px; border-radius: 20px; background: rgba(129,140,248,0.15); border: 1px solid rgba(129,140,248,0.4); color: #818cf8; font-weight: 600; cursor: pointer;">
+                                        ❄️ Alpine Scree &amp; Permafrost
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Soil Directory Results Grid -->
+                            <div id="global-soil-directory-grid" class="community-grid"></div>
                         </div>
                     </div>
                 </div>
