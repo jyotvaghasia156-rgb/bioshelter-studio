@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioShelter Studio &bull; Member Login &amp; Sign-Up Portal</title>
+    <meta name="description" content="Dynamic member registration, Sign-Up ID collection, and login portal for BioShelter 3D Bioclimatic Simulation Studio.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top center, #0f172a 0%, #020617 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .portal-nav-bar {
+            position: fixed;
+            top: 16px;
+            display: flex;
+            gap: 10px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 6px 12px;
+            border-radius: 40px;
+            backdrop-filter: blur(16px);
+            z-index: 100;
+        }
+        .portal-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .portal-nav-link:hover {
+            color: #f8fafc;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .portal-nav-link.active {
+            background: rgba(56, 189, 248, 0.18);
+            color: #38bdf8;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+        }
+        .auth-card-wrapper {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 40px rgba(56,189,248,0.15);
+            backdrop-filter: blur(24px);
+            padding: 34px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            position: relative;
+            animation: fadeIn 0.4s ease-out;
+            margin-top: 50px;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(15px) scale(0.97); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .tab-toggle-container {
+            display: flex;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .auth-tab-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .auth-tab-btn.active {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+        .form-input-styled {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 11px 14px;
+            color: #f8fafc;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-input-styled:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+        .btn-action-primary {
+            width: 100%;
+            padding: 13px;
+            border-radius: 10px;
+            border: none;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #ffffff;
+            transition: transform 0.15s, box-shadow 0.2s;
+        }
+        .btn-action-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        .btn-sso-action {
+            flex: 1;
+            padding: 10px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: #cbd5e1;
+            transition: all 0.2s;
+        }
+        .btn-sso-action:hover {
+            background: rgba(255,255,255,0.08);
+            color: #f8fafc;
+            transform: translateY(-1px);
+        }
+        .status-badge-id {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px dashed #10b981;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <nav class="portal-nav-bar">
+        <a href="index.html" class="portal-nav-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            3D Studio Main
+        </a>
+        <a href="login.html" class="portal-nav-link active">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+            Sign In &amp; Sign Up
+        </a>
+        <a href="otp.html" class="portal-nav-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+            OTP Verification
+        </a>
+    </nav>
+
+    <!-- Main Auth Card -->
+    <div class="auth-card-wrapper">
+        <!-- Brand Header -->
+        <div style="text-align: center; display: flex; flex-direction: column; gap: 6px;">
+            <div style="width: 48px; height: 48px; margin: 0 auto; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #10b981); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.84L18 11.2V18h-2v-6H8v6H6v-6.8l6-5.36z"/></svg>
+            </div>
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #38bdf8; font-weight: 800;">
+                BioShelter Member Net &bull; Database Sync
+            </div>
+            <h1 id="page-title" style="font-size: 22px; font-weight: 800; font-family: 'Outfit', sans-serif;">Welcome to BioShelter</h1>
+            <p style="font-size: 12px; color: #94a3b8;">Access the 3D Bioclimatic Simulation Studio &amp; Disaster Crisis Net.</p>
+        </div>
+
+        <!-- Mode Toggle (Sign In vs Sign Up) -->
+        <div class="tab-toggle-container">
+            <button id="tab-btn-signin" class="auth-tab-btn active">Sign In</button>
+            <button id="tab-btn-signup" class="auth-tab-btn">Create Account / Sign Up</button>
+        </div>
+
+        <!-- TAB 1: Sign In Form -->
+        <form id="form-signin" style="display: flex; flex-direction: column; gap: 12px;">
+            <div>
+                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Email, Phone, or Username</label>
+                <input type="text" id="signin-identifier" class="form-input-styled" placeholder="e.g. sarah.lin@gmail.com or 98765 43210" value="sarah.lin@gmail.com" required>
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Password</label>
+                <input type="password" id="signin-password" class="form-input-styled" placeholder="Enter your password" value="bioshelter2026" required>
+            </div>
+            <button type="submit" class="btn-action-primary" style="background: linear-gradient(135deg, #0284c7, #10b981);">
+                ⚡ Sign In &amp; Launch 3D Studio &rarr;
+            </button>
+        </form>
+
+        <!-- TAB 2: Create Account / Sign Up Form -->
+        <form id="form-signup" style="display: none; flex-direction: column; gap: 12px;">
+            <div>
+                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Full Name / Citizen Identity</label>
+                <input type="text" id="signup-name" class="form-input-styled" placeholder="e.g. Dr. Alex Henderson, Structural Engineer" value="Alex Henderson" required>
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Email Address</label>
+                <input type="email" id="signup-email" class="form-input-styled" placeholder="e.g. alex.henderson@resilience.org" value="alex.henderson@outlook.com" required>
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Mobile Phone (For Disaster SOS SMS)</label>
+                <input type="tel" id="signup-phone" class="form-input-styled" placeholder="+91 98765 43210" value="+91 98765 43210" required>
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Specialized Engineering Role</label>
+                <select id="signup-role" class="form-input-styled" style="cursor: pointer;">
+                    <option value="Certified Disaster Responder" selected>Certified Disaster Responder</option>
+                    <option value="Lead Thermal Modeling Physicist">Lead Thermal Modeling Physicist</option>
+                    <option value="Senior Structural &amp; Plinth Specialist">Senior Structural &amp; Plinth Specialist</option>
+                    <option value="Citizen Habitat Architect">Citizen Habitat Architect</option>
+                    <option value="Community Emergency Coordinator">Community Emergency Coordinator</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Institution / Organization</label>
+                <input type="text" id="signup-inst" class="form-input-styled" placeholder="e.g. Civil Disaster Resilience Net" value="Civil Disaster Resilience Net">
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Password</label>
+                <input type="password" id="signup-password" class="form-input-styled" placeholder="Create a secure password" value="bioshelter2026" required>
+            </div>
+            <button type="submit" class="btn-action-primary" style="background: linear-gradient(135deg, #10b981, #0284c7);">
+                🚀 Register Account &amp; Collect ID in Backend &rarr;
+            </button>
+        </form>
+
+        <!-- Dynamic Sign-Up Success & ID Display Box -->
+        <div id="signup-success-box" style="display: none;" class="status-badge-id">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 11px; font-weight: 800; color: #34d399;">ACCOUNT REGISTERED IN BACKEND</span>
+                <span style="font-size: 10px; color: #94a3b8;">STORED IN DB</span>
+            </div>
+            <div style="font-size: 12px; color: #f8fafc;">
+                Assigned ID: <strong id="registered-user-id" style="color: #38bdf8; font-family: 'JetBrains Mono';">usr_signup_1740672...</strong>
+            </div>
+            <div id="registered-user-msg" style="font-size: 11px; color: #cbd5e1;">Redirecting to 3D Simulation Twin...</div>
+        </div>
+
+        <!-- 1-Click Alternative Methods -->
+        <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px;">
+            <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; text-align: center;">Or Direct Single Sign-On:</div>
+            <div style="display: flex; gap: 8px;">
+                <button id="btn-login-google" class="btn-sso-action" style="border-color: rgba(234, 67, 53, 0.4); color: #fca5a5;">
+                    <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 12.713L1.043 4.225A2.001 2.001 0 013 3h18c.737 0 1.393.4 1.748 1L12 12.713z"/><path fill="#4285F4" d="M1.043 4.225C1.015 4.314 1 4.406 1 4.5V19a2 2 0 002 2h4V10.713L1.043 4.225z"/><path fill="#34A853" d="M23 4.5c0-.094-.015-.186-.043-.275L17 10.713V21h4a2 2 0 002-2V4.5z"/><path fill="#FBBC05" d="M7 21h10v-9.287L12 15.5l-5-3.787V21z"/></svg>
+                    Google
+                </button>
+                <button id="btn-login-ms" class="btn-sso-action" style="border-color: rgba(0, 164, 239, 0.4); color: #7dd3fc;">
+                    <svg width="14" height="14" viewBox="0 0 21 21"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>
+                    Microsoft
+                </button>
+                <a href="otp.html" class="btn-sso-action" style="text-decoration: none; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+                    OTP Portal
+                </a>
+            </div>
+        </div>
+
+        <!-- 1-Click Guest Mode Bypass -->
+        <div style="text-align: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px;">
+            <button id="btn-guest-direct" style="background: none; border: none; color: #38bdf8; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0 auto;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                👤 Continue as Guest Mode (1-Click Instant Unlock) &rarr;
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { authInstance } from './js/authEngine.js';
+
+        const tabSignIn = document.getElementById('tab-btn-signin');
+        const tabSignUp = document.getElementById('tab-btn-signup');
+        const formSignIn = document.getElementById('form-signin');
+        const formSignUp = document.getElementById('form-signup');
+        const pageTitle = document.getElementById('page-title');
+        const successBox = document.getElementById('signup-success-box');
+        const registeredIdEl = document.getElementById('registered-user-id');
+        const registeredMsgEl = document.getElementById('registered-user-msg');
+
+        // Toggle Tabs
+        tabSignIn.addEventListener('click', () => {
+            tabSignIn.classList.add('active');
+            tabSignUp.classList.remove('active');
+            formSignIn.style.display = 'flex';
+            formSignUp.style.display = 'none';
+            pageTitle.textContent = 'Sign In to BioShelter';
+            successBox.style.display = 'none';
+        });
+
+        tabSignUp.addEventListener('click', () => {
+            tabSignUp.classList.add('active');
+            tabSignIn.classList.remove('active');
+            formSignUp.style.display = 'flex';
+            formSignIn.style.display = 'none';
+            pageTitle.textContent = 'Create Member Account';
+            successBox.style.display = 'none';
+        });
+
+        const launchMainStudio = (user) => {
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 800);
+        };
+
+        // Handle Sign In Submit
+        formSignIn.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const identifier = document.getElementById('signin-identifier').value.trim();
+            const password = document.getElementById('signin-password').value;
+
+            const res = await authInstance.loginWithCredentials(identifier, password);
+            if (res.success) {
+                successBox.style.display = 'flex';
+                registeredIdEl.textContent = res.user.id;
+                registeredMsgEl.textContent = `Welcome back, ${res.user.displayName}! Launching 3D Studio...`;
+                launchMainStudio(res.user);
+            }
+        });
+
+        // Handle Sign Up Submit (Collects ID in Backend)
+        formSignUp.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const phone = document.getElementById('signup-phone').value.trim();
+            const role = document.getElementById('signup-role').value;
+            const institution = document.getElementById('signup-inst').value.trim();
+            const password = document.getElementById('signup-password').value;
+
+            const res = await authInstance.signUp({ name, email, phone, role, institution, password });
+            if (res.success) {
+                successBox.style.display = 'flex';
+                registeredIdEl.textContent = res.user.id;
+                registeredMsgEl.textContent = `Account created and stored in database! Enrolled as ${res.user.role}. Launching 3D Studio...`;
+                launchMainStudio(res.user);
+            }
+        });
+
+        // 1-Click Google Login
+        document.getElementById('btn-login-google').addEventListener('click', async () => {
+            const user = await authInstance.loginWithGoogle();
+            launchMainStudio(user);
+        });
+
+        // 1-Click Microsoft Login
+        document.getElementById('btn-login-ms').addEventListener('click', async () => {
+            const user = await authInstance.loginWithMicrosoft();
+            launchMainStudio(user);
+        });
+
+        // 1-Click Guest Mode
+        document.getElementById('btn-guest-direct').addEventListener('click', () => {
+            const guest = authInstance.loginAsGuest();
+            launchMainStudio(guest);
+        });
+    </script>
+</body>
+</html>

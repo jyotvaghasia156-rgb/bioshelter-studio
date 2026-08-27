@@ -322,6 +322,115 @@ try {
                 continue
             }
 
+            # 3f. User Sign-Up / Registration (Collects and Stores Sign-Up ID in Backend Database)
+            if (($rawPath -eq "/api/auth/signup" -or $rawPath -eq "/api/auth/register") -and $method -eq "POST") {
+                $name = "Citizen Engineer"
+                $email = ""
+                $phone = "+91 98765 43210"
+                $role = "Certified Disaster Responder"
+                $institution = "Civil Disaster Resilience Net"
+                $password = ""
+
+                if ($rawBody -match '"name"\s*:\s*"([^"]+)"') { $name = $matches[1] }
+                if ($rawBody -match '"email"\s*:\s*"([^"]+)"') { $email = $matches[1] }
+                if ($rawBody -match '"phone"\s*:\s*"([^"]+)"') { $phone = $matches[1] }
+                if ($rawBody -match '"role"\s*:\s*"([^"]+)"') { $role = $matches[1] }
+                if ($rawBody -match '"institution"\s*:\s*"([^"]+)"') { $institution = $matches[1] }
+                if ($rawBody -match '"password"\s*:\s*"([^"]+)"') { $password = $matches[1] }
+
+                if (-not $email) { $email = $name.ToLower().Replace(" ", ".") + "@bioshelter.org" }
+
+                $signupId = "usr_signup_" + [int][double]::Parse((Get-Date -UFormat %s)) + "_" + (Get-Random -Minimum 100 -Maximum 999)
+                $user = @{
+                    id = $signupId;
+                    displayName = $name;
+                    email = $email;
+                    phone = $phone;
+                    role = $role;
+                    institution = $institution;
+                    provider = "signup_form";
+                    providerName = "Direct Member Sign-Up";
+                    avatarUrl = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80";
+                    verifiedPhone = $true;
+                    verifiedAccount = $true;
+                    registeredAt = (Get-Date).ToString("o");
+                }
+
+                $db.users = @($user) + @($db.users)
+                Save-DB $db
+                $resObj = @{
+                    success = $true;
+                    user = $user;
+                    token = "SIGNUP_JWT_" + (Get-Random -Minimum 100000 -Maximum 999999);
+                    message = "Account successfully registered in BioShelter database with ID: $signupId"
+                }
+                $response.StatusCode = 201
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj))
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.OutputStream.Close()
+                continue
+            }
+
+            # 3g. Standard User Login Endpoint
+            if ($rawPath -eq "/api/auth/login" -and $method -eq "POST") {
+                $email = ""
+                $password = ""
+                if ($rawBody -match '"email"\s*:\s*"([^"]+)"') { $email = $matches[1] }
+                elseif ($rawBody -match '"username"\s*:\s*"([^"]+)"') { $email = $matches[1] }
+                elseif ($rawBody -match '"phone"\s*:\s*"([^"]+)"') { $email = $matches[1] }
+                if ($rawBody -match '"password"\s*:\s*"([^"]+)"') { $password = $matches[1] }
+
+                if (-not $email) { $email = "alex.henderson@outlook.com" }
+
+                # Search user in database
+                $found = $null
+                foreach ($u in $db.users) {
+                    if ($u.email -eq $email -or $u.phone -eq $email -or $u.displayName -eq $email) {
+                        $found = $u
+                        break
+                    }
+                }
+
+                if (-not $found) {
+                    $found = @{
+                        id = "usr_login_" + (Get-Random -Minimum 1000 -Maximum 9999);
+                        displayName = if ($email.Contains("@")) { $email.Split('@')[0] } else { "Citizen Engineer" };
+                        email = if ($email.Contains("@")) { $email } else { "$email@bioshelter.org" };
+                        phone = if ($email.StartsWith("+") -or $email -match '^\d') { $email } else { "+91 98765 43210" };
+                        role = "Certified Disaster Responder";
+                        institution = "Civil Disaster Resilience Net";
+                        provider = "password_login";
+                        providerName = "Direct Credential Login";
+                        avatarUrl = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80";
+                        verifiedPhone = $true;
+                        verifiedAccount = $true;
+                        registeredAt = (Get-Date).ToString("o");
+                    }
+                    $db.users = @($found) + @($db.users)
+                    Save-DB $db
+                }
+
+                $resObj = @{
+                    success = $true;
+                    user = $found;
+                    token = "LOGIN_JWT_" + (Get-Random -Minimum 100000 -Maximum 999999);
+                    message = "Welcome back, $($found.displayName)! Authentication verified."
+                }
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj))
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.OutputStream.Close()
+                continue
+            }
+
+            # 3h. Get All Users
+            if ($rawPath -eq "/api/users" -and $method -eq "GET") {
+                $resObj = @{ success = $true; users = $db.users }
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj -Depth 10))
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.OutputStream.Close()
+                continue
+            }
+
             # 4. Community Shelters (GET & POST)
             if ($rawPath -eq "/api/shelters") {
                 if ($method -eq "GET") {

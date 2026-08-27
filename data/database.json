@@ -1,6 +1,20 @@
 {
     "users":  [
                   {
+                      "registeredAt":  "2026-08-27T21:19:46.8029284+05:30",
+                      "id":  "usr_signup_1787865587_524",
+                      "email":  "r.menon.iitd@gmail.com",
+                      "avatarUrl":  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120\u0026auto=format\u0026fit=crop\u0026q=80",
+                      "verifiedPhone":  true,
+                      "institution":  "IIT Delhi Sustainable Habitat",
+                      "verifiedAccount":  true,
+                      "role":  "Lead Thermal Modeling Physicist",
+                      "providerName":  "Direct Member Sign-Up",
+                      "provider":  "signup_form",
+                      "phone":  "+91 98111 22334",
+                      "displayName":  "Rajiv Menon, Thermal Physicist"
+                  },
+                  {
                       "registeredAt":  "2026-08-27T20:54:53.4360415+05:30",
                       "id":  "usr_ms_8111",
                       "email":  "elena.rostova@un-habitat.org",
