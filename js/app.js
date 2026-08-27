@@ -1207,7 +1207,14 @@ class BioShelterApp {
             const btnUpgrade = document.getElementById('btn-header-verify-upgrade');
             if (btnUpgrade) {
                 btnUpgrade.addEventListener('click', () => {
-                    d.loginModal.classList.add('active');
+                    const gate = document.getElementById('auth-landing-gate');
+                    if (gate) {
+                        gate.classList.remove('unlocked');
+                        const p1 = document.getElementById('gate-phone-step-1');
+                        const p2 = document.getElementById('gate-phone-step-2');
+                        if (p1) p1.style.display = 'flex';
+                        if (p2) p2.style.display = 'none';
+                    }
                 });
             }
             const btnLogout = document.getElementById('btn-logout-user');
@@ -1220,13 +1227,22 @@ class BioShelterApp {
             d.authSection.innerHTML = `
                 <button id="btn-open-login-modal" class="btn-sign-in-nav">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                    Sign In (Google / Microsoft / Phone)
+                    Sign In with Phone OTP
                 </button>
             `;
             const btnOpen = document.getElementById('btn-open-login-modal');
             if (btnOpen) {
                 btnOpen.addEventListener('click', () => {
-                    d.loginModal.classList.add('active');
+                    const gate = document.getElementById('auth-landing-gate');
+                    if (gate) {
+                        gate.classList.remove('unlocked');
+                        const p1 = document.getElementById('gate-phone-step-1');
+                        const p2 = document.getElementById('gate-phone-step-2');
+                        if (p1) p1.style.display = 'flex';
+                        if (p2) p2.style.display = 'none';
+                    } else {
+                        this.switchTab('tab-login');
+                    }
                 });
             }
         }
