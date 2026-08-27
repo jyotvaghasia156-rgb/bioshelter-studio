@@ -168,9 +168,9 @@
                         <div id="live-map-inspect-humidity" style="font-size: 16px; font-weight: 800; color: var(--accent-sky);">44%</div>
                         <div id="live-map-inspect-source" style="font-size: 9px; color: var(--accent-emerald); font-weight: 600;">⚡ Live Online</div>
                     </div>
-                    <a href="index.html" class="export-btn-primary" style="text-decoration: none; padding: 10px 18px; font-size: 12px; background: linear-gradient(135deg, #0284c7, #10b981); cursor: pointer;">
-                        🚀 Open in 3D Studio &rarr;
-                    </a>
+                    <button id="btn-open-in-3d-studio" class="export-btn-primary" style="text-decoration: none; padding: 10px 18px; font-size: 12px; background: linear-gradient(135deg, #0284c7, #10b981); cursor: pointer; border: none; border-radius: 6px; color: white; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                        🚀 Simulate in 3D BioShelter Studio &rarr;
+                    </button>
                 </div>
             </div>
 
@@ -195,6 +195,18 @@
             const mapEngine = new WorldMapEngine('interactive-world-map-leaflet', (station) => {
                 console.log('Selected station:', station);
             });
+
+            // 1-Click Take Station to 3D Studio Button
+            const btnOpen3D = document.getElementById('btn-open-in-3d-studio');
+            if (btnOpen3D) {
+                btnOpen3D.addEventListener('click', () => {
+                    if (mapEngine && mapEngine.selectedStation) {
+                        mapEngine.applyStationToStudio(mapEngine.selectedStation);
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                });
+            }
 
             window.addEventListener('bioshelter-theme-changed', (e) => {
                 if (mapEngine && typeof mapEngine.setTheme === 'function') {

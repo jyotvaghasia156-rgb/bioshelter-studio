@@ -868,9 +868,30 @@ export class WorldMapEngine {
     }
 
     applyStationToStudio(station) {
+        if (!station) station = this.selectedStation;
         this.selectStation(station);
+        try {
+            localStorage.setItem('bioshelter_selected_station', JSON.stringify(station));
+            sessionStorage.setItem('bioshelter_selected_station', JSON.stringify(station));
+        } catch (e) {
+            console.warn('Storage save error', e);
+        }
+
+        // 1. If we are inside the index.html Studio workspace tab:
+        if (window.app && typeof window.app.onSelectWorldStation === 'function') {
+            window.app.onSelectWorldStation(station);
+            window.app.switchTab('tab-3d');
+            return;
+        }
+
         const btnApply = document.getElementById('btn-apply-map-climate');
-        if (btnApply) btnApply.click();
+        if (btnApply) {
+            btnApply.click();
+            return;
+        }
+
+        // 2. If we are on the standalone world-map.html page:
+        window.location.href = `index.html?stationId=${encodeURIComponent(station.id || '')}`;
     }
 
     updateTelemetryHUD(station) {

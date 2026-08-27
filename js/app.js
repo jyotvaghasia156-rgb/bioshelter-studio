@@ -88,6 +88,33 @@ class BioShelterApp {
         this.updateSimulation();
         this.updateSoilSection();
         this.renderSoilDirectory();
+        this.renderCustomMaterialsList();
+        this.renderLoginPage();
+
+        window.app = this;
+        window.bioShelterApp = this;
+
+        // Check if a station was passed via URL or localStorage
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const stationId = urlParams.get('stationId') || urlParams.get('station');
+            const savedStationStr = localStorage.getItem('bioshelter_selected_station') || sessionStorage.getItem('bioshelter_selected_station');
+            
+            if (stationId) {
+                const found = GLOBAL_STATIONS.find(s => s.id === stationId);
+                if (found) {
+                    setTimeout(() => this.onSelectWorldStation(found), 250);
+                }
+            } else if (savedStationStr) {
+                const savedStation = JSON.parse(savedStationStr);
+                if (savedStation && savedStation.tempC) {
+                    setTimeout(() => this.onSelectWorldStation(savedStation), 250);
+                }
+            }
+        } catch (e) {
+            console.warn('URL/Storage station init error', e);
+        }
+
         this.renderCommunityShelters();
         this.renderHazardReports();
         this.renderCustomMaterials();
@@ -922,25 +949,67 @@ class BioShelterApp {
     }
 
     onSelectWorldStation(station) {
+        if (!station) return;
         this.selectedWorldStation = station;
-        const targetZone = station.zone || (station.tempC >= 38 ? 'hot_arid' : (station.tempC <= 14 ? 'cold_mountainous' : (station.humidity >= 70 ? 'warm_humid' : 'temperate')));
+        
+        const targetZone = station.zoneId || station.zone || (
+            station.tempC >= 40 ? 'hot_arid' : (
+            station.tempC <= 14 ? 'cold_mountainous' : (
+            station.humidity >= 70 ? 'warm_humid' : 'temperate'
+        )));
+
         if (CLIMATE_ZONES[targetZone]) {
             this.state.zoneId = targetZone;
             if (this.dom.zoneSelect) this.dom.zoneSelect.value = targetZone;
+            const zone = CLIMATE_ZONES[targetZone];
+            this.state.config.typology = zone.recommendedTypology || 'gable';
+            if (this.dom.typologySelect) this.dom.typologySelect.value = this.state.config.typology;
+            this.state.config.ventMode = zone.recommendedVentMode || 'adaptive_diurnal';
+            if (this.dom.ventModeSelect) this.dom.ventModeSelect.value = this.state.config.ventMode;
         }
-        
-        const tMax = station.tempMax || station.tempC || 44;
-        const tMin = station.tempMin || Math.max(8, tMax - 14);
+
+        const tMax = station.tempMax || station.tempC || 42.0;
+        const tMin = station.tempMin || Math.max(10, tMax - 14);
 
         this.state.customClimateParams = {
-            tMax: tMax,
-            tMin: tMin,
-            rhDay: Math.max(12, station.humidity ? station.humidity - 15 : 25),
+            tMax: Number(tMax),
+            tMin: Number(tMin),
+            rhDay: Math.max(10, station.humidity ? station.humidity - 15 : 25),
             rhNight: Math.min(95, station.humidity ? station.humidity + 15 : 60),
-            windSpeedAvg: station.windSpeedMps || station.windSpeed || 3.8,
-            solarPeak: station.solarGhi || 950
+            windSpeedAvg: station.windSpeedMps || 3.8,
+            ghiPeak: station.solarGhi || 950
         };
 
+        // Update HUD display
+        const locNameEl = document.getElementById('hud-location-name');
+        if (locNameEl) locNameEl.textContent = `📍 ${station.name}, ${station.country || ''} (WORLD MAP)`;
+
+        const badgeEl = document.getElementById('hud-climate-badge');
+        if (badgeEl) {
+            badgeEl.textContent = station.status || station.climateType || 'Planetary Microclimate';
+            badgeEl.style.background = station.tempC >= 40 ? 'rgba(239,68,68,0.2)' : (station.tempC <= 15 ? 'rgba(56,189,248,0.2)' : 'rgba(16,185,129,0.2)');
+            badgeEl.style.color = station.tempC >= 40 ? '#ef4444' : (station.tempC <= 15 ? '#38bdf8' : '#10b981');
+        }
+
+        const stmtEl = document.getElementById('hud-weather-statement');
+        if (stmtEl) stmtEl.textContent = station.weatherStatement || `Live map telemetry loaded from ${station.name}. Full thermodynamic envelope simulation active.`;
+
+        // Update Top Live Temperature Bar
+        const cityText = document.getElementById('live-weather-city-text');
+        if (cityText) cityText.textContent = `${station.name}, ${station.country || ''}`;
+        const tempBadge = document.getElementById('live-weather-temp-badge');
+        if (tempBadge) tempBadge.textContent = `🌡️ ${station.tempC}°C`;
+        const feelsVal = document.getElementById('live-weather-feels-val');
+        if (feelsVal) feelsVal.textContent = `${station.tempC + 1.5}°C`;
+        const humidityVal = document.getElementById('live-weather-humidity-val');
+        if (humidityVal) humidityVal.textContent = `${station.humidity || 45}%`;
+        const windVal = document.getElementById('live-weather-wind-val');
+        if (windVal) windVal.textContent = `${station.windSpeedMps || 3.8} m/s ${station.windDirectionText || ''}`;
+        const wetbulbVal = document.getElementById('live-weather-wetbulb-val');
+        if (wetbulbVal) wetbulbVal.textContent = `${station.wetBulbC || Math.round(station.tempC * 0.65)}°C`;
+
+        // Switch to 3D Viewport Tab
+        this.switchTab('tab-3d');
         this.updateSimulation();
     }
 
