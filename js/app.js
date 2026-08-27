@@ -711,6 +711,76 @@ class BioShelterApp {
                 gate.classList.remove('unlocked');
             }
 
+            // Master Unified Gate Tabs (Sign In / Sign Up / 6-Digit OTP)
+            const tabBtnSignIn = document.getElementById('btn-master-tab-signin');
+            const tabBtnSignUp = document.getElementById('btn-master-tab-signup');
+            const tabBtnOtp = document.getElementById('btn-master-tab-otp');
+            const secSignIn = document.getElementById('gate-section-signin');
+            const secSignUp = document.getElementById('gate-section-signup');
+            const secOtp = document.getElementById('gate-section-otp');
+
+            const activateMasterTab = (tab) => {
+                [tabBtnSignIn, tabBtnSignUp, tabBtnOtp].forEach(b => { if (b) b.classList.remove('active'); });
+                if (secSignIn) secSignIn.style.display = (tab === 'signin') ? 'flex' : 'none';
+                if (secSignUp) secSignUp.style.display = (tab === 'signup') ? 'flex' : 'none';
+                if (secOtp) secOtp.style.display = (tab === 'otp') ? 'flex' : 'none';
+            };
+
+            if (tabBtnSignIn) tabBtnSignIn.addEventListener('click', () => { tabBtnSignIn.classList.add('active'); activateMasterTab('signin'); });
+            if (tabBtnSignUp) tabBtnSignUp.addEventListener('click', () => { tabBtnSignUp.classList.add('active'); activateMasterTab('signup'); });
+            if (tabBtnOtp) tabBtnOtp.addEventListener('click', () => { tabBtnOtp.classList.add('active'); activateMasterTab('otp'); });
+
+            // Demo Profiles 1-Click Fill & Login
+            const btnDemoSarah = document.getElementById('btn-gate-demo-sarah');
+            if (btnDemoSarah) {
+                btnDemoSarah.addEventListener('click', async () => {
+                    const user = await authInstance.loginWithCredentials('sarah.lin@gmail.com', 'bioshelter2026');
+                    unlockStudioWithAnimation('Dr. Sarah Lin Verified!', `Welcome back! Connecting with 3D Simulation Twin.`);
+                });
+            }
+            const btnDemoAlex = document.getElementById('btn-gate-demo-alex');
+            if (btnDemoAlex) {
+                btnDemoAlex.addEventListener('click', async () => {
+                    const user = await authInstance.loginWithCredentials('alex.henderson@outlook.com', 'bioshelter2026');
+                    unlockStudioWithAnimation('Alex Henderson Verified!', `Welcome back! Connecting with 3D Simulation Twin.`);
+                });
+            }
+
+            // Member Sign In Form Submit
+            const formGateSignIn = document.getElementById('form-gate-signin');
+            if (formGateSignIn) {
+                formGateSignIn.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const ident = (document.getElementById('gate-signin-ident') || {}).value || '';
+                    const pwd = (document.getElementById('gate-signin-pwd') || {}).value || '';
+                    const res = await authInstance.loginWithCredentials(ident, pwd);
+                    if (res.success) {
+                        unlockStudioWithAnimation('Member Login Verified!', `Welcome back, ${res.user.displayName}! Connecting with 3D Studio.`);
+                    } else {
+                        alert(res.message);
+                    }
+                });
+            }
+
+            // Member Sign Up Form Submit (Stores ID in Database)
+            const formGateSignUp = document.getElementById('form-gate-signup');
+            if (formGateSignUp) {
+                formGateSignUp.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = (document.getElementById('gate-signup-name') || {}).value || 'Citizen Engineer';
+                    const email = (document.getElementById('gate-signup-email') || {}).value || '';
+                    const phone = (document.getElementById('gate-signup-phone') || {}).value || '';
+                    const role = (document.getElementById('gate-signup-role') || {}).value || 'Certified Disaster Responder';
+                    const pwd = (document.getElementById('gate-signup-pwd') || {}).value || '';
+                    const res = await authInstance.signUp({ name, email, phone, role, password: pwd });
+                    if (res.success) {
+                        unlockStudioWithAnimation('Member Account Enrolled!', `Welcome, ${res.user.displayName}! Assigned ID: ${res.user.id}.`);
+                    } else {
+                        alert(res.message);
+                    }
+                });
+            }
+
             // Multi-Channel OTP Selection Tabs (Phone, Gmail, Microsoft)
             const channelTabs = document.querySelectorAll('[data-otp-channel]');
             const channelForms = {
@@ -740,12 +810,11 @@ class BioShelterApp {
 
             // Helper to unlock gate with success animation
             const unlockStudioWithAnimation = (title, msg) => {
-                const step1 = document.getElementById('gate-otp-step-1');
-                const step2 = document.getElementById('gate-otp-step-2');
-                const tabsBar = document.querySelector('.gate-nav-tabs');
-                if (step1) step1.style.display = 'none';
-                if (step2) step2.style.display = 'none';
-                if (tabsBar) tabsBar.style.display = 'none';
+                if (secSignIn) secSignIn.style.display = 'none';
+                if (secSignUp) secSignUp.style.display = 'none';
+                if (secOtp) secOtp.style.display = 'none';
+                const tabsBar = document.querySelectorAll('.gate-nav-tabs');
+                tabsBar.forEach(t => { t.style.display = 'none'; });
 
                 if (gateSuccessOverlay) {
                     gateSuccessOverlay.classList.add('active');
@@ -759,6 +828,7 @@ class BioShelterApp {
                         setTimeout(() => this.visualizer3D.onWindowResize(), 50);
                     }
                     this.updateSimulation();
+                    this.renderLoginPage();
                 }, 700);
             };
 
@@ -1048,15 +1118,25 @@ class BioShelterApp {
             }
         }
 
-        // Modal Open / Close
+        // Header Sign In / Switch Account button opens the single unified master gate
         if (d.btnOpenLoginModal) {
             d.btnOpenLoginModal.addEventListener('click', () => {
-                d.loginModal.classList.add('active');
+                if (gate) {
+                    gate.classList.remove('unlocked');
+                    const tabsBar = document.querySelectorAll('.gate-nav-tabs');
+                    tabsBar.forEach(t => { t.style.display = 'flex'; });
+                    const secSignIn = document.getElementById('gate-section-signin');
+                    if (secSignIn) secSignIn.style.display = 'flex';
+                    const successOverlay = document.getElementById('gate-success-overlay');
+                    if (successOverlay) successOverlay.classList.remove('active');
+                } else if (d.loginModal) {
+                    d.loginModal.classList.add('active');
+                }
             });
         }
         if (d.btnCloseLoginModal) {
             d.btnCloseLoginModal.addEventListener('click', () => {
-                d.loginModal.classList.remove('active');
+                if (d.loginModal) d.loginModal.classList.remove('active');
             });
         }
 
@@ -1331,9 +1411,9 @@ class BioShelterApp {
             }
         } else {
             d.authSection.innerHTML = `
-                <button id="btn-open-login-modal" class="btn-sign-in-nav">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                    Sign In with Phone OTP
+                <button id="btn-open-login-modal" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                    <span>Member Sign In / Sign Up</span>
                 </button>
             `;
             const btnOpen = document.getElementById('btn-open-login-modal');
@@ -1342,17 +1422,16 @@ class BioShelterApp {
                     const gate = document.getElementById('auth-landing-gate');
                     if (gate) {
                         gate.classList.remove('unlocked');
-                        const p1 = document.getElementById('gate-phone-step-1');
-                        const p2 = document.getElementById('gate-phone-step-2');
-                        if (p1) p1.style.display = 'flex';
-                        if (p2) p2.style.display = 'none';
-                    } else {
-                        this.switchTab('tab-login');
+                        const tabsBar = document.querySelectorAll('.gate-nav-tabs');
+                        tabsBar.forEach(t => { t.style.display = 'flex'; });
+                        const secSignIn = document.getElementById('gate-section-signin');
+                        if (secSignIn) secSignIn.style.display = 'flex';
+                        const successOverlay = document.getElementById('gate-success-overlay');
+                        if (successOverlay) successOverlay.classList.remove('active');
                     }
                 });
             }
         }
-        this.renderLoginPage();
     }
 
     renderLoginPage() {
