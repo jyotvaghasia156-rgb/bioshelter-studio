@@ -687,6 +687,59 @@ class BioShelterApp {
         d.btnExportBim.addEventListener('click', () => {
             exportBIMGeoJSON(this.state.config, this.climateData, this.simulationData);
         });
+
+        // World Map Apply Climate Button
+        const btnApplyMap = document.getElementById('btn-apply-map-climate');
+        if (btnApplyMap) {
+            btnApplyMap.addEventListener('click', () => {
+                const station = this.selectedWorldStation || { city: 'Jodhpur', country: 'India', zone: 'hot_arid', tempMax: 44, tempMin: 28, climate: 'Hot-Arid Desert' };
+                this.onSelectWorldStation(station);
+                this.switchTab('tab-3d');
+                alert(`✅ Applied Climate of ${station.city}, ${station.country} to 3D Simulation Twin!`);
+            });
+        }
+
+        // Direct Enter Studio button in login tab
+        const btnEnterStudio = document.getElementById('btn-enter-studio-direct');
+        if (btnEnterStudio) {
+            btnEnterStudio.addEventListener('click', () => {
+                this.switchTab('tab-3d');
+            });
+        }
+
+        // Cloud Save Project Button
+        const btnSaveProject = document.getElementById('btn-save-project');
+        if (btnSaveProject) {
+            btnSaveProject.addEventListener('click', () => {
+                const user = authInstance.getCurrentUser();
+                const saved = userDataStore.saveShelterProject({
+                    zoneId: this.state.zoneId,
+                    config: this.state.config,
+                    summary: this.simulationData ? this.simulationData.summary : {},
+                    savedBy: user ? user.displayName : 'Guest Engineer',
+                    savedAt: new Date().toISOString()
+                });
+                alert(`💾 BioShelter 3D Model & Parameters Saved to Cloud Workspace!`);
+            });
+        }
+    }
+
+    onSelectWorldStation(station) {
+        this.selectedWorldStation = station;
+        if (station.zone && CLIMATE_ZONES[station.zone]) {
+            this.state.zoneId = station.zone;
+            if (this.dom.zoneSelect) this.dom.zoneSelect.value = station.zone;
+        }
+        if (station.tempMax && station.tempMin) {
+            this.state.customClimateParams = {
+                tMax: station.tempMax,
+                tMin: station.tempMin,
+                rhAvg: station.humidity || 45,
+                windSpeed: station.windSpeed || 3.8,
+                solarPeak: station.solarPeak || 980
+            };
+        }
+        this.updateSimulation();
     }
 
     /* --- Auth & Phone OTP Verification Bindings --- */
