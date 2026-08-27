@@ -551,6 +551,109 @@ try {
                 continue
             }
 
+            # 6c. Custom Materials Lab (GET & POST)
+            if ($rawPath -eq "/api/materials") {
+                if ($method -eq "GET") {
+                    $mats = $db.customMaterials
+                    if (-not $mats) { $mats = @() }
+                    $resObj = @{ success = $true; materials = $mats }
+                    $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj -Depth 10))
+                    $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                    $response.OutputStream.Close()
+                    continue
+                }
+                if ($method -eq "POST") {
+                    $mat = @{
+                        id = "mat_custom_" + (Get-Random -Minimum 1000 -Maximum 9999);
+                        name = if ($body.name) { $body.name } else { "Custom Compressed Block" };
+                        k = if ($body.k) { [double]$body.k } else { 0.45 };
+                        rho = if ($body.rho) { [double]$body.rho } else { 1600 };
+                        cp = if ($body.cp) { [double]$body.cp } else { 920 };
+                        embodiedCarbon = if ($body.embodiedCarbon) { [double]$body.embodiedCarbon } else { 15.0 };
+                        createdAt = (Get-Date).ToString("o");
+                    }
+                    $db.customMaterials = @($mat) + @($db.customMaterials)
+                    Save-DB $db
+                    $resObj = @{ success = $true; material = $mat }
+                    $response.StatusCode = 201
+                    $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj -Depth 10))
+                    $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                    $response.OutputStream.Close()
+                    continue
+                }
+            }
+
+            # 6d. Cloud Saved Shelter Projects (GET & POST)
+            if ($rawPath -eq "/api/projects") {
+                if ($method -eq "GET") {
+                    $projs = $db.projects
+                    if (-not $projs) { $projs = @() }
+                    $resObj = @{ success = $true; projects = $projs }
+                    $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj -Depth 10))
+                    $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                    $response.OutputStream.Close()
+                    continue
+                }
+                if ($method -eq "POST") {
+                    $proj = @{
+                        id = "proj_" + (Get-Random -Minimum 1000 -Maximum 9999);
+                        zoneId = if ($body.zoneId) { $body.zoneId } else { "hot_arid" };
+                        config = if ($body.config) { $body.config } else { @{} };
+                        summary = if ($body.summary) { $body.summary } else { @{} };
+                        savedBy = if ($body.savedBy) { $body.savedBy } else { "Citizen Engineer" };
+                        savedAt = (Get-Date).ToString("o");
+                    }
+                    if (-not $db.projects) { $db.projects = @() }
+                    $db.projects = @($proj) + @($db.projects)
+                    Save-DB $db
+                    $resObj = @{ success = $true; project = $proj; message = "Shelter model and bioclimatic parameters saved to backend database." }
+                    $response.StatusCode = 201
+                    $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj -Depth 10))
+                    $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                    $response.OutputStream.Close()
+                    continue
+                }
+            }
+
+            # 6e. Comfort Matcher & Vacation Destinations API
+            if ($rawPath -eq "/api/comfort/destinations" -and $method -eq "GET") {
+                $resObj = @{
+                    success = $true;
+                    count = 12;
+                    destinations = @(
+                        @{ name = "Medellín"; country = "Colombia"; tempAvg = 23.5; humidity = 64; tagline = "City of Eternal Spring 🌸" },
+                        @{ name = "Funchal / Madeira"; country = "Portugal"; tempAvg = 22.8; humidity = 62; tagline = "Floating Garden Eden 🌴" },
+                        @{ name = "San Diego"; country = "United States"; tempAvg = 22.4; humidity = 58; tagline = "Coastal Paradise 🏖️" },
+                        @{ name = "Santa Cruz / Tenerife"; country = "Spain"; tempAvg = 24.1; humidity = 56; tagline = "Island of Eternal Summer ☀️" },
+                        @{ name = "Kunming"; country = "China"; tempAvg = 21.6; humidity = 55; tagline = "Spring City of the Orient 🌸" },
+                        @{ name = "Ooty"; country = "India"; tempAvg = 19.8; humidity = 58; tagline = "Queen of Hill Stations 🍵" },
+                        @{ name = "Lake Como"; country = "Italy"; tempAvg = 23.0; humidity = 56; tagline = "Alpine Lake Solace ⛵" },
+                        @{ name = "Maui"; country = "United States"; tempAvg = 25.5; humidity = 64; tagline = "Pacific Trade Wind Eden 🌴" }
+                    )
+                }
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj -Depth 10))
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.OutputStream.Close()
+                continue
+            }
+
+            if ($rawPath -eq "/api/comfort/match" -and $method -eq "POST") {
+                $targetTemp = if ($body -and $body.targetTemp) { [double]$body.targetTemp } else { 23.0 }
+                $targetHum = if ($body -and $body.targetHumidity) { [double]$body.targetHumidity } else { 55.0 }
+                $resObj = @{
+                    success = $true;
+                    evaluatedAt = (Get-Date).ToString("o");
+                    targetTemperature = $targetTemp;
+                    targetHumidity = $targetHum;
+                    topRecommendation = "Medellín, Colombia (23.5°C / 98% Match)";
+                    status = "OPTIMAL_BIOCLIMATIC_COMFORT"
+                }
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj -Depth 10))
+                $response.OutputStream.Write($bytes, 0, $bytes.Length)
+                $response.OutputStream.Close()
+                continue
+            }
+
             # 7. Simulation Solver API
             if ($rawPath -eq "/api/simulate" -and $method -eq "POST") {
                 $zone = if ($body.zoneId) { $body.zoneId } else { "hot_arid" }

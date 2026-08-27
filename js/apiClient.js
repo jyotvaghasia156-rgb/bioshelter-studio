@@ -1,7 +1,8 @@
 /**
  * BioShelter Studio - Backend REST API Client
  * Connects frontend views, authentication flows, community registry,
- * hazard reports, and SOS dispatchers to the Python / Node.js backend.
+ * hazard reports, SOS dispatchers, project models, and vacation comfort matchers
+ * to the backend REST API server.
  */
 
 export class BioShelterAPIClient {
@@ -28,23 +29,37 @@ export class BioShelterAPIClient {
             return await res.json();
         } catch (err) {
             // Graceful offline fallback
-            console.warn(`[BioShelter API] Network request to ${endpoint} failed, utilizing local state:`, err);
+            console.warn(`[BioShelter API] Network request to ${endpoint} failed, utilizing local fallback:`, err);
             return { success: false, offline: true, error: err.message };
         }
     }
 
-    /* --- 1. Authentication & Phone OTP --- */
-    async sendPhoneOtp(phone, countryCode = '+91') {
-        return await this.request('/api/auth/otp/send', {
+    /* --- 1. Authentication & Member Registration --- */
+    async signUp(userData) {
+        return await this.request('/api/auth/signup', {
             method: 'POST',
-            body: JSON.stringify({ phone, countryCode })
+            body: JSON.stringify(userData)
         });
     }
 
-    async verifyPhoneOtp(code, name, phone) {
+    async login(credentials) {
+        return await this.request('/api/auth/login', {
+            method: 'POST',
+            body: JSON.stringify(credentials)
+        });
+    }
+
+    async sendOtp(channel, target, name = '', country = '+91') {
+        return await this.request('/api/auth/otp/send', {
+            method: 'POST',
+            body: JSON.stringify({ channel, target, name, countryCode: country })
+        });
+    }
+
+    async verifyOtp(channel, target, code, name = '') {
         return await this.request('/api/auth/otp/verify', {
             method: 'POST',
-            body: JSON.stringify({ code, name, phone })
+            body: JSON.stringify({ channel, target, code, name })
         });
     }
 
@@ -60,6 +75,16 @@ export class BioShelterAPIClient {
             method: 'POST',
             body: JSON.stringify(profileData)
         });
+    }
+
+    async loginGuest() {
+        return await this.request('/api/auth/guest', {
+            method: 'POST'
+        });
+    }
+
+    async getAllUsers() {
+        return await this.request('/api/users');
     }
 
     /* --- 2. Community Shelters --- */
@@ -97,7 +122,7 @@ export class BioShelterAPIClient {
 
     /* --- 4. Disaster SOS Broadcast Net --- */
     async triggerDisasterAlert(scenarioKey, title, epicenter) {
-        return await this.request('/api/sos/trigger', {
+        return await this.request('/api/sos/broadcast', {
             method: 'POST',
             body: JSON.stringify({ scenario: scenarioKey, title, epicenter })
         });
@@ -108,6 +133,10 @@ export class BioShelterAPIClient {
     }
 
     /* --- 5. Custom Material Lab --- */
+    async getCustomMaterials() {
+        return await this.request('/api/materials');
+    }
+
     async saveCustomMaterial(matData) {
         return await this.request('/api/materials', {
             method: 'POST',
@@ -115,7 +144,31 @@ export class BioShelterAPIClient {
         });
     }
 
-    /* --- 6. Backend Physics Simulation --- */
+    /* --- 6. Cloud Saved Projects --- */
+    async saveProject(projectData) {
+        return await this.request('/api/projects', {
+            method: 'POST',
+            body: JSON.stringify(projectData)
+        });
+    }
+
+    async getSavedProjects() {
+        return await this.request('/api/projects');
+    }
+
+    /* --- 7. Global Weather & Comfort Matcher API --- */
+    async getWeatherStations() {
+        return await this.request('/api/weather/stations');
+    }
+
+    async matchComfortPlaces(criteria) {
+        return await this.request('/api/comfort/match', {
+            method: 'POST',
+            body: JSON.stringify(criteria)
+        });
+    }
+
+    /* --- 8. Backend Physics Simulation --- */
     async runServerSimulation(zoneId, config) {
         return await this.request('/api/simulate', {
             method: 'POST',
