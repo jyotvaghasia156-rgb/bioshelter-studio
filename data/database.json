@@ -1,6 +1,20 @@
 {
     "users":  [
                   {
+                      "registeredAt":  "2026-08-27T21:28:15.3911720+05:30",
+                      "id":  "usr_signup_1787866095_968",
+                      "email":  "priya.sen@disaster-resilience.in",
+                      "avatarUrl":  "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120\u0026auto=format\u0026fit=crop\u0026q=80",
+                      "verifiedPhone":  true,
+                      "institution":  "National Disaster Management Lab",
+                      "verifiedAccount":  true,
+                      "role":  "Citizen Habitat Architect",
+                      "providerName":  "Direct Member Sign-Up",
+                      "provider":  "signup_form",
+                      "phone":  "+91 98450 11223",
+                      "displayName":  "Priya Sen, Habitat Architect"
+                  },
+                  {
                       "registeredAt":  "2026-08-27T21:19:46.8029284+05:30",
                       "id":  "usr_signup_1787865587_524",
                       "email":  "r.menon.iitd@gmail.com",

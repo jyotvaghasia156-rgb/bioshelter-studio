@@ -28,12 +28,13 @@
             top: 16px;
             display: flex;
             gap: 10px;
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            padding: 6px 12px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 6px 14px;
             border-radius: 40px;
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
             z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .portal-nav-link {
             display: flex;
@@ -49,43 +50,43 @@
         }
         .portal-nav-link:hover {
             color: #f8fafc;
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.08);
         }
         .portal-nav-link.active {
-            background: rgba(56, 189, 248, 0.18);
+            background: rgba(56, 189, 248, 0.2);
             color: #38bdf8;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
         }
         .auth-card-wrapper {
             width: 100%;
-            max-width: 500px;
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            border-radius: 20px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 40px rgba(56,189,248,0.15);
+            max-width: 520px;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 22px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 45px rgba(56,189,248,0.18);
             backdrop-filter: blur(24px);
-            padding: 34px 28px;
+            padding: 36px 30px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 20px;
             position: relative;
             animation: fadeIn 0.4s ease-out;
-            margin-top: 50px;
+            margin-top: 60px;
         }
         @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(15px) scale(0.97); }
+            0% { opacity: 0; transform: translateY(16px) scale(0.97); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         .tab-toggle-container {
             display: flex;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.45);
             border-radius: 12px;
             padding: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .auth-tab-btn {
             flex: 1;
-            padding: 10px;
+            padding: 11px;
             border-radius: 8px;
             border: none;
             background: transparent;
@@ -94,30 +95,63 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         .auth-tab-btn.active {
             background: rgba(56, 189, 248, 0.2);
             color: #38bdf8;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+        }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .field-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         .form-input-styled {
             width: 100%;
-            background: rgba(0, 0, 0, 0.45);
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            padding: 11px 14px;
+            border-radius: 9px;
+            padding: 12px 14px;
             color: #f8fafc;
             font-size: 13px;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
         .form-input-styled:focus {
             border-color: #38bdf8;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+            background: rgba(56, 189, 248, 0.04);
         }
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .password-toggle-btn:hover { color: #38bdf8; }
         .btn-action-primary {
             width: 100%;
-            padding: 13px;
+            padding: 14px;
             border-radius: 10px;
             border: none;
             font-size: 14px;
@@ -132,12 +166,40 @@
         }
         .btn-action-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        }
+        .btn-action-primary:active { transform: translateY(0); }
+        .quick-picker-card {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px dashed rgba(56, 189, 248, 0.3);
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .quick-acc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 11px;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .quick-acc-btn:hover {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.4);
+            color: #38bdf8;
         }
         .btn-sso-action {
             flex: 1;
-            padding: 10px 8px;
-            border-radius: 8px;
+            padding: 11px 8px;
+            border-radius: 9px;
             font-size: 12px;
             font-weight: 700;
             display: flex;
@@ -149,6 +211,7 @@
             background: rgba(255,255,255,0.04);
             color: #cbd5e1;
             transition: all 0.2s;
+            text-decoration: none;
         }
         .btn-sso-action:hover {
             background: rgba(255,255,255,0.08);
@@ -156,13 +219,19 @@
             transform: translateY(-1px);
         }
         .status-badge-id {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px dashed #10b981;
-            border-radius: 8px;
-            padding: 10px 14px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(56, 189, 248, 0.15));
+            border: 1px solid #10b981;
+            border-radius: 12px;
+            padding: 14px 18px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 8px;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.25);
+            animation: pulse 1.5s infinite alternate;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+            100% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); }
         }
     </style>
 </head>
@@ -188,53 +257,101 @@
     <div class="auth-card-wrapper">
         <!-- Brand Header -->
         <div style="text-align: center; display: flex; flex-direction: column; gap: 6px;">
-            <div style="width: 48px; height: 48px; margin: 0 auto; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #10b981); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.84L18 11.2V18h-2v-6H8v6H6v-6.8l6-5.36z"/></svg>
+            <div style="width: 50px; height: 50px; margin: 0 auto; border-radius: 14px; background: linear-gradient(135deg, #0284c7, #10b981); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(56, 189, 248, 0.5);">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.84L18 11.2V18h-2v-6H8v6H6v-6.8l6-5.36z"/></svg>
             </div>
             <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #38bdf8; font-weight: 800;">
-                BioShelter Member Net &bull; Database Sync
+                BioShelter Member Network &bull; Live Database
             </div>
-            <h1 id="page-title" style="font-size: 22px; font-weight: 800; font-family: 'Outfit', sans-serif;">Welcome to BioShelter</h1>
-            <p style="font-size: 12px; color: #94a3b8;">Access the 3D Bioclimatic Simulation Studio &amp; Disaster Crisis Net.</p>
+            <h1 id="page-title" style="font-size: 22px; font-weight: 800; font-family: 'Outfit', sans-serif;">Sign In to BioShelter</h1>
+            <p style="font-size: 12px; color: #94a3b8;">Full access to 3D Bioclimatic Simulation Studio &amp; Disaster Crisis Net.</p>
         </div>
 
         <!-- Mode Toggle (Sign In vs Sign Up) -->
         <div class="tab-toggle-container">
-            <button id="tab-btn-signin" class="auth-tab-btn active">Sign In</button>
-            <button id="tab-btn-signup" class="auth-tab-btn">Create Account / Sign Up</button>
+            <button id="tab-btn-signin" class="auth-tab-btn active">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                Sign In
+            </button>
+            <button id="tab-btn-signup" class="auth-tab-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                Create Account (Sign Up)
+            </button>
         </div>
 
         <!-- TAB 1: Sign In Form -->
-        <form id="form-signin" style="display: flex; flex-direction: column; gap: 12px;">
-            <div>
-                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Email, Phone, or Username</label>
-                <input type="text" id="signin-identifier" class="form-input-styled" placeholder="e.g. sarah.lin@gmail.com or 98765 43210" value="sarah.lin@gmail.com" required>
+        <form id="form-signin" style="display: flex; flex-direction: column; gap: 14px;">
+            <!-- 1-Click Demo Profiles Picker -->
+            <div class="quick-picker-card">
+                <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">⚡ Quick 1-Click Demo Profiles:</span>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div class="quick-acc-btn" id="btn-quick-sarah">
+                        <span>👩‍🔬 <strong>Dr. Sarah Lin</strong> (sarah.lin@gmail.com)</span>
+                        <span style="color: #34d399; font-weight: 700;">Physicist &rarr;</span>
+                    </div>
+                    <div class="quick-acc-btn" id="btn-quick-alex">
+                        <span>👷‍♂️ <strong>Alex Henderson</strong> (alex.henderson@outlook.com)</span>
+                        <span style="color: #38bdf8; font-weight: 700;">Engineer &rarr;</span>
+                    </div>
+                </div>
             </div>
-            <div>
-                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Password</label>
-                <input type="password" id="signin-password" class="form-input-styled" placeholder="Enter your password" value="bioshelter2026" required>
+
+            <div class="field-group">
+                <label class="field-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    Email Address or Phone Number
+                </label>
+                <input type="text" id="signin-identifier" class="form-input-styled" placeholder="e.g. sarah.lin@gmail.com or +91 98765 43210" value="sarah.lin@gmail.com" required>
             </div>
-            <button type="submit" class="btn-action-primary" style="background: linear-gradient(135deg, #0284c7, #10b981);">
+
+            <div class="field-group">
+                <label class="field-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    Password
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" id="signin-password" class="form-input-styled" placeholder="Enter your account password" value="bioshelter2026" required>
+                    <button type="button" class="password-toggle-btn" id="toggle-signin-pw" title="Toggle password view">👁️</button>
+                </div>
+            </div>
+
+            <button type="submit" id="btn-submit-signin" class="btn-action-primary" style="background: linear-gradient(135deg, #0284c7, #10b981);">
                 ⚡ Sign In &amp; Launch 3D Studio &rarr;
             </button>
         </form>
 
         <!-- TAB 2: Create Account / Sign Up Form -->
-        <form id="form-signup" style="display: none; flex-direction: column; gap: 12px;">
-            <div>
-                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Full Name / Citizen Identity</label>
-                <input type="text" id="signup-name" class="form-input-styled" placeholder="e.g. Dr. Alex Henderson, Structural Engineer" value="Alex Henderson" required>
+        <form id="form-signup" style="display: none; flex-direction: column; gap: 13px;">
+            <div class="field-group">
+                <label class="field-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    Full Name / Citizen Identity
+                </label>
+                <input type="text" id="signup-name" class="form-input-styled" placeholder="e.g. Dr. Alex Henderson, Civil Engineer" value="Alex Henderson" required>
             </div>
-            <div>
-                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Email Address</label>
-                <input type="email" id="signup-email" class="form-input-styled" placeholder="e.g. alex.henderson@resilience.org" value="alex.henderson@outlook.com" required>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="field-group">
+                    <label class="field-label">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        Email Address
+                    </label>
+                    <input type="email" id="signup-email" class="form-input-styled" placeholder="e.g. alex@outlook.com" value="alex.henderson@outlook.com" required>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+                        Mobile Phone (SOS Net)
+                    </label>
+                    <input type="tel" id="signup-phone" class="form-input-styled" placeholder="+91 98765 43210" value="+91 98765 43210" required>
+                </div>
             </div>
-            <div>
-                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Mobile Phone (For Disaster SOS SMS)</label>
-                <input type="tel" id="signup-phone" class="form-input-styled" placeholder="+91 98765 43210" value="+91 98765 43210" required>
-            </div>
-            <div>
-                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Specialized Engineering Role</label>
+
+            <div class="field-group">
+                <label class="field-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    Specialized Engineering Role
+                </label>
                 <select id="signup-role" class="form-input-styled" style="cursor: pointer;">
                     <option value="Certified Disaster Responder" selected>Certified Disaster Responder</option>
                     <option value="Lead Thermal Modeling Physicist">Lead Thermal Modeling Physicist</option>
@@ -243,15 +360,27 @@
                     <option value="Community Emergency Coordinator">Community Emergency Coordinator</option>
                 </select>
             </div>
-            <div>
-                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Institution / Organization</label>
+
+            <div class="field-group">
+                <label class="field-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
+                    Institution / Council / NGO
+                </label>
                 <input type="text" id="signup-inst" class="form-input-styled" placeholder="e.g. Civil Disaster Resilience Net" value="Civil Disaster Resilience Net">
             </div>
-            <div>
-                <label style="font-size: 12px; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 5px;">Password</label>
-                <input type="password" id="signup-password" class="form-input-styled" placeholder="Create a secure password" value="bioshelter2026" required>
+
+            <div class="field-group">
+                <label class="field-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    Create Password
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" id="signup-password" class="form-input-styled" placeholder="Choose a secure password" value="bioshelter2026" required>
+                    <button type="button" class="password-toggle-btn" id="toggle-signup-pw" title="Toggle password view">👁️</button>
+                </div>
             </div>
-            <button type="submit" class="btn-action-primary" style="background: linear-gradient(135deg, #10b981, #0284c7);">
+
+            <button type="submit" id="btn-submit-signup" class="btn-action-primary" style="background: linear-gradient(135deg, #10b981, #0284c7);">
                 🚀 Register Account &amp; Collect ID in Backend &rarr;
             </button>
         </form>
@@ -259,13 +388,16 @@
         <!-- Dynamic Sign-Up Success & ID Display Box -->
         <div id="signup-success-box" style="display: none;" class="status-badge-id">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-size: 11px; font-weight: 800; color: #34d399;">ACCOUNT REGISTERED IN BACKEND</span>
-                <span style="font-size: 10px; color: #94a3b8;">STORED IN DB</span>
+                <span style="font-size: 11px; font-weight: 800; color: #34d399; display: flex; align-items: center; gap: 5px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    ACCOUNT STORED IN BACKEND DATABASE
+                </span>
+                <span style="font-size: 10px; color: #38bdf8; font-weight: 700;">HTTP 201 CREATED</span>
             </div>
-            <div style="font-size: 12px; color: #f8fafc;">
-                Assigned ID: <strong id="registered-user-id" style="color: #38bdf8; font-family: 'JetBrains Mono';">usr_signup_1740672...</strong>
+            <div style="font-size: 13px; color: #f8fafc;">
+                Generated Member ID: <strong id="registered-user-id" style="color: #38bdf8; font-family: 'JetBrains Mono';">usr_signup_1787865...</strong>
             </div>
-            <div id="registered-user-msg" style="font-size: 11px; color: #cbd5e1;">Redirecting to 3D Simulation Twin...</div>
+            <div id="registered-user-msg" style="font-size: 11px; color: #cbd5e1;">Redirecting to 3D Simulation Twin in 1 second...</div>
         </div>
 
         <!-- 1-Click Alternative Methods -->
@@ -280,7 +412,7 @@
                     <svg width="14" height="14" viewBox="0 0 21 21"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>
                     Microsoft
                 </button>
-                <a href="otp.html" class="btn-sso-action" style="text-decoration: none; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+                <a href="otp.html" class="btn-sso-action" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
                     OTP Portal
                 </a>
@@ -327,10 +459,38 @@
             successBox.style.display = 'none';
         });
 
+        // Quick Demo Fill buttons
+        document.getElementById('btn-quick-sarah').addEventListener('click', () => {
+            document.getElementById('signin-identifier').value = 'sarah.lin@gmail.com';
+            document.getElementById('signin-password').value = 'bioshelter2026';
+            formSignIn.dispatchEvent(new Event('submit'));
+        });
+
+        document.getElementById('btn-quick-alex').addEventListener('click', () => {
+            document.getElementById('signin-identifier').value = 'alex.henderson@outlook.com';
+            document.getElementById('signin-password').value = 'bioshelter2026';
+            formSignIn.dispatchEvent(new Event('submit'));
+        });
+
+        // Password Show/Hide Toggles
+        const setupPwToggle = (toggleBtnId, inputId) => {
+            const btn = document.getElementById(toggleBtnId);
+            const input = document.getElementById(inputId);
+            if (btn && input) {
+                btn.addEventListener('click', () => {
+                    const isPw = input.type === 'password';
+                    input.type = isPw ? 'text' : 'password';
+                    btn.textContent = isPw ? '🔒' : '👁️';
+                });
+            }
+        };
+        setupPwToggle('toggle-signin-pw', 'signin-password');
+        setupPwToggle('toggle-signup-pw', 'signup-password');
+
         const launchMainStudio = (user) => {
             setTimeout(() => {
                 window.location.href = 'index.html';
-            }, 800);
+            }, 900);
         };
 
         // Handle Sign In Submit
@@ -339,12 +499,18 @@
             const identifier = document.getElementById('signin-identifier').value.trim();
             const password = document.getElementById('signin-password').value;
 
+            const btn = document.getElementById('btn-submit-signin');
+            btn.innerHTML = '⌛ Verifying Credentials with Backend...';
+
             const res = await authInstance.loginWithCredentials(identifier, password);
             if (res.success) {
                 successBox.style.display = 'flex';
                 registeredIdEl.textContent = res.user.id;
                 registeredMsgEl.textContent = `Welcome back, ${res.user.displayName}! Launching 3D Studio...`;
                 launchMainStudio(res.user);
+            } else {
+                btn.innerHTML = '⚡ Sign In & Launch 3D Studio &rarr;';
+                alert(res.message);
             }
         });
 
@@ -358,12 +524,18 @@
             const institution = document.getElementById('signup-inst').value.trim();
             const password = document.getElementById('signup-password').value;
 
+            const btn = document.getElementById('btn-submit-signup');
+            btn.innerHTML = '⌛ Registering & Storing in Database...';
+
             const res = await authInstance.signUp({ name, email, phone, role, institution, password });
             if (res.success) {
                 successBox.style.display = 'flex';
                 registeredIdEl.textContent = res.user.id;
                 registeredMsgEl.textContent = `Account created and stored in database! Enrolled as ${res.user.role}. Launching 3D Studio...`;
                 launchMainStudio(res.user);
+            } else {
+                btn.innerHTML = '🚀 Register Account & Collect ID in Backend &rarr;';
+                alert(res.message);
             }
         });
 
