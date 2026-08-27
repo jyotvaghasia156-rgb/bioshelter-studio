@@ -2808,6 +2808,32 @@ class BioShelterApp {
         const badgeCount = document.getElementById('comfort-results-count-badge');
         if (badgeCount) badgeCount.textContent = `${ranked.length} Paradise Destinations Ranked`;
 
+        // 1. Update AI Analytics Summary & Metrics
+        if (ranked.length > 0) {
+            const top = ranked[0];
+            const second = ranked[1];
+            const summaryEl = document.getElementById('comfort-ai-summary-text');
+            if (summaryEl) {
+                summaryEl.innerHTML = `
+                    Based on your target of <strong>${targetTemp.toFixed(1)}°C</strong> and <strong>${targetHum}% humidity</strong>, 
+                    <strong>${top.name}, ${top.country}</strong> (${top.matchScore}% Match) and <strong>${second ? second.name : 'Madeira'}, ${second ? second.country : 'Portugal'}</strong> 
+                    represent your optimal bioclimatic comfort zone with <strong>${top.comfortDaysPerYear} comfort days/year</strong>.
+                `;
+            }
+
+            const tsiEl = document.getElementById('analytics-tsi-val');
+            if (tsiEl) tsiEl.textContent = `${top.analytics.thermalStability} / 100`;
+
+            const daysEl = document.getElementById('analytics-comfort-days-val');
+            if (daysEl) daysEl.textContent = `${top.comfortDaysPerYear} Days`;
+
+            const leiEl = document.getElementById('analytics-lei-val');
+            if (leiEl) leiEl.textContent = `${top.analytics.lifeEnjoymentScore} / 100`;
+
+            // 2. Render Bioclimatic Spider / Radar Chart
+            this.renderComfortRadarChart(ranked.slice(0, 3));
+        }
+
         grid.innerHTML = ranked.map((d, index) => {
             const isTop = index === 0;
             const matchCol = d.matchScore >= 90 ? '#10b981' : (d.matchScore >= 75 ? '#38bdf8' : '#f59e0b');
@@ -2846,6 +2872,12 @@ class BioShelterApp {
                         </div>
                     </div>
 
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">
+                        <span>Elevation: <strong>${d.elevationMeters || 120}m</strong></span>
+                        <span>Sunshine: <strong>${d.sunshineHoursYear || 2400} hrs/yr</strong></span>
+                        <span>Comfort Days: <strong>${d.comfortDaysPerYear || 320} d/yr</strong></span>
+                    </div>
+
                     <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.45; margin-bottom: 8px;">
                         ${d.weatherStatement}
                     </p>
@@ -2854,9 +2886,14 @@ class BioShelterApp {
                         ${d.idealFor.map(tag => `<span style="font-size: 10px; background: rgba(56,189,248,0.1); color: var(--accent-sky); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56,189,248,0.2);">${tag}</span>`).join('')}
                     </div>
 
-                    <button class="export-btn-primary btn-simulate-paradise" data-dest-id="${d.id}" style="width: 100%; justify-content: center; font-size: 12px; padding: 8px; background: linear-gradient(135deg, #0284c7, #10b981);">
-                        🚀 Simulate BioShelter in ${d.name} &rarr;
-                    </button>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <a href="${d.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${d.lat},${d.lng}`}" target="_blank" rel="noopener noreferrer" class="btn-sign-in-nav" style="text-decoration: none; justify-content: center; font-size: 11px; padding: 7px; background: rgba(56,189,248,0.12); border-color: rgba(56,189,248,0.3); color: var(--accent-sky); font-weight: 700;">
+                            📍 Explore on Google Maps ↗
+                        </a>
+                        <button class="export-btn-primary btn-simulate-paradise" data-dest-id="${d.id}" style="justify-content: center; font-size: 11px; padding: 7px; background: linear-gradient(135deg, #0284c7, #10b981);">
+                            🚀 Simulate in 3D &rarr;
+                        </button>
+                    </div>
                 </div>
             `;
         }).join('');
@@ -2888,6 +2925,95 @@ class BioShelterApp {
                 }
             });
         });
+    }
+
+    renderComfortRadarChart(topDestinations) {
+        const ctx = document.getElementById('comfort-analytics-radar-chart');
+        if (!ctx || !window.Chart) return;
+
+        const isDark = this.theme === 'dark';
+        const textColor = isDark ? '#94a3b8' : '#475569';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.1)';
+
+        const colors = [
+            { border: '#10b981', bg: 'rgba(16, 185, 129, 0.25)' },
+            { border: '#38bdf8', bg: 'rgba(56, 189, 248, 0.2)' },
+            { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' }
+        ];
+
+        const labels = [
+            'Thermal Stability (TSI)',
+            'Humidity Balance',
+            'Wind Breeze Comfort',
+            'Air Purity (AQI)',
+            'Sunshine Vitality',
+            'Life Enjoyment (LEI)'
+        ];
+
+        const datasets = topDestinations.map((d, i) => {
+            const c = colors[i % colors.length];
+            return {
+                label: `${d.name} (${d.matchScore}% Match)`,
+                data: [
+                    d.analytics ? d.analytics.thermalStability : 90,
+                    d.analytics ? d.analytics.humidityBalance : 90,
+                    d.analytics ? d.analytics.windComfort : 90,
+                    d.analytics ? d.analytics.airPurity : 90,
+                    d.analytics ? d.analytics.sunshineVitality : 90,
+                    d.analytics ? d.analytics.lifeEnjoymentScore : 90
+                ],
+                borderColor: c.border,
+                backgroundColor: c.bg,
+                borderWidth: 2,
+                pointBackgroundColor: c.border,
+                pointRadius: 3
+            };
+        });
+
+        if (this.comfortRadarChart) {
+            this.comfortRadarChart.data.datasets = datasets;
+            this.comfortRadarChart.update();
+        } else {
+            this.comfortRadarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: gridColor },
+                            grid: { color: gridColor },
+                            pointLabels: {
+                                color: textColor,
+                                font: { family: 'Inter', size: 10, weight: '600' }
+                            },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                color: textColor,
+                                min: 50,
+                                max: 100,
+                                stepSize: 10,
+                                font: { size: 8 }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: textColor,
+                                font: { family: 'Inter', size: 10, weight: '700' },
+                                boxWidth: 12
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 
     updateChartsData() {
