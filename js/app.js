@@ -700,6 +700,10 @@ class BioShelterApp {
         const gateSuccessOverlay = document.getElementById('gate-success-overlay');
 
         if (gate) {
+            let activeChannel = 'phone';
+            let activeTarget = '+91 98765 43210';
+            let activeName = 'Alex Henderson';
+
             // Check initial auth state
             if (authInstance.isAuthenticated()) {
                 gate.classList.add('unlocked');
@@ -707,23 +711,42 @@ class BioShelterApp {
                 gate.classList.remove('unlocked');
             }
 
-            // Tab switching
-            gateTabBtns.forEach(btn => {
+            // Multi-Channel OTP Selection Tabs (Phone, Gmail, Microsoft)
+            const channelTabs = document.querySelectorAll('[data-otp-channel]');
+            const channelForms = {
+                phone: document.getElementById('channel-form-phone'),
+                gmail: document.getElementById('channel-form-gmail'),
+                microsoft: document.getElementById('channel-form-microsoft')
+            };
+
+            channelTabs.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    gateTabBtns.forEach(b => b.classList.remove('active'));
+                    channelTabs.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.background = '';
+                        b.style.borderColor = '';
+                    });
                     btn.classList.add('active');
-                    const targetPaneId = btn.getAttribute('data-gate-pane');
-                    gatePanes.forEach(p => {
-                        p.classList.toggle('active', p.id === targetPaneId);
+                    activeChannel = btn.getAttribute('data-otp-channel');
+
+                    // Show corresponding form
+                    Object.keys(channelForms).forEach(ch => {
+                        if (channelForms[ch]) {
+                            channelForms[ch].style.display = (ch === activeChannel) ? 'flex' : 'none';
+                        }
                     });
                 });
             });
 
             // Helper to unlock gate with success animation
             const unlockStudioWithAnimation = (title, msg) => {
-                gatePanes.forEach(p => p.style.display = 'none');
+                const step1 = document.getElementById('gate-otp-step-1');
+                const step2 = document.getElementById('gate-otp-step-2');
                 const tabsBar = document.querySelector('.gate-nav-tabs');
+                if (step1) step1.style.display = 'none';
+                if (step2) step2.style.display = 'none';
                 if (tabsBar) tabsBar.style.display = 'none';
+
                 if (gateSuccessOverlay) {
                     gateSuccessOverlay.classList.add('active');
                     if (title) document.getElementById('gate-success-title').textContent = title;
@@ -739,59 +762,118 @@ class BioShelterApp {
                 }, 700);
             };
 
-            // Gate Phone OTP - Step 1: Send SMS
-            const btnGateSendOtp = document.getElementById('btn-gate-send-otp');
-            const gatePhoneStep1 = document.getElementById('gate-phone-step-1');
-            const gatePhoneStep2 = document.getElementById('gate-phone-step-2');
+            const gateOtpStep1 = document.getElementById('gate-otp-step-1');
+            const gateOtpStep2 = document.getElementById('gate-otp-step-2');
             const gateOtpDigits = document.querySelectorAll('.gate-otp-digit');
             const btnGateVerifyOtp = document.getElementById('btn-gate-verify-otp');
             const btnGateResendOtp = document.getElementById('btn-gate-resend-otp');
-
             const btnGateQuickAutofill = document.getElementById('btn-gate-quick-autofill');
+            const btnGateChangeChannel = document.getElementById('btn-gate-change-channel');
 
-            if (btnGateSendOtp) {
-                btnGateSendOtp.addEventListener('click', () => {
-                    const phoneInput = document.getElementById('gate-phone-number');
-                    let phone = phoneInput.value.trim();
-                    if (!phone) {
-                        phone = '98765 43210';
-                        phoneInput.value = phone;
+            const triggerStep2Verification = (channel, target, name, res) => {
+                activeChannel = channel;
+                activeTarget = target;
+                activeName = name;
+
+                if (gateOtpStep1) gateOtpStep1.style.display = 'none';
+                if (gateOtpStep2) gateOtpStep2.style.display = 'flex';
+
+                const targetDisplay = document.getElementById('gate-display-otp-target');
+                if (targetDisplay) targetDisplay.textContent = target;
+
+                const liveCodeDisplay = document.getElementById('gate-live-otp-code');
+                if (liveCodeDisplay) liveCodeDisplay.textContent = res.code;
+
+                const badgeEl = document.getElementById('gate-otp-dispatch-channel-badge');
+                if (badgeEl) {
+                    if (channel === 'gmail') {
+                        badgeEl.innerHTML = '📧 Gmail Inbox Dispatch';
+                    } else if (channel === 'microsoft') {
+                        badgeEl.innerHTML = '🏢 Microsoft Exchange Dispatch';
+                    } else {
+                        badgeEl.innerHTML = '📱 Cellular SMS Dispatch';
                     }
-                    const code = document.getElementById('gate-phone-country').value;
-                    const name = document.getElementById('gate-phone-name').value.trim() || 'Citizen Engineer';
+                }
 
-                    const res = authInstance.requestPhoneOtp(phone, code);
+                // Auto pre-fill all 6 digits immediately
+                const digits = res.code.split('');
+                gateOtpDigits.forEach((input, i) => { input.value = digits[i] || ''; });
+
+                this.showSmsPushToast(res.code, target);
+                this.startGateOtpCountdown();
+            };
+
+            // 1. Send Mobile Phone OTP
+            const btnSendPhone = document.getElementById('btn-gate-send-phone-otp') || document.getElementById('btn-gate-send-otp');
+            if (btnSendPhone) {
+                btnSendPhone.addEventListener('click', () => {
+                    const phoneInput = document.getElementById('gate-phone-number');
+                    let phone = phoneInput ? phoneInput.value.trim() : '98765 43210';
+                    if (!phone) phone = '98765 43210';
+                    const country = (document.getElementById('gate-phone-country') || {}).value || '+91';
+                    const name = (document.getElementById('gate-phone-name') || {}).value || 'Alex Henderson';
+
+                    const res = authInstance.requestOtp('phone', phone, name, country);
                     if (res.success) {
-                        gatePhoneStep1.style.display = 'none';
-                        gatePhoneStep2.style.display = 'flex';
-                        document.getElementById('gate-display-otp-phone').textContent = res.phone;
-                        const liveCodeDisplay = document.getElementById('gate-live-otp-code');
-                        if (liveCodeDisplay) liveCodeDisplay.textContent = res.code;
-
-                        // Auto pre-fill all 6 digits immediately for seamless experience
-                        const digits = res.code.split('');
-                        gateOtpDigits.forEach((input, i) => { input.value = digits[i] || ''; });
-
-                        this.showSmsPushToast(res.code, res.phone);
-                        this.startGateOtpCountdown();
+                        triggerStep2Verification('phone', res.target, name, res);
                     }
                 });
             }
 
+            // 2. Send Gmail ID OTP
+            const btnSendGmail = document.getElementById('btn-gate-send-gmail-otp');
+            if (btnSendGmail) {
+                btnSendGmail.addEventListener('click', () => {
+                    const emailInput = document.getElementById('gate-gmail-address');
+                    let email = emailInput ? emailInput.value.trim() : 'sarah.lin.resilience@gmail.com';
+                    if (!email) email = 'sarah.lin.resilience@gmail.com';
+                    const name = (document.getElementById('gate-gmail-name') || {}).value || 'Dr. Sarah Lin';
+
+                    const res = authInstance.requestOtp('gmail', email, name);
+                    if (res.success) {
+                        triggerStep2Verification('gmail', res.target, name, res);
+                    }
+                });
+            }
+
+            // 3. Send Microsoft ID OTP
+            const btnSendMs = document.getElementById('btn-gate-send-ms-otp');
+            if (btnSendMs) {
+                btnSendMs.addEventListener('click', () => {
+                    const emailInput = document.getElementById('gate-ms-address');
+                    let email = emailInput ? emailInput.value.trim() : 'alex.henderson@outlook.com';
+                    if (!email) email = 'alex.henderson@outlook.com';
+                    const name = (document.getElementById('gate-ms-name') || {}).value || 'Alex Henderson';
+
+                    const res = authInstance.requestOtp('microsoft', email, name);
+                    if (res.success) {
+                        triggerStep2Verification('microsoft', res.target, name, res);
+                    }
+                });
+            }
+
+            // 4. Quick Auto-Fill & Instant Unlock
             if (btnGateQuickAutofill) {
                 btnGateQuickAutofill.addEventListener('click', () => {
                     const liveCode = document.getElementById('gate-live-otp-code').textContent.trim() || '849201';
-                    const name = document.getElementById('gate-phone-name').value.trim() || 'Citizen Engineer';
                     const digits = liveCode.split('');
                     gateOtpDigits.forEach((input, i) => { input.value = digits[i] || ''; });
-                    const result = authInstance.verifyPhoneOtp(liveCode, name);
+                    const result = authInstance.verifyOtp(liveCode, activeChannel, activeTarget, activeName);
                     if (result.success) {
-                        unlockStudioWithAnimation('Phone Verified & Enrolled!', `Welcome, ${result.user.displayName}! Phone ${result.user.phone} registered for Disaster SOS broadcasts.`);
+                        unlockStudioWithAnimation(`${result.user.providerName} Verified!`, `Welcome, ${result.user.displayName}! Connecting with 3D Simulation Twin.`);
                     }
                 });
             }
 
-            // Auto advance PIN digits in gate
+            // 5. Change Channel Button (Return to Step 1)
+            if (btnGateChangeChannel) {
+                btnGateChangeChannel.addEventListener('click', () => {
+                    if (gateOtpStep1) gateOtpStep1.style.display = 'flex';
+                    if (gateOtpStep2) gateOtpStep2.style.display = 'none';
+                });
+            }
+
+            // 6. Auto advance PIN digits in gate
             gateOtpDigits.forEach((digitInput, idx) => {
                 digitInput.addEventListener('input', (e) => {
                     if (e.target.value.length === 1 && idx < gateOtpDigits.length - 1) {
@@ -805,7 +887,7 @@ class BioShelterApp {
                 });
             });
 
-            // Gate Phone OTP - Step 2: Verify Code
+            // 7. Verify OTP Code Button
             if (btnGateVerifyOtp) {
                 btnGateVerifyOtp.addEventListener('click', () => {
                     let codeStr = '';
@@ -813,24 +895,26 @@ class BioShelterApp {
                     if (!codeStr || codeStr.length !== 6) {
                         codeStr = document.getElementById('gate-live-otp-code').textContent.trim() || '849201';
                     }
-                    const name = document.getElementById('gate-phone-name').value.trim() || 'Citizen Engineer';
 
-                    const result = authInstance.verifyPhoneOtp(codeStr, name);
+                    const result = authInstance.verifyOtp(codeStr, activeChannel, activeTarget, activeName);
                     if (result.success) {
-                        unlockStudioWithAnimation('Phone Verified & Enrolled!', `Welcome, ${result.user.displayName}! Phone ${result.user.phone} registered for Disaster SOS broadcasts.`);
+                        unlockStudioWithAnimation(`${result.user.providerName} Verified!`, `Welcome, ${result.user.displayName}! Connecting with 3D Simulation Twin.`);
                     } else {
                         alert(result.message);
                     }
                 });
             }
 
+            // 8. Resend OTP Button
             if (btnGateResendOtp) {
                 btnGateResendOtp.addEventListener('click', () => {
-                    const phone = document.getElementById('gate-phone-number').value.trim();
-                    const code = document.getElementById('gate-phone-country').value;
-                    const res = authInstance.requestPhoneOtp(phone, code);
+                    const res = authInstance.requestOtp(activeChannel, activeTarget, activeName);
                     if (res.success) {
-                        this.showSmsPushToast(res.code, res.phone);
+                        const liveCodeDisplay = document.getElementById('gate-live-otp-code');
+                        if (liveCodeDisplay) liveCodeDisplay.textContent = res.code;
+                        const digits = res.code.split('');
+                        gateOtpDigits.forEach((input, i) => { input.value = digits[i] || ''; });
+                        this.showSmsPushToast(res.code, activeTarget);
                         this.startGateOtpCountdown();
                     }
                 });

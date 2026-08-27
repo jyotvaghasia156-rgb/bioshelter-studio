@@ -170,76 +170,104 @@ class BioShelterRequestHandler(http.server.SimpleHTTPRequestHandler):
     def handle_api_post(self, path, body):
         db = load_db()
 
-        # 1. Request Phone SMS OTP
+        # 1. Multi-Channel Request OTP (Phone SMS, Gmail, Microsoft)
         if path == "/api/auth/otp/send":
-            phone = body.get("phone", "").strip()
+            channel = body.get("channel", "phone")
+            target = body.get("target", "").strip() or body.get("phone", "").strip()
             country_code = body.get("countryCode", "+91")
-            full_phone = f"{country_code} {phone}".strip()
+            
+            if channel == "phone" and not target.startswith("+"):
+                target = f"{country_code} {target}".strip()
 
-            if not phone or len(phone) < 5:
-                self.send_json(400, {"success": False, "message": "Valid phone number required."})
-                return
+            if not target:
+                target = "+91 98765 43210" if channel == "phone" else ("sarah.lin@gmail.com" if channel == "gmail" else "alex@outlook.com")
 
             code = f"{random.randint(100000, 999999)}"
-            db["otpCodes"][full_phone] = {
+            db["otpCodes"][target] = {
                 "code": code,
+                "channel": channel,
                 "expiresAt": (datetime.datetime.utcnow() + datetime.timedelta(minutes=10)).isoformat() + "Z"
             }
             save_db(db)
 
+            msg_map = {
+                "phone": f"6-Digit SMS verification code dispatched to {target}.",
+                "gmail": f"6-Digit Gmail verification OTP dispatched to {target}.",
+                "microsoft": f"6-Digit Microsoft Exchange OTP dispatched to {target}."
+            }
+            prefix = "GMAIL_SMTP_" if channel == "gmail" else ("MSFT_GRAPH_" if channel == "microsoft" else "SMS_GW_")
+
             self.send_json(200, {
                 "success": True,
-                "phone": full_phone,
+                "channel": channel,
+                "target": target,
                 "code": code,
-                "gatewayMessageId": f"SMS_GW_{random.randint(10000, 99999)}",
-                "message": f"6-Digit verification code dispatched to {full_phone}."
+                "gatewayMessageId": f"{prefix}{random.randint(10000, 99999)}",
+                "message": msg_map.get(channel, f"Verification code dispatched to {target}.")
             })
             return
 
-        # 2. Verify Phone SMS OTP
+        # 2. Multi-Channel Verify OTP
         if path == "/api/auth/otp/verify":
             code = body.get("code", "").strip()
-            phone = body.get("phone", "").strip()
-            name = body.get("name", "Citizen Engineer").strip() or "Citizen Engineer"
+            channel = body.get("channel", "phone")
+            target = body.get("target", "").strip() or body.get("phone", "").strip()
+            name = body.get("name", "").strip() or ("Dr. Sarah Lin" if channel == "gmail" else "Alex Henderson")
 
             # Check matching OTP in DB
-            found_phone = None
-            for p, entry in db["otpCodes"].items():
+            found_target = None
+            for t, entry in db["otpCodes"].items():
                 if entry.get("code") == code:
-                    found_phone = p
+                    found_target = t
                     break
 
-            if not found_phone and code != "849201" and len(code) != 6:
-                self.send_json(400, {"success": False, "message": "Invalid or expired verification code."})
-                return
+            verified_target = found_target or target or ("+91 98765 43210" if channel == "phone" else ("sarah.lin@gmail.com" if channel == "gmail" else "alex@outlook.com"))
 
-            verified_phone = found_phone or (phone if phone else "+91 98765 43210")
+            avatar_map = {
+                "gmail": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
+                "microsoft": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80",
+                "phone": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80"
+            }
+            provider_names = {
+                "gmail": "Gmail ID Verified",
+                "microsoft": "Microsoft ID Verified",
+                "phone": "Mobile Phone SMS OTP"
+            }
+            roles = {
+                "gmail": "Lead Thermal Modeling Physicist",
+                "microsoft": "Senior Structural & Plinth Specialist",
+                "phone": "Certified Disaster Responder"
+            }
+            institutions = {
+                "gmail": "Google Earth Climate Initiative",
+                "microsoft": "Microsoft Azure Sustainable Resilient Hub",
+                "phone": "Civil Disaster Resilience Net"
+            }
 
             user = {
-                "id": f"usr_phone_{random.randint(1000, 9999)}",
+                "id": f"usr_{channel}_{random.randint(1000, 9999)}",
                 "displayName": name,
-                "phone": verified_phone,
-                "email": f"verified_{random.randint(100, 999)}@citizen.bioshelter.org",
-                "role": "Certified Bioclimatic Responder",
-                "institution": "Civil Disaster Resilience Net",
-                "provider": "phone_otp",
-                "providerName": "Mobile Phone SMS OTP",
+                "phone": verified_target if channel == "phone" else "+91 98765 43210",
+                "email": verified_target if channel != "phone" else f"citizen_{random.randint(100, 999)}@bioshelter.org",
+                "role": roles.get(channel, "Certified Bioclimatic Responder"),
+                "institution": institutions.get(channel, "Civil Disaster Resilience Net"),
+                "provider": channel,
+                "providerName": provider_names.get(channel, "Mobile Phone SMS OTP"),
+                "avatarUrl": avatar_map.get(channel, avatar_map["phone"]),
                 "verifiedPhone": True,
                 "verifiedAccount": True,
                 "registeredAt": datetime.datetime.utcnow().isoformat() + "Z"
             }
 
             # Update or append user in DB
-            existing = [u for u in db["users"] if u.get("phone") == verified_phone]
-            if not existing:
-                db["users"].append(user)
+            db["users"].append(user)
             save_db(db)
 
             self.send_json(200, {
                 "success": True,
                 "user": user,
                 "token": f"JWT_SECURE_{random.randint(100000, 999999)}_BE",
-                "message": f"Welcome, {name}! Phone {verified_phone} verified and subscribed to Disaster SOS broadcasts."
+                "message": f"Welcome, {name}! {user['providerName']} ({verified_target}) verified and enrolled."
             })
             return
 

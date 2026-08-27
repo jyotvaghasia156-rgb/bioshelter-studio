@@ -187,14 +187,25 @@ export class AuthEngine {
     }
 
     /**
-     * Phone Number Authentication - Step 1: Send 6-Digit SMS OTP
+     * Multi-Channel OTP Request (Phone SMS, Gmail ID, or Microsoft ID)
      */
-    requestPhoneOtp(phoneNumber, countryCode = '+1') {
-        const fullPhone = `${countryCode} ${phoneNumber.trim()}`;
+    requestOtp(channel = 'phone', target = '', name = 'Citizen Engineer', countryCode = '+91') {
+        let fullTarget = target.trim();
+        if (channel === 'phone') {
+            if (!fullTarget) fullTarget = '98765 43210';
+            fullTarget = `${countryCode} ${fullTarget}`.trim();
+        } else if (channel === 'gmail') {
+            if (!fullTarget) fullTarget = 'sarah.lin.resilience@gmail.com';
+        } else if (channel === 'microsoft') {
+            if (!fullTarget) fullTarget = 'alex.henderson@outlook.com';
+        }
+
         const generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
         
         this.activeOtpState = {
-            phone: fullPhone,
+            channel: channel,
+            target: fullTarget,
+            name: name,
             code: generatedCode,
             sentAt: Date.now(),
             expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes
@@ -205,27 +216,44 @@ export class AuthEngine {
             fetch('/api/auth/otp/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone: phoneNumber, countryCode })
+                body: JSON.stringify({ channel, target: fullTarget, name, countryCode })
             }).catch(() => {});
         } catch {}
 
+        const channelLabels = {
+            phone: `📱 SMS verification code dispatched to ${fullTarget}`,
+            gmail: `📧 Gmail verification OTP dispatched to ${fullTarget}`,
+            microsoft: `🏢 Microsoft Exchange OTP dispatched to ${fullTarget}`
+        };
+
         return {
             success: true,
-            phone: fullPhone,
-            code: generatedCode, // Exposed for simulated on-screen SMS toast
-            message: `Verification code dispatched to ${fullPhone}`
+            channel: channel,
+            target: fullTarget,
+            code: generatedCode,
+            message: channelLabels[channel] || `Verification code sent to ${fullTarget}`
         };
     }
 
     /**
-     * Phone Number Authentication - Step 2: Verify 6-Digit Code
+     * Backwards-compatible Phone OTP Request
      */
-    verifyPhoneOtp(inputCode, name = 'Citizen Engineer') {
-        let verifiedPhone = '+91 98765 43210';
+    requestPhoneOtp(phoneNumber, countryCode = '+91') {
+        return this.requestOtp('phone', phoneNumber, 'Citizen Engineer', countryCode);
+    }
+
+    /**
+     * Multi-Channel OTP Verification (Phone SMS, Gmail ID, or Microsoft ID)
+     */
+    verifyOtp(inputCode, channel = 'phone', target = '', name = 'Citizen Engineer') {
+        let verifiedTarget = target;
+        let verifiedChannel = channel;
         const cleanCode = (inputCode || '').toString().trim();
 
         if (this.activeOtpState) {
-            verifiedPhone = this.activeOtpState.phone;
+            verifiedTarget = this.activeOtpState.target || target;
+            verifiedChannel = this.activeOtpState.channel || channel;
+            name = this.activeOtpState.name || name;
             this.activeOtpState = null;
         }
 
@@ -233,31 +261,64 @@ export class AuthEngine {
             return { success: false, message: 'Please enter the 6-digit verification code.' };
         }
 
-        const phoneUser = {
-            provider: 'phone',
-            providerName: 'Mobile Phone OTP',
-            uid: 'phone_' + Math.random().toString(36).substr(2, 9),
-            displayName: name,
-            email: `${name.toLowerCase().replace(/\s+/g, '.') || 'user'}@bioshelter.org`,
-            phone: verifiedPhone,
+        // Generate tailored avatars and credentials based on channel
+        let avatarUrl = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80';
+        let providerName = 'Mobile Phone SMS OTP';
+        let email = `${name.toLowerCase().replace(/\s+/g, '.') || 'user'}@bioshelter.org`;
+        let phone = verifiedChannel === 'phone' ? verifiedTarget : '+91 98765 43210';
+        let role = 'Certified Disaster Responder';
+        let institution = 'Civil Disaster Resilience Net';
+
+        if (verifiedChannel === 'gmail') {
+            providerName = 'Gmail ID Verified';
+            email = verifiedTarget || 'sarah.lin.climate@gmail.com';
+            avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80';
+            role = 'Lead Thermal Modeling Physicist';
+            institution = 'Google Earth Climate Initiative';
+        } else if (verifiedChannel === 'microsoft') {
+            providerName = 'Microsoft ID Verified';
+            email = verifiedTarget || 'alex.henderson@outlook.com';
+            avatarUrl = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80';
+            role = 'Senior Structural & Plinth Specialist';
+            institution = 'Microsoft Azure Sustainable Resilient Hub';
+        }
+
+        const verifiedUser = {
+            provider: verifiedChannel,
+            providerName: providerName,
+            uid: `${verifiedChannel}_${Math.random().toString(36).substr(2, 9)}`,
+            displayName: name || (verifiedChannel === 'gmail' ? 'Dr. Sarah Lin' : 'Alex Henderson'),
+            email: email,
+            phone: phone,
             verifiedPhone: true,
             verifiedAccount: true,
-            avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
-            institution: 'Community Resilient Shelter Network',
-            role: 'Verified Disaster Responder',
+            avatarUrl: avatarUrl,
+            institution: institution,
+            role: role,
             tokenExpiry: Date.now() + 3600 * 1000 * 24 * 14,
             authTimestamp: new Date().toISOString()
         };
 
-        this.saveSession(phoneUser);
+        this.saveSession(verifiedUser);
 
         // Async notify backend
         try {
             fetch('/api/auth/otp/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: inputCode, phone: verifiedPhone, name })
+                body: JSON.stringify({ code: cleanCode, channel: verifiedChannel, target: verifiedTarget, name: verifiedUser.displayName })
             }).catch(() => {});
+        } catch {}
+
+        return { success: true, user: verifiedUser };
+    }
+
+    /**
+     * Backwards-compatible Phone OTP Verification
+     */
+    verifyPhoneOtp(inputCode, name = 'Citizen Engineer') {
+        return this.verifyOtp(inputCode, 'phone', '', name);
+    }
         } catch {}
 
         return { success: true, user: phoneUser };

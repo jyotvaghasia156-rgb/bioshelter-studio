@@ -74,8 +74,9 @@ try {
         if ($rawPath.StartsWith("/api/")) {
             $response.ContentType = "application/json; charset=utf-8"
             $body = $null
+            $rawBody = ""
             if ($request.HasEntityBody) {
-                $reader = New-Object System.IO.StreamReader($request.InputStream, $request.ContentEncoding)
+                $reader = New-Object System.IO.StreamReader($request.InputStream, [System.Text.Encoding]::UTF8)
                 $rawBody = $reader.ReadToEnd()
                 if (-not [string]::IsNullOrEmpty($rawBody)) {
                     try { $body = ConvertFrom-Json $rawBody } catch { $body = $null }
@@ -93,19 +94,41 @@ try {
                 continue
             }
 
-            # 2. Request Phone OTP SMS
+            # 2. Multi-Channel Request OTP (Phone, Gmail, Microsoft)
             if ($rawPath -eq "/api/auth/otp/send" -and $method -eq "POST") {
-                $phone = if ($body.phone) { $body.phone } else { "9876543210" }
-                $code = [string](Get-Random -Minimum 100000 -Maximum 999999)
-                $country = if ($body.countryCode) { $body.countryCode } else { "+91" }
-                $fullPhone = "$country $phone"
+                $channel = "phone"
+                $target = ""
+                $name = ""
+                $country = "+91"
+
+                if ($rawBody -match '"channel"\s*:\s*"([^"]+)"') { $channel = $matches[1] }
+                if ($rawBody -match '"target"\s*:\s*"([^"]+)"') { $target = $matches[1] }
+                elseif ($rawBody -match '"phone"\s*:\s*"([^"]+)"') { $target = $matches[1] }
+                if ($rawBody -match '"countryCode"\s*:\s*"([^"]+)"') { $country = $matches[1] }
+                if ($rawBody -match '"name"\s*:\s*"([^"]+)"') { $name = $matches[1] }
+                
+                $code = (Get-Random -Minimum 100000 -Maximum 999999).ToString()
+                if (-not $target) {
+                    $target = if ($channel -eq "phone") { "+91 98765 43210" } elseif ($channel -eq "gmail") { "sarah.lin@gmail.com" } else { "alex@outlook.com" }
+                }
+                if ($channel -eq "phone" -and -not $target.StartsWith("+")) {
+                    $target = "$country $target"
+                }
+
+                $msgMap = @{
+                    phone = "6-Digit SMS verification code sent to $target."
+                    gmail = "6-Digit Gmail verification OTP sent to $target."
+                    microsoft = "6-Digit Microsoft Exchange OTP sent to $target."
+                }
+                $prefix = switch ($channel) { "gmail" { "GMAIL_SMTP_" } "microsoft" { "MSFT_GRAPH_" } default { "SMS_GW_" } }
 
                 $resObj = @{
                     success = $true;
-                    phone = $fullPhone;
+                    channel = $channel;
+                    target = $target;
                     code = $code;
-                    gatewayMessageId = "SMS_GW_" + (Get-Random -Minimum 10000 -Maximum 99999);
-                    message = "6-Digit SMS verification code sent to $fullPhone."
+                    gatewayMessageId = $prefix + (Get-Random -Minimum 10000 -Maximum 99999);
+                    message = if ($msgMap.ContainsKey($channel)) { $msgMap[$channel] } else { "Verification code sent to $target." }
                 }
                 $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj))
                 $response.OutputStream.Write($bytes, 0, $bytes.Length)
@@ -113,20 +136,57 @@ try {
                 continue
             }
 
-            # 3. Verify Phone OTP SMS
+            # 3. Multi-Channel Verify OTP
             if ($rawPath -eq "/api/auth/otp/verify" -and $method -eq "POST") {
-                $name = if ($body.name) { $body.name } else { "Citizen Engineer" }
-                $phone = if ($body.phone) { $body.phone } else { "+91 98765 43210" }
+                $channel = "phone"
+                $target = ""
+                $name = ""
+                if ($rawBody -match '"channel"\s*:\s*"([^"]+)"') { $channel = $matches[1] }
+                if ($rawBody -match '"target"\s*:\s*"([^"]+)"') { $target = $matches[1] }
+                elseif ($rawBody -match '"phone"\s*:\s*"([^"]+)"') { $target = $matches[1] }
+                if ($rawBody -match '"name"\s*:\s*"([^"]+)"') { $name = $matches[1] }
+
+                if (-not $target) {
+                    $target = if ($channel -eq "phone") { "+91 98765 43210" } elseif ($channel -eq "gmail") { "sarah.lin@gmail.com" } else { "alex@outlook.com" }
+                }
+                if (-not $name) {
+                    $name = if ($channel -eq "gmail") { "Dr. Sarah Lin" } else { "Alex Henderson" }
+                }
                 
+                $avatar = switch ($channel) {
+                    "gmail" { "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" }
+                    "microsoft" { "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80" }
+                    default { "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80" }
+                }
+                $providerName = switch ($channel) {
+                    "gmail" { "Gmail ID Verified" }
+                    "microsoft" { "Microsoft ID Verified" }
+                    default { "Mobile Phone SMS OTP" }
+                }
+                $role = switch ($channel) {
+                    "gmail" { "Lead Thermal Modeling Physicist" }
+                    "microsoft" { "Senior Structural & Plinth Specialist" }
+                    default { "Certified Disaster Responder" }
+                }
+                $institution = switch ($channel) {
+                    "gmail" { "Google Earth Climate Initiative" }
+                    "microsoft" { "Microsoft Azure Sustainable Resilient Hub" }
+                    default { "Civil Disaster Resilience Net" }
+                }
+
+                $userPhone = if ($channel -eq "phone") { $target } else { "+91 98765 43210" }
+                $userEmail = if ($channel -eq "phone") { "citizen_" + (Get-Random -Minimum 100 -Maximum 999) + "@bioshelter.org" } else { $target }
+
                 $user = @{
-                    id = "usr_" + (Get-Random -Minimum 1000 -Maximum 9999);
+                    id = "usr_" + $channel + "_" + (Get-Random -Minimum 1000 -Maximum 9999);
                     displayName = $name;
-                    phone = $phone;
-                    email = "citizen_" + (Get-Random -Minimum 100 -Maximum 999) + "@bioshelter.org";
-                    role = "Certified Bioclimatic Responder";
-                    institution = "Civil Disaster Resilience Net";
-                    provider = "phone_otp";
-                    providerName = "Mobile Phone SMS OTP";
+                    phone = $userPhone;
+                    email = $userEmail;
+                    role = $role;
+                    institution = $institution;
+                    provider = $channel;
+                    providerName = $providerName;
+                    avatarUrl = $avatar;
                     verifiedPhone = $true;
                     verifiedAccount = $true;
                     registeredAt = (Get-Date).ToString("o");
@@ -136,7 +196,7 @@ try {
                     success = $true;
                     user = $user;
                     token = "JWT_SECURE_" + (Get-Random -Minimum 100000 -Maximum 999999);
-                    message = "Welcome, $name! Phone $phone verified and enrolled in Disaster SOS network."
+                    message = "Welcome, $name! $providerName ($target) verified and enrolled."
                 }
                 $bytes = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json $resObj))
                 $response.OutputStream.Write($bytes, 0, $bytes.Length)

@@ -34,17 +34,34 @@
                 </div>
                 <div class="gate-badge-security">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
-                    Identity &amp; Disaster Network Gate
+                    Multi-Channel Security &amp; OTP Gate
                 </div>
                 <h1 class="gate-title">BioShelter Studio</h1>
-                <p class="gate-desc">Enter your mobile phone number to receive a 6-digit SMS verification code and unlock the full BioShelter 3D Studio &amp; Disaster SOS Network.</p>
+                <p class="gate-desc">Receive a 6-digit verification OTP through your <strong>Mobile Number</strong>, <strong>Gmail ID</strong>, or <strong>Microsoft ID</strong> to unlock the complete modeling suite.</p>
             </div>
 
-            <!-- Single Dedicated Phone Number OTP Authentication Form -->
-            <div id="gate-pane-phone" class="gate-pane active">
-                <div id="gate-phone-step-1" style="display: flex; flex-direction: column; gap: 14px;">
+            <!-- OTP Dispatch Channel Selection Tabs -->
+            <div class="gate-nav-tabs" style="display: flex; gap: 6px; margin-bottom: 4px;">
+                <button class="gate-tab-btn active" data-otp-channel="phone" id="btn-tab-channel-phone" style="flex: 1; padding: 10px 8px; font-size: 12px; font-weight: 700; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+                    Mobile Phone
+                </button>
+                <button class="gate-tab-btn" data-otp-channel="gmail" id="btn-tab-channel-gmail" style="flex: 1; padding: 10px 8px; font-size: 12px; font-weight: 700; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 12.713L1.043 4.225A2.001 2.001 0 013 3h18c.737 0 1.393.4 1.748 1L12 12.713z"/><path fill="#4285F4" d="M1.043 4.225C1.015 4.314 1 4.406 1 4.5V19a2 2 0 002 2h4V10.713L1.043 4.225z"/><path fill="#34A853" d="M23 4.5c0-.094-.015-.186-.043-.275L17 10.713V21h4a2 2 0 002-2V4.5z"/><path fill="#FBBC05" d="M7 21h10v-9.287L12 15.5l-5-3.787V21z"/></svg>
+                    Gmail ID
+                </button>
+                <button class="gate-tab-btn" data-otp-channel="microsoft" id="btn-tab-channel-microsoft" style="flex: 1; padding: 10px 8px; font-size: 12px; font-weight: 700; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 21 21"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>
+                    Microsoft ID
+                </button>
+            </div>
+
+            <!-- STEP 1: Multi-Channel OTP Request Forms -->
+            <div id="gate-otp-step-1" style="display: flex; flex-direction: column; gap: 14px;">
+                <!-- Channel 1: Mobile Phone Form -->
+                <div id="channel-form-phone" class="otp-channel-form active" style="display: flex; flex-direction: column; gap: 12px;">
                     <div class="control-group">
-                        <label class="control-label" style="font-size: 13px; font-weight: 700;">Mobile Phone Number</label>
+                        <label class="control-label" style="font-size: 12px; font-weight: 700;">Mobile Phone Number</label>
                         <div class="phone-input-row">
                             <select id="gate-phone-country" class="phone-country-code">
                                 <option value="+91" selected>🇮🇳 +91 (IN)</option>
@@ -59,57 +76,88 @@
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label" style="font-size: 13px; font-weight: 700;">Your Full Name</label>
+                        <label class="control-label" style="font-size: 12px; font-weight: 700;">Full Name / Identity</label>
                         <input type="text" id="gate-phone-name" class="input-select" placeholder="e.g. Alex Henderson, Civil Engineer" value="Alex Henderson">
                     </div>
-                    <button id="btn-gate-send-otp" class="export-btn-primary" style="width: 100%; padding: 14px; font-size: 14px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #10b981); border-radius: var(--radius-md);">
-                        📱 Send 6-Digit SMS Verification Code &rarr;
+                    <button id="btn-gate-send-phone-otp" class="export-btn-primary" style="width: 100%; padding: 13px; font-size: 13px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #10b981); border-radius: var(--radius-md);">
+                        📱 Send 6-Digit SMS Verification OTP &rarr;
                     </button>
                 </div>
 
-                <div id="gate-phone-step-2" style="display: none; flex-direction: column; gap: 14px;">
-                    <!-- Dynamic Live OTP Incoming Display Card -->
-                    <div class="dynamic-otp-live-card">
-                        <div class="dynamic-otp-header">
-                            <span style="display: flex; align-items: center; gap: 6px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                                📱 SMS Dispatch Success
-                            </span>
-                            <span class="dynamic-otp-badge-live">VERIFICATION CODE</span>
-                        </div>
-                        <div class="dynamic-otp-code-row">
-                            <div>
-                                <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Your 6-Digit OTP:</div>
-                                <div id="gate-live-otp-code" class="dynamic-otp-number">849201</div>
-                            </div>
-                            <button id="btn-gate-quick-autofill" class="btn-quick-autofill" title="Auto-Fill &amp; Verify Instantly">
-                                ⚡ Auto-Fill &amp; Unlock
-                            </button>
-                        </div>
-                        <div class="dynamic-otp-timer-bar">
-                            <div id="gate-otp-timer-bar-fill" class="dynamic-otp-timer-fill"></div>
-                        </div>
+                <!-- Channel 2: Gmail ID Form -->
+                <div id="channel-form-gmail" class="otp-channel-form" style="display: none; flex-direction: column; gap: 12px;">
+                    <div class="control-group">
+                        <label class="control-label" style="font-size: 12px; font-weight: 700;">Gmail / Google Workspace Address</label>
+                        <input type="email" id="gate-gmail-address" class="input-select" placeholder="e.g. sarah.lin.resilience@gmail.com" value="sarah.lin.resilience@gmail.com">
                     </div>
-
-                    <p style="font-size: 12px; color: var(--text-secondary); text-align: center; margin-top: -2px;">
-                        Enter the 6-digit code sent to <strong id="gate-display-otp-phone" style="color: var(--accent-sky);">+91 98765 43210</strong>:
-                    </p>
-                    <div class="otp-pin-container">
-                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="0" value="8">
-                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="1" value="4">
-                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="2" value="9">
-                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="3" value="2">
-                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="4" value="0">
-                        <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="5" value="1">
+                    <div class="control-group">
+                        <label class="control-label" style="font-size: 12px; font-weight: 700;">Full Name</label>
+                        <input type="text" id="gate-gmail-name" class="input-select" placeholder="e.g. Dr. Sarah Lin" value="Dr. Sarah Lin">
                     </div>
-                    <div class="otp-resend-bar" style="justify-content: center; gap: 10px;">
-                        <span>Didn't receive SMS?</span>
-                        <button id="btn-gate-resend-otp" class="btn-resend-otp">Resend in <span id="gate-otp-timer-count">60</span>s</button>
-                    </div>
-                    <button id="btn-gate-verify-otp" class="export-btn-primary" style="width: 100%; padding: 14px; font-size: 14px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #10b981);">
-                        ⚡ Verify Account &amp; Unlock Studio &rarr;
+                    <button id="btn-gate-send-gmail-otp" class="export-btn-primary" style="width: 100%; padding: 13px; font-size: 13px; font-weight: 800; background: linear-gradient(135deg, #ea4335, #fbbc05); border-radius: var(--radius-md); color: #fff;">
+                        🇬 Send 6-Digit Gmail OTP &rarr;
                     </button>
                 </div>
+
+                <!-- Channel 3: Microsoft ID Form -->
+                <div id="channel-form-microsoft" class="otp-channel-form" style="display: none; flex-direction: column; gap: 12px;">
+                    <div class="control-group">
+                        <label class="control-label" style="font-size: 12px; font-weight: 700;">Microsoft / Azure AD / Outlook Email</label>
+                        <input type="email" id="gate-ms-address" class="input-select" placeholder="e.g. alex.henderson@outlook.com" value="alex.henderson@outlook.com">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" style="font-size: 12px; font-weight: 700;">Full Name</label>
+                        <input type="text" id="gate-ms-name" class="input-select" placeholder="e.g. Alex Henderson" value="Alex Henderson">
+                    </div>
+                    <button id="btn-gate-send-ms-otp" class="export-btn-primary" style="width: 100%; padding: 13px; font-size: 13px; font-weight: 800; background: linear-gradient(135deg, #00a4ef, #7fba00); border-radius: var(--radius-md); color: #fff;">
+                        Ⓜ️ Send 6-Digit Microsoft OTP &rarr;
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Unified Dynamic Live OTP Verification Display -->
+            <div id="gate-otp-step-2" style="display: none; flex-direction: column; gap: 14px;">
+                <!-- Dynamic Live OTP Incoming Card -->
+                <div class="dynamic-otp-live-card">
+                    <div class="dynamic-otp-header">
+                        <span id="gate-otp-dispatch-channel-badge" style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;">
+                            📱 SMS Dispatch Success
+                        </span>
+                        <span class="dynamic-otp-badge-live">LIVE OTP CODE</span>
+                    </div>
+                    <div class="dynamic-otp-code-row">
+                        <div>
+                            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Your 6-Digit OTP:</div>
+                            <div id="gate-live-otp-code" class="dynamic-otp-number">849201</div>
+                        </div>
+                        <button id="btn-gate-quick-autofill" class="btn-quick-autofill" title="Auto-Fill &amp; Verify Instantly">
+                            ⚡ Auto-Fill &amp; Unlock
+                        </button>
+                    </div>
+                    <div class="dynamic-otp-timer-bar">
+                        <div id="gate-otp-timer-bar-fill" class="dynamic-otp-timer-fill"></div>
+                    </div>
+                </div>
+
+                <p style="font-size: 12px; color: var(--text-secondary); text-align: center; margin-top: -2px;">
+                    Enter the 6 digits sent to <strong id="gate-display-otp-target" style="color: var(--accent-sky);">+91 98765 43210</strong>:
+                </p>
+                <div class="otp-pin-container">
+                    <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="0" value="8">
+                    <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="1" value="4">
+                    <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="2" value="9">
+                    <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="3" value="2">
+                    <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="4" value="0">
+                    <input type="text" maxlength="1" class="otp-pin-digit gate-otp-digit" data-idx="5" value="1">
+                </div>
+                <div class="otp-resend-bar" style="justify-content: center; gap: 10px;">
+                    <span>Didn't receive code?</span>
+                    <button id="btn-gate-resend-otp" class="btn-resend-otp">Resend in <span id="gate-otp-timer-count">60</span>s</button>
+                    <button id="btn-gate-change-channel" class="btn-resend-otp" style="color: var(--accent-sky);">Change Channel</button>
+                </div>
+                <button id="btn-gate-verify-otp" class="export-btn-primary" style="width: 100%; padding: 14px; font-size: 14px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #10b981);">
+                    ⚡ Verify OTP &amp; Unlock Main Studio &rarr;
+                </button>
             </div>
 
             <!-- Verification Success State Screen -->
@@ -117,8 +165,8 @@
                 <div class="gate-success-icon">
                     <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
                 </div>
-                <h3 id="gate-success-title" style="font-size: 18px; font-weight: 700; color: var(--accent-emerald);">Account Verified!</h3>
-                <p id="gate-success-msg" style="font-size: 13px; color: var(--text-secondary);">Unlocking full BioShelter modeling suite and emergency telemetry...</p>
+                <h3 id="gate-success-title" style="font-size: 18px; font-weight: 700; color: var(--accent-emerald);">OTP Verified Successfully!</h3>
+                <p id="gate-success-msg" style="font-size: 13px; color: var(--text-secondary);">Connecting identity with 3D Bioclimatic Studio &amp; Disaster Crisis Net...</p>
             </div>
 
             <!-- Guest Mode Direct 1-Click Access Card -->
