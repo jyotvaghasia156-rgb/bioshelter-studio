@@ -85,7 +85,7 @@ class BioShelterApp {
         this.renderHazardReports();
         this.renderCustomMaterials();
         this.renderSOSDispatchLogs();
-        this.switchTab('tab-login');
+        this.switchTab('tab-3d');
     }
 
     /* --- Theme Engine (Dark & Light Mode) --- */
@@ -732,7 +732,11 @@ class BioShelterApp {
                 setTimeout(() => {
                     gate.classList.add('unlocked');
                     this.switchTab('tab-3d');
-                }, 1100);
+                    if (this.visualizer3D) {
+                        setTimeout(() => this.visualizer3D.onWindowResize(), 50);
+                    }
+                    this.updateSimulation();
+                }, 700);
             };
 
             // Gate Phone OTP - Step 1: Send SMS
@@ -922,9 +926,8 @@ class BioShelterApp {
             const btnGuest = document.getElementById('btn-gate-guest-access');
             if (btnGuest) {
                 btnGuest.addEventListener('click', () => {
-                    authInstance.loginAsGuest();
-                    gate.classList.add('unlocked');
-                    this.switchTab('tab-3d');
+                    const user = authInstance.loginAsGuest();
+                    unlockStudioWithAnimation('Guest Explorer Activated!', `Welcome, ${user.displayName}! Accessing full 3D simulation suite.`);
                 });
             }
 

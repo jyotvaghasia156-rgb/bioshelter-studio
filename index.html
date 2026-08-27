@@ -356,14 +356,14 @@
         <main class="main-workspace">
             <!-- Navigation Tabs Bar -->
             <nav class="tab-nav-bar">
-                <!-- 1. DEDICATED FULL-PAGE LOGIN & IDENTITY PORTAL (FIRST PAGE) -->
-                <button class="tab-btn active" data-tab="tab-login" style="background: rgba(56, 189, 248, 0.16); color: var(--accent-sky); border: 1px solid rgba(56, 189, 248, 0.4); font-weight: 700;">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                    Sign In / Login
-                </button>
-                <button class="tab-btn" data-tab="tab-3d">
+                <!-- 1. 3D Digital Twin Tab (PRIMARY MAIN PAGE) -->
+                <button class="tab-btn active" data-tab="tab-3d">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.991.991 0 013 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88v9z"/></svg>
                     3D Digital Twin
+                </button>
+                <button class="tab-btn" data-tab="tab-login">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                    Profile &amp; Account
                 </button>
                 <button class="tab-btn" data-tab="tab-diurnal">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
@@ -426,17 +426,8 @@
 
             <!-- Tab Viewport Content Panes -->
             <div class="tab-viewport">
-                <!-- 1. Dedicated Login & User Profile Hub Tab (FIRST ACTIVE PAGE) -->
-                <div id="tab-login" class="tab-pane active">
-                    <div class="tab-content-scroll">
-                        <div id="login-page-dynamic-container">
-                            <!-- Dynamically rendered login page / profile dashboard -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. 3D Digital Twin Tab -->
-                <div id="tab-3d" class="tab-pane">
+                <!-- 1. 3D Digital Twin Tab (PRIMARY ACTIVE PANE) -->
+                <div id="tab-3d" class="tab-pane active">
                     <div id="three-canvas-container"></div>
 
                     <!-- Floating HUD Metrics (Top Left) -->
@@ -444,13 +435,7 @@
                         <div class="hud-card">
                             <div class="hud-header">
                                 <span class="hud-title">Operative Comfort Temp</span>
-                                <span id="hud-adaptive-status" class="section-badge" style="background: rgba(16,185,129,0.2); color: #34d399;">COMFORTABLE</span>
                             </div>
-                            <div style="display: flex; align-items: baseline; gap: 8px;">
-                                <span id="hud-operative-temp" class="hud-value-large">26.4°C</span>
-                                <span style="font-size: 12px; color: var(--text-muted);">T_op (Indoor + MRT)</span>
-                            </div>
-
                             <div class="hud-grid-metrics">
                                 <div class="hud-metric-box">
                                     <div class="hud-metric-label">Indoor Air Temp</div>
@@ -461,50 +446,20 @@
                                     <div id="hud-ambient-temp" class="hud-metric-val">39.2°C</div>
                                 </div>
                                 <div class="hud-metric-box">
-                                    <div class="hud-metric-label">PPD Dissatisfied</div>
-                                    <div id="hud-ppd" class="hud-metric-val">8.5%</div>
+                                    <div class="hud-metric-label">Surface MRT</div>
+                                    <div id="hud-surface-mrt" class="hud-metric-val">27.1°C</div>
                                 </div>
                                 <div class="hud-metric-box">
-                                    <div class="hud-metric-label">Airflow Rate</div>
-                                    <div id="hud-ach" class="hud-metric-val">4.5 ACH</div>
-                                </div>
-                            </div>
-
-                            <!-- PMV Bar Gauge -->
-                            <div class="pmv-meter-container">
-                                <div style="display: flex; justify-content: space-between; font-size: 10px;">
-                                    <span style="color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Fanger PMV: <strong id="hud-pmv-value" style="color: var(--accent-emerald);">+0.15</strong></span>
-                                    <span style="color: var(--text-muted);">ASHRAE 55 Range</span>
-                                </div>
-                                <div class="pmv-meter-track">
-                                    <div id="hud-pmv-indicator" class="pmv-indicator-needle" style="left: 52%;"></div>
-                                </div>
-                                <div class="pmv-labels-row">
-                                    <span>-3 Cold</span>
-                                    <span>0 Neutral</span>
-                                    <span>+3 Hot</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Secondary Summary Card -->
-                        <div class="hud-card" style="min-width: 200px;">
-                            <div class="hud-grid-metrics" style="margin-top: 0;">
-                                <div class="hud-metric-box">
-                                    <div class="hud-metric-label">Comfort Score</div>
-                                    <div id="hud-comfort-score" class="hud-metric-val" style="color: var(--accent-emerald);">88%</div>
-                                </div>
-                                <div class="hud-metric-box">
-                                    <div class="hud-metric-label">Thermal Damping</div>
-                                    <div id="hud-damping-ratio" class="hud-metric-val" style="color: var(--accent-sky);">68%</div>
+                                    <div class="hud-metric-label">Air Velocity</div>
+                                    <div id="hud-air-velocity" class="hud-metric-val">0.82 m/s</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Heatmap Color Gradient Legend (Bottom Left) -->
-                    <div class="heatmap-legend">
-                        <div style="font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Surface Heat Flux Gradient</div>
+                    <!-- Thermal Scale Legend (Bottom Left) -->
+                    <div class="viewport-legend">
+                        <div class="legend-title">Temperature Gradient (°C)</div>
                         <div class="legend-bar"></div>
                         <div class="legend-labels">
                             <span>15°C (Cool)</span>
@@ -530,7 +485,16 @@
                     </div>
                 </div>
 
-                <!-- 2. 24h Diurnal Curves Tab -->
+                <!-- 2. Profile & Account Tab -->
+                <div id="tab-login" class="tab-pane">
+                    <div class="tab-content-scroll">
+                        <div id="login-page-dynamic-container">
+                            <!-- Dynamically rendered login page / profile dashboard -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 24h Diurnal Curves Tab -->
                 <div id="tab-diurnal" class="tab-pane">
                     <div class="tab-content-scroll">
                         <div class="chart-container-card">

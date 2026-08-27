@@ -285,6 +285,26 @@ class BioShelterRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json(200, {"success": True, "user": user, "token": f"AZURE_TOKEN_{random.randint(10000, 99999)}"})
             return
 
+        # 4b. Guest Mode Session
+        if path == "/api/auth/guest":
+            guest_id = random.randint(1000, 9999)
+            user = {
+                "id": f"guest_{guest_id}",
+                "displayName": f"Guest Engineer #{guest_id}",
+                "email": f"guest_{guest_id}@bioshelter.preview",
+                "avatarUrl": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80",
+                "role": "Guest Bioclimatic Engineer",
+                "institution": "BioShelter Open Access Explorer",
+                "provider": "guest",
+                "providerName": "Guest Explorer",
+                "phone": "",
+                "verifiedPhone": False,
+                "verifiedAccount": False,
+                "registeredAt": datetime.datetime.utcnow().isoformat() + "Z"
+            }
+            self.send_json(200, {"success": True, "user": user, "token": f"GUEST_SESSION_{random.randint(10000, 99999)}"})
+            return
+
         # 5. Create Community Shelter
         if path == "/api/shelters":
             new_shelter = {
