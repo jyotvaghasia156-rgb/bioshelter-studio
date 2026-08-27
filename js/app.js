@@ -1523,6 +1523,17 @@ class BioShelterApp {
             const btnPageToken = document.getElementById('btn-page-verify-account-token');
             if (btnPageToken) {
                 btnPageToken.addEventListener('click', () => {
+                    const token = document.getElementById('input-page-account-token').value.trim();
+                    const res = authInstance.verifyAccountCode(token);
+                    if (res.success) {
+                        alert(res.message);
+                        this.renderLoginPage();
+                    } else {
+                        alert(res.message);
+                    }
+                });
+            }
+
             // Guest Mode Login in Page
             const btnPageGuest = document.getElementById('btn-page-login-guest');
             if (btnPageGuest) {
