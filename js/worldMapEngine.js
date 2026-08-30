@@ -135,7 +135,7 @@ export const GLOBAL_STATIONS = [
         weatherStatement: 'Unshaded Saharan sun with zero cloud cover. Heavy earthen masonry and deep courtyard shading required.'
     },
 
-    // 🟢 2. PARADISE COMFORT HAVENS (20°C - 26°C, IDEAL PLACES TO ENJOY LIFE)
+    // 🟢 2. PARADISE COMFORT HAVENS (20°C - 26°C, IDEAL PL°CES TO ENJOY LIFE)
     {
         id: 'station_medellin',
         name: 'Medellín / Aburrá Valley',
@@ -682,8 +682,16 @@ export class WorldMapEngine {
             zoom: 2,
             minZoom: 2,
             maxZoom: 18,
-            zoomControl: true,
+            zoomControl: false,
             attributionControl: false
+        });
+
+        // Ensure Leaflet calculates viewport dimensions immediately
+        setTimeout(() => {
+            if (this.map) this.map.invalidateSize();
+        }, 150);
+        window.addEventListener('resize', () => {
+            if (this.map) this.map.invalidateSize();
         });
 
         // 1. Google Streets Layer
@@ -710,6 +718,11 @@ export class WorldMapEngine {
             subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
         });
 
+        // 5. OpenStreetMap Standard Layer (Fast Worldwide Fallback)
+        this.tileLayers['osm_standard'] = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        });
+
         // Default to Google Street
         this.tileLayers['google_street'].addTo(this.map);
 
@@ -722,9 +735,14 @@ export class WorldMapEngine {
             await this.fetchAndInspectLivePoint(lat, lng, `Custom GPS Location (${lat.toFixed(2)}°, ${lng.toFixed(2)}°)`);
         });
 
+        // Zoom & Pan Event Listeners
+        this.map.on('zoomend', () => this.emitZoomUpdate());
+        this.map.on('moveend', () => this.emitZoomUpdate());
+
         // Render table
         this.renderStationTable();
         this.updateTelemetryHUD(this.selectedStation);
+        this.emitZoomUpdate();
     }
 
     setLayer(layerKey) {
@@ -975,7 +993,7 @@ export class WorldMapEngine {
             wallRecommendation = 'Rammed Earth (400mm) + Earthbag Berm (U = 0.52 W/m²·K, 12.5h lag)';
             roofRecommendation = 'Heavy Terracotta Vault + Soil Vegetative Green Layer (300mm)';
             dampingReq = 'High Thermal Mass (Damping Ratio > 82%, Time Lag > 12 hours)';
-            ventStrategy = 'Daytime Envelope Sealing with High-Velocity Night Purge (> 12 ACH)';
+            ventStrategy = 'Daytime Envelope Sealing with High-Velocity Night Purge (> 12 °CH)';
             solarOverhang = `${(0.8 + lat * 0.015).toFixed(2)}m Deep Louvered Shading (Total Solar Cutoff)`;
             groundSink = `Earth-Tube Geothermal Exchange at 3.5m depth (${(t - 16).toFixed(1)}°C stable soil sink)`;
             stressLevel = 'CRITICAL SURVIVAL RISK';
@@ -988,7 +1006,7 @@ export class WorldMapEngine {
                 wallRecommendation = 'Breathable Bamboo Lattice + Lime Plaster Render (Lightweight)';
                 roofRecommendation = 'Steep Pitched Thatched Straw with Ventilated Ridge Vent Cavity';
                 dampingReq = 'Low Thermal Mass (Rapid Heat Dissipation, Time Lag < 3 hours)';
-                ventStrategy = 'Continuous Natural Air Movement (Cross-Ventilation > 25 ACH)';
+                ventStrategy = 'Continuous Natural Air Movement (Cross-Ventilation > 25 °CH)';
                 solarOverhang = `${(0.9 + lat * 0.01).toFixed(2)}m Extended Eaves for Monsoonal Rain & Sun Shading`;
                 groundSink = 'Elevated Floor Void to Prevent Ground Moisture Trapping';
                 stressLevel = 'HIGH HUMIDITY DISCOMFORT';
@@ -1464,5 +1482,146 @@ export class WorldMapEngine {
             console.warn('Open-Meteo live API error:', err);
             if (statusEl) statusEl.innerHTML = `<span>⚠️ Could not fetch live weather: ${err.message}.</span>`;
         }
+    }
+
+    /* =========================================================================
+     * ZOOM & GEOSPATIAL VIEWPORT CONTROLS
+     * ========================================================================= */
+    zoomIn() {
+        if (this.map) {
+            this.map.zoomIn();
+            this.emitZoomUpdate();
+        }
+    }
+
+    zoomOut() {
+        if (this.map) {
+            this.map.zoomOut();
+            this.emitZoomUpdate();
+        }
+    }
+
+    setZoom(level) {
+        if (this.map) {
+            const z = Math.max(2, Math.min(18, Number(level)));
+            this.map.setZoom(z);
+            this.emitZoomUpdate();
+        }
+    }
+
+    getZoom() {
+        return this.map ? this.map.getZoom() : 2;
+    }
+
+    getZoomScaleDescription(zoom = null) {
+        const z = zoom !== null ? zoom : this.getZoom();
+        if (z <= 3) return { label: '🌍 Planetary Global Scale', badge: `${z}x Global`, desc: '1:100M Scale - Full Earth satellite overview & planetary heat belts' };
+        if (z <= 6) return { label: '🗺️ Continental / Country Scale', badge: `${z}x Continental`, desc: '1:10M Scale - Regional storm fronts & national borders' };
+        if (z <= 9) return { label: '🏜️ State / Basin Region Scale', badge: `${z}x Regional Basin`, desc: '1:1M Scale - Microclimate topography & desert basins' };
+        if (z <= 13) return { label: '🏙️ City / Metropolitan Grid', badge: `${z}x City Grid`, desc: '1:100K Scale - Urban heat islands & civil defense safe zones' };
+        if (z <= 16) return { label: '🏘️ District / BioShelter Sector', badge: `${z}x BioShelter Sector`, desc: '1:10K Scale - Geotechnical soil plots & GAHT tube fields' };
+        return { label: '🔬 High-Res Building Detail', badge: `${z}x Building Detail`, desc: '1:1K Scale - Sub-meter building envelope orientation' };
+    }
+
+    flyTo(lat, lng, zoom = null) {
+        if (!this.map) return;
+        const targetZoom = zoom !== null ? zoom : this.map.getZoom();
+        this.map.flyTo([lat, lng], targetZoom, {
+            duration: 1.3,
+            easeLinearity: 0.25
+        });
+        this.emitZoomUpdate();
+    }
+
+    resetGlobalView() {
+        if (this.map) {
+            this.map.flyTo([24.0, 10.0], 2, { duration: 1.2 });
+            this.emitZoomUpdate();
+        }
+    }
+
+    fitAllStations() {
+        if (!this.map || typeof L === 'undefined') return;
+        const bounds = L.latLngBounds(GLOBAL_STATIONS.map(s => [s.lat, s.lng]));
+        this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+        this.emitZoomUpdate();
+    }
+
+    async locateUserAndZoom() {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const { latitude, longitude } = pos.coords;
+                await this.fetchAndInspectLivePoint(latitude, longitude, 'Your Live GPS Location');
+                this.flyTo(latitude, longitude, 14);
+            },
+            (err) => {
+                alert(`GPS location error: ${err.message}`);
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+
+    async saveViewportToBackend() {
+        if (!this.map) return;
+        const center = this.map.getCenter();
+        const zoom = this.map.getZoom();
+        const payload = {
+            lat: center.lat,
+            lng: center.lng,
+            zoom: zoom,
+            layer: this.currentLayerKey,
+            activeStationId: this.selectedStation ? this.selectedStation.id : null
+        };
+        try {
+            const res = await fetch('/api/map/view', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            return data;
+        } catch (e) {
+            localStorage.setItem('bioshelter_map_view', JSON.stringify(payload));
+            return { success: true, localOnly: true };
+        }
+    }
+
+    async restoreViewportFromBackend() {
+        try {
+            const res = await fetch('/api/map/view');
+            const data = await res.json();
+            if (data.success && data.view) {
+                const { lat, lng, zoom, layer } = data.view;
+                if (this.map && lat !== undefined && lng !== undefined) {
+                    this.map.setView([lat, lng], zoom || 2);
+                    if (layer && this.tileLayers[layer]) {
+                        this.setLayer(layer);
+                    }
+                    this.emitZoomUpdate();
+                }
+            }
+        } catch (e) {
+            const local = localStorage.getItem('bioshelter_map_view');
+            if (local && this.map) {
+                const { lat, lng, zoom } = JSON.parse(local);
+                this.map.setView([lat, lng], zoom || 2);
+                this.emitZoomUpdate();
+            }
+        }
+    }
+
+    emitZoomUpdate() {
+        if (!this.map) return;
+        const zoom = this.map.getZoom();
+        const center = this.map.getCenter();
+        const info = this.getZoomScaleDescription(zoom);
+        const event = new CustomEvent('bioshelter-map-zoom-changed', {
+            detail: { zoom, center, info }
+        });
+        window.dispatchEvent(event);
     }
 }

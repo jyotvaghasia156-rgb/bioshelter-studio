@@ -10,9 +10,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     
-    <!-- Leaflet Maps -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Maps (Local with CDN Fallback) -->
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';">
+    <script src="vendor/leaflet/leaflet.js"></script>
+    <script>
+      if (typeof L === 'undefined') {
+        document.write('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">');
+        document.write('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>');
+      }
+    </script>
 
     <!-- App Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
@@ -66,6 +72,30 @@
             </a>
         </div>
     </header>
+
+    <!-- Universal Global Navigation Menu Bar -->
+    <nav class="global-nav-bar" aria-label="Global System Navigation">
+        <a href="index.html" class="global-nav-item">🌐 3D BioShelter Studio</a>
+        <a href="world-map.html" class="global-nav-item">🗺️ World Map GIS</a>
+        <a href="sos-command.html" class="global-nav-item sos-badge">🚨 Emergency SOS Command</a>
+        <a href="hazards.html" class="global-nav-item">⚠️ Hazards &amp; Crisis Feed</a>
+        <a href="nearby-bunkers.html" class="global-nav-item active">🛡️ Nearby Bunkers</a>
+        <a href="comfort-places.html" class="global-nav-item">🌴 Comfort Havens</a>
+        <a href="physics-graphs.html" class="global-nav-item">📊 Multi-Physics</a>
+        <a href="bioclimatic-optimizer.html" class="global-nav-item">⚡ Optimizer</a>
+        <a href="soil-directory.html" class="global-nav-item">🌍 Soil Directory</a>
+        <a href="materials-lab.html" class="global-nav-item">🧪 Materials Lab</a>
+        <a href="custom-materials.html" class="global-nav-item">🧬 Custom Materials</a>
+        <a href="psychrometric.html" class="global-nav-item">📈 Psychrometric</a>
+        <a href="weather-solar.html" class="global-nav-item">☀️ Weather &amp; Solar</a>
+        <a href="community.html" class="global-nav-item">👥 Community Net</a>
+        <a href="sih_presentation.html" class="global-nav-item">🏆 SIH Deck</a>
+        <a href="college_guide.html" class="global-nav-item">📚 College Guide</a>
+        <a href="profile-settings.html" class="global-nav-item">👤 Profile</a>
+        <a href="login.html" class="global-nav-item">🔑 Member Portal</a>
+        <a href="otp.html" class="global-nav-item">📲 OTP Verification</a>
+        <a href="reports-exports.html" class="global-nav-item">📑 Reports &amp; Exports</a>
+    </nav>
 
     <main class="page-container" style="padding: 24px; max-width: 1600px; margin: 0 auto;">
         <div class="page-header-bar" style="margin-bottom: 20px;">

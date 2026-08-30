@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bioclimatic Architectural Physics &amp; Life-Support Engineering | College Curriculum Guide</title>
+  <meta name="description" content="Academic Curriculum, Mathematical Physics Derivations, and Hands-on Laboratory Manual for BioShelter Studio.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles/main.css">
+
+  <style>
+    .guide-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 30px 24px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 30px;
+    }
+
+    .guide-sidebar-nav {
+      position: sticky;
+      top: 80px;
+      height: fit-content;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .guide-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+    }
+
+    .guide-nav-link:hover, .guide-nav-link.active {
+      color: var(--emerald-400);
+      background: rgba(16, 185, 129, 0.12);
+      border-left: 3px solid var(--emerald-500);
+    }
+
+    .guide-article {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 36px 42px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .article-section {
+      scroll-margin-top: 80px;
+    }
+
+    .article-h2 {
+      font-family: var(--font-heading);
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 8px;
+    }
+
+    .math-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--cyan-400);
+      margin: 14px 0;
+      overflow-x: auto;
+    }
+
+    .lab-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-top: 14px;
+      border-left: 4px solid var(--emerald-500);
+    }
+
+    .rubric-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 14px;
+    }
+
+    .rubric-table th, .rubric-table td {
+      border: 1px solid var(--border-subtle);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    .rubric-table th {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--emerald-400);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-icon">🌱</div>
+      <div>
+        <h1 class="brand-title" style="margin: 0; line-height: 1.1;">BIOSHELTER STUDIO</h1>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+          <span class="brand-tag">ACADEMIC &amp; COLLEGE CURRICULUM</span>
+          <span style="font-size: 11px; color: var(--text-muted);">Bioclimatic Engineering Manual</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <a href="index.html" class="btn-secondary" style="text-decoration: none;">
+        <span>🏠 3D Studio</span>
+      </a>
+      <a href="sih_presentation.html" class="btn-secondary" style="text-decoration: none;">
+        <span>🏆 SIH Deck</span>
+      </a>
+      <button class="btn-primary" onclick="window.print()" title="Print Academic Syllabus &amp; Laboratory Manual">
+        <span>📄 Print Syllabus PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Universal Global Navigation Menu Bar -->
+  <nav class="global-nav-bar" aria-label="Global System Navigation">
+    <a href="index.html" class="global-nav-item">🌐 3D BioShelter Studio</a>
+    <a href="world-map.html" class="global-nav-item">🗺️ World Map GIS</a>
+    <a href="sos-command.html" class="global-nav-item sos-badge">🚨 Emergency SOS Command</a>
+    <a href="hazards.html" class="global-nav-item">⚠️ Hazards &amp; Crisis Feed</a>
+    <a href="nearby-bunkers.html" class="global-nav-item">🛡️ Nearby Bunkers</a>
+    <a href="comfort-places.html" class="global-nav-item">🌴 Comfort Havens</a>
+    <a href="physics-graphs.html" class="global-nav-item">📊 Multi-Physics</a>
+    <a href="bioclimatic-optimizer.html" class="global-nav-item">⚡ Optimizer</a>
+    <a href="soil-directory.html" class="global-nav-item">🌍 Soil Directory</a>
+    <a href="materials-lab.html" class="global-nav-item">🧪 Materials Lab</a>
+    <a href="custom-materials.html" class="global-nav-item">🧬 Custom Materials</a>
+    <a href="psychrometric.html" class="global-nav-item">📈 Psychrometric</a>
+    <a href="weather-solar.html" class="global-nav-item">☀️ Weather &amp; Solar</a>
+    <a href="community.html" class="global-nav-item">👥 Community Net</a>
+    <a href="sih_presentation.html" class="global-nav-item">🏆 SIH Deck</a>
+    <a href="college_guide.html" class="global-nav-item active">📚 College Guide</a>
+    <a href="profile-settings.html" class="global-nav-item">👤 Profile</a>
+    <a href="login.html" class="global-nav-item">🔑 Member Portal</a>
+    <a href="otp.html" class="global-nav-item">📲 OTP Verification</a>
+    <a href="reports-exports.html" class="global-nav-item">📑 Reports &amp; Exports</a>
+  </nav>
+
+  <!-- Main Content Layout -->
+  <div style="flex: 1; overflow-y: auto; background: var(--bg-primary);">
+    <main class="guide-container">
+      
+      <!-- Table of Contents Sidebar -->
+      <aside class="guide-sidebar-nav">
+        <span style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Curriculum Modules</span>
+        <a href="#module-1" class="guide-nav-link active">1. Course Syllabus &amp; Objectives</a>
+        <a href="#module-2" class="guide-nav-link">2. Mathematical Derivations</a>
+        <a href="#module-3" class="guide-nav-link">3. Geothermal Kusuda Physics</a>
+        <a href="#module-4" class="guide-nav-link">4. Thermal Mass &amp; GAHT Sizing</a>
+        <a href="#module-5" class="guide-nav-link">5. Closed-Loop Bio-Loops</a>
+        <a href="#module-6" class="guide-nav-link">6. Laboratory Practicals (6 Labs)</a>
+        <a href="#module-7" class="guide-nav-link">7. Grading Rubrics &amp; Standards</a>
+      </aside>
+
+      <!-- Main Document Body -->
+      <article class="guide-article">
+        
+        <!-- Header Introduction -->
+        <div>
+          <span class="slide-badge">Academic Curriculum &bull; Architectural Engineering &amp; Physics</span>
+          <h1 style="font-family: var(--font-heading); font-size: 30px; font-weight: 800; color: var(--text-primary); margin: 8px 0;">
+            Bioclimatic Architectural Physics &amp; Closed-Loop Life-Support Engineering
+          </h1>
+          <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6;">
+            A rigorous 4-credit collegiate course curriculum designed for undergraduate and graduate civil engineers, architectural physicists, and disaster relief planners.
+          </p>
+        </div>
+
+        <!-- MODULE 1: SYLLABUS -->
+        <section id="module-1" class="article-section">
+          <h2 class="article-h2"><span>1.</span> Course Syllabus &amp; Educational Objectives</h2>
+          <p style="color: var(--text-secondary); line-height: 1.6; font-size: 13px;">
+            By completing this curriculum using BioShelter Studio, students master zero-energy passive heating and cooling, transient thermal mass heat equations, Kusuda harmonic subsoil geothermics, and ASHRAE 55 / ISO 7730 human thermal comfort modeling.
+          </p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px;">
+            <div class="feature-box">
+              <h3 style="font-size: 14px; font-weight: 700; color: var(--emerald-400);">Unit I: Solar Geometry &amp; Microclimates</h3>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Celestial sun-path azimuth, solar altitude angle ($\alpha$), direct normal irradiance ($DNI$), and psychrometric enthalpy analysis.</p>
+            </div>
+            <div class="feature-box">
+              <h3 style="font-size: 14px; font-weight: 700; color: var(--cyan-400);">Unit II: Geothermal &amp; Soil Physics</h3>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Kusuda subsoil harmonic temperature attenuation, soil thermal conductivity ($k$), volumetric heat capacity, and Ground-to-Air Heat Transfer (GAHT).</p>
+            </div>
+            <div class="feature-box">
+              <h3 style="font-size: 14px; font-weight: 700; color: var(--amber-400);">Unit III: Transient Envelope Physics</h3>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Multi-layer composite U-values, periodic thermal lag ($\phi$), decrement factor ($f$), and thermal mass water buffering.</p>
+            </div>
+            <div class="feature-box">
+              <h3 style="font-size: 14px; font-weight: 700; color: var(--coral-500);">Unit IV: Closed-Loop Regenerative Bio-Loops</h3>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Nitrosomonas / Nitrobacter biological nitrification cycle, symbiotic fish waste-to-vegetable harvest ratios, and CO2 photosynthesis dynamics.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- MODULE 2: MATHEMATICAL DERIVATIONS -->
+        <section id="module-2" class="article-section">
+          <h2 class="article-h2"><span>2.</span> Mathematical Foundations &amp; Thermal Lag Calculus</h2>
+          <p style="color: var(--text-secondary); line-height: 1.6; font-size: 13px;">
+            In passive solar bioshelters, thermal inertia delays heat transmission through dense earthen envelope assemblies. For a homogeneous masonry monolith of thickness $L$, thermal diffusivity $\alpha = \frac{k}{\rho \cdot c_p}$, subjected to periodic diurnal solar radiation of period $\tau = 24\text{ hours}$:
+          </p>
+
+          <div class="math-card">
+            Thermal Diffusivity:  &alpha; = k / (&rho; &bull; c_p)   [m&sup2;/s]<br>
+            Periodic Thermal Lag: &phi; = (0.5 &bull; L &bull; &radic;(86400 / (&pi; &bull; &alpha;))) / 3600   [hours]<br>
+            Decrement Factor:     f = exp(-0.25 &bull; &phi;)   [dimensionless ratio]
+          </div>
+
+          <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            <strong>Example Verification:</strong> A 300mm Rammed Earth Monolith ($k = 1.25\text{ W/m}\cdot\text{K}$, $\rho = 2100\text{ kg/m}^3$, $c_p = 1050\text{ J/kg}\cdot\text{K}$) yields $\alpha = 5.67 \times 10^{-7}\text{ m}^2/\text{s}$, producing an exact analytical time lag $\phi = 9.18\text{ hours}$ and decrement factor $f = 0.10$. Peak solar heat penetrating at 13:00 reaches the interior at 22:11, exactly when night heating is required.
+          </p>
+        </section>
+
+        <!-- MODULE 3: KUSUDA SOIL PHYSICS -->
+        <section id="module-3" class="article-section">
+          <h2 class="article-h2"><span>3.</span> Subsurface Geothermal Kusuda Equation</h2>
+          <p style="color: var(--text-secondary); line-height: 1.6; font-size: 13px;">
+            Earth temperature at depth $z$ (meters) on day $t$ (0 to 365) is computed using the semi-infinite solid heat conduction formulation with periodic surface harmonic boundary condition:
+          </p>
+
+          <div class="math-card">
+            T(z, t) = T_mean - A_s &bull; exp(-z &radic;(&pi; / (&alpha; &bull; 365))) &bull; cos( (2&pi;/365) &bull; (t - t_0 - (z/2) &radic;(365 / (&pi; &bull; &alpha;))) )
+          </div>
+
+          <p style="font-size: 12px; color: var(--text-muted);">
+            Where $T_{mean}$ is annual mean surface ambient temperature (°C), $A_s$ is annual surface temperature amplitude (°C), $\alpha$ is soil thermal diffusivity (m²/day), and $t_0$ is day of minimum surface temperature.
+          </p>
+        </section>
+
+        <!-- MODULE 6: LABORATORY PRACTICALS -->
+        <section id="module-6" class="article-section">
+          <h2 class="article-h2"><span>6.</span> Hands-on Engineering Laboratory Practicals (6 Labs)</h2>
+          
+          <div class="lab-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--emerald-400);">Lab 1: Measuring Thermal Lag &amp; Decrement of Earthen Envelopes</h3>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cyan-400);">Duration: 3 Hours</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">
+              <strong>Objective:</strong> Compare 300mm Rammed Earth, 200mm CEB Earthbag, and 16mm Polycarbonate under 1,000 W/m² halogen solar simulator in BioShelter Studio. Calculate time lag $\Delta t$ and amplitude damping.
+            </p>
+          </div>
+
+          <div class="lab-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--cyan-400);">Lab 2: GAHT Earth Tube Sizing &amp; Soil Geothermal Purge</h3>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cyan-400);">Duration: 3 Hours</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">
+              <strong>Objective:</strong> Design a 120m corrugated HDPE subsurface air tube network at 2.5m depth. Measure convective heat transfer coefficient ($h$) and air exit temperature drop under 45°C ambient inlet air.
+            </p>
+          </div>
+
+          <div class="lab-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--amber-400);">Lab 3: Closed-Loop Aquaponic Nitrogen Equilibrium</h3>
+              <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cyan-400);">Duration: 2 Hours</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">
+              <strong>Objective:</strong> Calibrate the stoichiometric biological conversion of un-ionized ammonia ($NH_3$) to nitrite ($NO_2^-$) and nitrate ($NO_3^-$) for a 6.5m³ fish tank supporting 85m² of vegetable crop beds.
+            </p>
+          </div>
+        </section>
+
+        <!-- MODULE 7: RUBRIC TABLE -->
+        <section id="module-7" class="article-section">
+          <h2 class="article-h2"><span>7.</span> Student Evaluation &amp; Design Rubrics</h2>
+          <table class="rubric-table">
+            <thead>
+              <tr>
+                <th>Criterion</th>
+                <th>Exemplary (90-100%)</th>
+                <th>Competent (75-89%)</th>
+                <th>Needs Improvement (&lt; 75%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Thermal Comfort (ASHRAE 55)</strong></td>
+                <td>-0.5 &le; PMV &le; +0.5 throughout 24h diurnal cycle with zero active A/C.</td>
+                <td>-0.8 &le; PMV &le; +0.8 with minor overheating &lt; 2 hours.</td>
+                <td>PMV &gt; 1.5; severe discomfort under peak summer solar flux.</td>
+              </tr>
+              <tr>
+                <td><strong>Geothermal Integration</strong></td>
+                <td>Accurate Kusuda harmonic calculation with &ge; 8.0h envelope thermal lag.</td>
+                <td>Soil depth sized correctly; partial damping accounted for.</td>
+                <td>Unshaded envelope with zero thermal mass buffer.</td>
+              </tr>
+              <tr>
+                <td><strong>Closed-Loop Yield</strong></td>
+                <td>Balanced nitrogen bio-loop with &ge; 2,500 kg/yr food harvest output.</td>
+                <td>Bio-loop operational; minor nutrient imbalance.</td>
+                <td>Toxic ammonia accumulation exceeding biological limits.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+      </article>
+    </main>
+  </div>
+
+</body>
+</html>

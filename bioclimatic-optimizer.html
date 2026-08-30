@@ -8,7 +8,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -21,35 +21,22 @@
     <!-- Top Global Header -->
     <header class="app-header">
         <div class="brand-section">
-            <div class="brand-logo">
-                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-            </div>
-            <div>
-                <h1 class="brand-title">BioShelter Studio</h1>
-                <div class="brand-subtitle">Bioclimatic Multi-Objective Optimizer</div>
-            </div>
+            <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <div class="brand-logo" style="width: 32px; height: 32px; background: linear-gradient(135deg, #0284c7, #10b981); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                </div>
+                <div>
+                    <h1 class="brand-title" style="font-size: 16px; font-weight: 800; color: var(--text-primary);">BioShelter Studio</h1>
+                    <div class="brand-subtitle" style="font-size: 11px; color: var(--text-secondary);">Bioclimatic Multi-Objective Optimizer</div>
+                </div>
+            </a>
         </div>
 
-        <!-- Header Nav Links -->
-        <nav class="header-nav-links">
-            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
-            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
-            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
-            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
-            <a href="nearby-bunkers.html" class="nav-link-btn">🛡️ Nearby Bunkers</a>
-            <a href="weather-solar.html" class="nav-link-btn">☀️ Weather &amp; Solar</a>
-            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
-            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
-            <a href="bioclimatic-optimizer.html" class="nav-link-btn active">⚡ Optimizer</a>
-            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
-            <a href="custom-materials.html" class="nav-link-btn">🧬 Custom Materials</a>
-            <a href="community.html" class="nav-link-btn">🤝 Community</a>
-            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
-            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
-            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
-        </nav>
-
         <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
+            <button id="btn-run-optimizer" class="export-btn-primary" style="padding: 8px 16px; font-size: 12px; background: linear-gradient(135deg, #0284c7, #10b981); cursor: pointer;">
+                ⚡ Execute Genetic Solver
+            </button>
+
             <!-- Dark / Light Theme Toggle -->
             <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Light / Dark Mode">
                 <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
@@ -66,6 +53,30 @@
         </div>
     </header>
 
+    <!-- Universal Global Navigation Menu Bar -->
+    <nav class="global-nav-bar" aria-label="Global System Navigation">
+        <a href="index.html" class="global-nav-item">🌐 3D BioShelter Studio</a>
+        <a href="world-map.html" class="global-nav-item">🗺️ World Map GIS</a>
+        <a href="sos-command.html" class="global-nav-item sos-badge">🚨 Emergency SOS Command</a>
+        <a href="hazards.html" class="global-nav-item">⚠️ Hazards &amp; Crisis Feed</a>
+        <a href="nearby-bunkers.html" class="global-nav-item">🛡️ Nearby Bunkers</a>
+        <a href="comfort-places.html" class="global-nav-item">🌴 Comfort Havens</a>
+        <a href="physics-graphs.html" class="global-nav-item">📊 Multi-Physics</a>
+        <a href="bioclimatic-optimizer.html" class="global-nav-item active">⚡ Optimizer</a>
+        <a href="soil-directory.html" class="global-nav-item">🌍 Soil Directory</a>
+        <a href="materials-lab.html" class="global-nav-item">🧪 Materials Lab</a>
+        <a href="custom-materials.html" class="global-nav-item">🧬 Custom Materials</a>
+        <a href="psychrometric.html" class="global-nav-item">📈 Psychrometric</a>
+        <a href="weather-solar.html" class="global-nav-item">☀️ Weather &amp; Solar</a>
+        <a href="community.html" class="global-nav-item">👥 Community Net</a>
+        <a href="sih_presentation.html" class="global-nav-item">🏆 SIH Deck</a>
+        <a href="college_guide.html" class="global-nav-item">📚 College Guide</a>
+        <a href="profile-settings.html" class="global-nav-item">👤 Profile</a>
+        <a href="login.html" class="global-nav-item">🔑 Member Portal</a>
+        <a href="otp.html" class="global-nav-item">📲 OTP Verification</a>
+        <a href="reports-exports.html" class="global-nav-item">📑 Reports &amp; Exports</a>
+    </nav>
+
     <main class="page-container" style="padding: 24px; max-width: 1600px; margin: 0 auto;">
         <div class="page-header-bar" style="margin-bottom: 24px;">
             <div class="page-header-info">
@@ -73,9 +84,9 @@
                 <p>Computes the mathematical Pareto-optimal envelope geometry, shading depth, thermal mass inertia, and ventilation schedules that maximize human thermal comfort while minimizing embodied carbon and construction cost.</p>
             </div>
             <div class="page-header-actions">
-                <button id="btn-run-optimizer" class="export-btn-primary" style="padding: 10px 20px; font-size: 13px; background: linear-gradient(135deg, #0284c7, #10b981); cursor: pointer;">
-                    ⚡ Execute Pareto Optimization
-                </button>
+                <a href="index.html" class="export-btn-primary" style="text-decoration: none; padding: 10px 18px; font-size: 12px; background: linear-gradient(135deg, #10b981, #059669);">
+                    🚀 Open in 3D Twin &rarr;
+                </a>
             </div>
         </div>
 
@@ -93,7 +104,7 @@
                 </p>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border-glass);">
                     <span style="font-size: 11px; color: var(--text-muted);">Carbon Impact: -180 kg CO₂</span>
-                    <button class="btn-resend-otp btn-apply-step" data-step="overhang" style="padding: 6px 12px; font-size: 11px;">Apply Interventions &rarr;</button>
+                    <button class="btn-resend-otp btn-apply-step" data-step="overhang" style="padding: 6px 12px; font-size: 11px; cursor: pointer;">Apply Interventions &rarr;</button>
                 </div>
             </div>
 
@@ -109,7 +120,7 @@
                 </p>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border-glass);">
                     <span style="font-size: 11px; color: var(--text-muted);">Lag Shift: +6.5 Hours</span>
-                    <button class="btn-resend-otp btn-apply-step" data-step="walls" style="padding: 6px 12px; font-size: 11px;">Apply Interventions &rarr;</button>
+                    <button class="btn-resend-otp btn-apply-step" data-step="walls" style="padding: 6px 12px; font-size: 11px; cursor: pointer;">Apply Interventions &rarr;</button>
                 </div>
             </div>
 
@@ -125,7 +136,7 @@
                 </p>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border-glass);">
                     <span style="font-size: 11px; color: var(--text-muted);">Night Purge: 14.5 ACH</span>
-                    <button class="btn-resend-otp btn-apply-step" data-step="night_purge" style="padding: 6px 12px; font-size: 11px;">Apply Interventions &rarr;</button>
+                    <button class="btn-resend-otp btn-apply-step" data-step="night_purge" style="padding: 6px 12px; font-size: 11px; cursor: pointer;">Apply Interventions &rarr;</button>
                 </div>
             </div>
         </div>
@@ -233,6 +244,26 @@
             });
         }
 
+        function applyIntervention(step) {
+            try {
+                const raw = localStorage.getItem('bioshelter_studio_state');
+                const st = raw ? JSON.parse(raw) : {};
+                if (step === 'overhang') {
+                    st.overhangDepth = 0.85;
+                    alert('✅ Applied 0.85m Solar Overhang to 3D Digital Twin!');
+                } else if (step === 'walls') {
+                    st.wallMaterial = 'rammed_earth_400';
+                    alert('✅ Upgraded Envelope to 400mm Rammed Earth Thermal Mass Monolith!');
+                } else if (step === 'night_purge') {
+                    st.ventMode = 'night_purge';
+                    alert('✅ Activated Automated Night Purge Ventilation Cycle (14.5 ACH)!');
+                }
+                localStorage.setItem('bioshelter_studio_state', JSON.stringify(st));
+            } catch (e) {
+                alert('✅ Applied intervention to active session!');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             renderComparisonChart();
             window.addEventListener('bioshelter-theme-changed', renderComparisonChart);
@@ -243,7 +274,8 @@
 
             document.querySelectorAll('.btn-apply-step').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    alert('✅ Applied intervention! Parameter updated in 3D digital twin.');
+                    const step = btn.getAttribute('data-step');
+                    applyIntervention(step);
                 });
             });
         });

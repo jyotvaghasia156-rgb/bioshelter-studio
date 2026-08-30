@@ -3,13 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community BioShelter Blueprints & Registry - BioShelter Studio</title>
+    <title>Community BioShelter Blueprints &amp; Registry - BioShelter Studio</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
+    <style>
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .filter-chip:hover {
+            background: rgba(255,255,255,0.08);
+            color: var(--text-primary);
+        }
+        .filter-chip.active {
+            background: rgba(16,185,129,0.2);
+            border-color: rgba(16,185,129,0.6);
+            color: #10b981;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 620px;
+            padding: 28px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
     <!-- Top Navigation Header -->
@@ -29,21 +77,11 @@
             </a>
         </div>
 
-        <nav class="header-nav-links" style="display: flex; align-items: center; gap: 6px; overflow-x: auto;">
-            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
-            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
-            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
-            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
-            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
-            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
-            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
-            <a href="community.html" class="nav-link-btn active">🤝 Community</a>
-            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
-            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
-            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
-        </nav>
-
         <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
+            <button id="btn-open-submit-modal" class="export-btn-primary" style="background: linear-gradient(135deg, #0284c7, #10b981); padding: 8px 16px; font-size: 12px; cursor: pointer;">
+                + Submit Shelter Model
+            </button>
+
             <!-- Dark / Light Theme Mode Toggle -->
             <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Light / Dark Mode">
                 <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
@@ -60,21 +98,131 @@
         </div>
     </header>
 
+    <!-- Universal Global Navigation Menu Bar -->
+    <nav class="global-nav-bar" aria-label="Global System Navigation">
+        <a href="index.html" class="global-nav-item">🌐 3D BioShelter Studio</a>
+        <a href="world-map.html" class="global-nav-item">🗺️ World Map GIS</a>
+        <a href="sos-command.html" class="global-nav-item sos-badge">🚨 Emergency SOS Command</a>
+        <a href="hazards.html" class="global-nav-item">⚠️ Hazards &amp; Crisis Feed</a>
+        <a href="nearby-bunkers.html" class="global-nav-item">🛡️ Nearby Bunkers</a>
+        <a href="comfort-places.html" class="global-nav-item">🌴 Comfort Havens</a>
+        <a href="physics-graphs.html" class="global-nav-item">📊 Multi-Physics</a>
+        <a href="bioclimatic-optimizer.html" class="global-nav-item">⚡ Optimizer</a>
+        <a href="soil-directory.html" class="global-nav-item">🌍 Soil Directory</a>
+        <a href="materials-lab.html" class="global-nav-item">🧪 Materials Lab</a>
+        <a href="custom-materials.html" class="global-nav-item">🧬 Custom Materials</a>
+        <a href="psychrometric.html" class="global-nav-item">📈 Psychrometric</a>
+        <a href="weather-solar.html" class="global-nav-item">☀️ Weather &amp; Solar</a>
+        <a href="community.html" class="global-nav-item active">👥 Community Net</a>
+        <a href="sih_presentation.html" class="global-nav-item">🏆 SIH Deck</a>
+        <a href="college_guide.html" class="global-nav-item">📚 College Guide</a>
+        <a href="profile-settings.html" class="global-nav-item">👤 Profile</a>
+        <a href="login.html" class="global-nav-item">🔑 Member Portal</a>
+        <a href="otp.html" class="global-nav-item">📲 OTP Verification</a>
+        <a href="reports-exports.html" class="global-nav-item">📑 Reports &amp; Exports</a>
+    </nav>
+
     <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
-        <div class="page-header-bar" style="margin-bottom: 24px;">
+        <div class="page-header-bar" style="margin-bottom: 20px;">
             <div class="page-header-info">
                 <h2>Open-Source Bioclimatic Shelter Registry &amp; Blueprints Hub</h2>
                 <p>Peer-reviewed community safe-havens, vernacular designs, and extreme weather refuges submitted by disaster relief architects worldwide.</p>
             </div>
-            <div class="page-header-actions">
-                <a href="index.html" class="export-btn-primary" style="text-decoration: none; padding: 8px 16px; font-size: 12px;">
-                    + Submit Shelter Model
-                </a>
+        </div>
+
+        <!-- Filter Chips & Search Bar -->
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; background: var(--bg-card); padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Zone Filter:</span>
+                <button class="filter-chip active" data-zone="all">All Climates</button>
+                <button class="filter-chip" data-zone="hot_arid">🏜️ Hot Arid</button>
+                <button class="filter-chip" data-zone="warm_humid">🌴 Warm Humid</button>
+                <button class="filter-chip" data-zone="composite">🌦️ Composite</button>
+                <button class="filter-chip" data-zone="cold">🏔️ Cold / Alpine</button>
+                <button class="filter-chip" data-zone="temperate">🌲 Temperate</button>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="text" id="community-search-input" class="input-text" placeholder="🔍 Search by name, author, or city..." style="padding: 8px 12px; font-size: 12px; width: 240px;">
             </div>
         </div>
 
         <div id="community-shelters-list" class="community-grid"></div>
     </main>
+
+    <!-- Submit Shelter Model Modal -->
+    <div id="modal-submit-shelter" class="modal-overlay">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 18px; font-weight: 800; color: #10b981;">🏛️ Submit Bioclimatic Shelter Model</h3>
+                <button id="btn-close-submit-modal" style="background: transparent; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer;">&times;</button>
+            </div>
+            <form id="form-submit-shelter" style="display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                    <label class="control-label">Shelter Model Name</label>
+                    <input type="text" id="input-sh-name" class="input-text" placeholder="e.g. Geothermal Earth-Covered Vault Ark" required style="width: 100%; margin-top: 4px;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="control-label">Target Climate Zone</label>
+                        <select id="select-sh-zone" class="input-select" style="width: 100%; margin-top: 4px;">
+                            <option value="hot_arid">Hot Arid Desert</option>
+                            <option value="warm_humid">Warm Humid Tropical</option>
+                            <option value="composite">Composite / Monsoon</option>
+                            <option value="cold">Cold / Alpine Scree</option>
+                            <option value="temperate">Temperate Oceanic</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="control-label">Typology</label>
+                        <select id="select-sh-typology" class="input-select" style="width: 100%; margin-top: 4px;">
+                            <option value="wind_tower">Arid Wind-Tower (Badgir)</option>
+                            <option value="vaulted_earth">Earthen Barrel Vault</option>
+                            <option value="stilt_vernacular">Monsoon Stilt Refuge</option>
+                            <option value="trombe_wall">Alpine Trombe Wall</option>
+                            <option value="gable_insulated">Insulated Gable Shelter</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="control-label">Location / Region</label>
+                        <input type="text" id="input-sh-location" class="input-text" placeholder="e.g. Jodhpur, Rajasthan" required style="width: 100%; margin-top: 4px;">
+                    </div>
+                    <div>
+                        <label class="control-label">Shelter Capacity (People)</label>
+                        <input type="number" id="input-sh-capacity" class="input-text" min="1" max="500" value="25" required style="width: 100%; margin-top: 4px;">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="control-label">Wall &amp; Envelope Assembly</label>
+                    <input type="text" id="input-sh-wall" class="input-text" placeholder="e.g. Rammed Earth 400mm + Lime Render" required style="width: 100%; margin-top: 4px;">
+                </div>
+
+                <div>
+                    <label class="control-label">Passive Thermal Strategy</label>
+                    <input type="text" id="input-sh-strategy" class="input-text" placeholder="e.g. Earth Berming (3.0m) + Nocturnal Wind Catching" style="width: 100%; margin-top: 4px;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="control-label">Author Name &amp; Title</label>
+                        <input type="text" id="input-sh-author" class="input-text" placeholder="e.g. Priya Sharma, Arch.D" style="width: 100%; margin-top: 4px;">
+                    </div>
+                    <div>
+                        <label class="control-label">Emergency Phone</label>
+                        <input type="text" id="input-sh-phone" class="input-text" placeholder="e.g. +91 98200-44112" style="width: 100%; margin-top: 4px;">
+                    </div>
+                </div>
+
+                <button type="submit" class="export-btn-primary" style="background: linear-gradient(135deg, #0284c7, #10b981); padding: 12px; font-size: 13px; font-weight: 700; justify-content: center; margin-top: 8px; cursor: pointer;">
+                    🚀 Publish Model to Global Registry
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- Script Module -->
     <script type="module">
@@ -82,51 +230,173 @@
         import { themeManager } from './js/themeManager.js';
         import { userDataStore } from './js/userDataStore.js';
 
+        let currentZone = 'all';
+        let searchQuery = '';
+
         async function loadCommunity() {
             const shelters = await userDataStore.getCommunityShelters();
             const grid = document.getElementById('community-shelters-list');
 
-            grid.innerHTML = shelters.map(s => `
+            let filtered = shelters;
+            if (currentZone !== 'all') {
+                filtered = filtered.filter(s => s.climateZone === currentZone);
+            }
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(s => 
+                    (s.name && s.name.toLowerCase().includes(q)) ||
+                    (s.location && s.location.toLowerCase().includes(q)) ||
+                    (s.authorName && s.authorName.toLowerCase().includes(q)) ||
+                    (s.wallMaterial && s.wallMaterial.toLowerCase().includes(q))
+                );
+            }
+
+            if (!filtered || filtered.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                        <div style="font-size: 36px; margin-bottom: 8px;">🏛️</div>
+                        <h3>No Shelters Found</h3>
+                        <p style="font-size: 12px; margin-top: 4px;">Be the first architect to submit a model for this climate zone!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(s => `
                 <div class="community-card">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                         <div>
                             <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">${s.name}</h3>
                             <div style="font-size: 11px; color: var(--accent-sky); font-weight: 600; margin-top: 2px;">📍 ${s.location}</div>
                         </div>
-                        <span class="rec-priority-badge low">Upvotes: ${s.upvotes || 1} 👍</span>
+                        <button class="btn-upvote" data-id="${s.id}" style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: #10b981; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                            👍 ${s.upvotes || 1}
+                        </button>
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 6px; font-size: 11px;">
                         <div style="text-align: center;">
                             <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Zone</div>
-                            <div style="font-weight: 700; color: var(--text-primary);">${s.climateZone}</div>
+                            <div style="font-weight: 700; color: var(--text-primary);">${s.climateZone ? s.climateZone.replace('_', ' ').toUpperCase() : 'ALL'}</div>
                         </div>
                         <div style="text-align: center;">
                             <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Typology</div>
-                            <div style="font-weight: 700; color: var(--accent-emerald);">${s.typology}</div>
+                            <div style="font-weight: 700; color: var(--accent-emerald);">${s.typology ? s.typology.replace('_', ' ') : 'Vernacular'}</div>
                         </div>
                         <div style="text-align: center;">
                             <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;">Capacity</div>
-                            <div style="font-weight: 700; color: #f59e0b;">${s.capacity} People</div>
+                            <div style="font-weight: 700; color: #f59e0b;">${s.capacity || 20} People</div>
                         </div>
                     </div>
 
                     <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
                         Passive Strategy: <strong>${s.coolingStrategy || 'Natural Ventilation & Earth Berming'}</strong>.<br>
-                        Wall Assembly: ${s.wallMaterial}.
+                        Wall Assembly: ${s.wallMaterial || 'Thermal Mass Monolith'}.
                     </p>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-glass); padding-top: 10px;">
                         <span style="font-size: 10px; color: var(--text-muted);">Author: ${s.authorName || 'Citizen Architect'}</span>
-                        <a href="index.html" class="export-btn-primary" style="text-decoration: none; padding: 6px 12px; font-size: 11px;">
+                        <button class="btn-load-3d export-btn-primary" data-id="${s.id}" style="padding: 6px 12px; font-size: 11px; cursor: pointer; border: none;">
                             🚀 Open in 3D Twin &rarr;
-                        </a>
+                        </button>
                     </div>
                 </div>
             `).join('');
+
+            // Wire upvote clicks
+            document.querySelectorAll('.btn-upvote').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    await userDataStore.upvoteShelter(id);
+                    loadCommunity();
+                });
+            });
+
+            // Wire 3D Twin loader
+            document.querySelectorAll('.btn-load-3d').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const item = shelters.find(s => s.id === id);
+                    if (item) {
+                        try {
+                            const raw = localStorage.getItem('bioshelter_studio_state');
+                            const st = raw ? JSON.parse(raw) : {};
+                            st.biomeId = item.climateZone || 'hot_arid';
+                            st.structureType = item.typology || 'dome';
+                            st.projectName = item.name;
+                            if (item.config) {
+                                Object.assign(st, item.config);
+                            }
+                            localStorage.setItem('bioshelter_studio_state', JSON.stringify(st));
+                        } catch (err) {}
+                    }
+                    window.location.href = 'index.html';
+                });
+            });
         }
 
-        document.addEventListener('DOMContentLoaded', loadCommunity);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCommunity();
+
+            // Filter chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    currentZone = chip.dataset.zone;
+                    loadCommunity();
+                });
+            });
+
+            // Search input
+            const searchInput = document.getElementById('community-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchQuery = e.target.value;
+                    loadCommunity();
+                });
+            }
+
+            // Modal
+            const modal = document.getElementById('modal-submit-shelter');
+            const openBtn = document.getElementById('btn-open-submit-modal');
+            const closeBtn = document.getElementById('btn-close-submit-modal');
+            const form = document.getElementById('form-submit-shelter');
+
+            if (openBtn) openBtn.addEventListener('click', () => modal.classList.add('active'));
+            if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('input-sh-name').value;
+                    const climateZone = document.getElementById('select-sh-zone').value;
+                    const typology = document.getElementById('select-sh-typology').value;
+                    const location = document.getElementById('input-sh-location').value;
+                    const capacity = parseInt(document.getElementById('input-sh-capacity').value, 10);
+                    const wallMaterial = document.getElementById('input-sh-wall').value;
+                    const coolingStrategy = document.getElementById('input-sh-strategy').value;
+                    const authorName = document.getElementById('input-sh-author').value || 'Citizen Architect';
+                    const emergencyContact = document.getElementById('input-sh-phone').value || '+1 (555) 019-2831';
+
+                    await userDataStore.addCommunityShelter({
+                        name, climateZone, typology, location, capacity, wallMaterial, coolingStrategy,
+                        authorName, emergencyContact,
+                        config: {
+                            typology,
+                            length: 8.0, width: 5.5, height: 3.2,
+                            occupants: Math.min(capacity, 10)
+                        }
+                    });
+
+                    modal.classList.remove('active');
+                    form.reset();
+                    loadCommunity();
+                    alert(`✅ Shelter model "${name}" has been published to the open-source community registry!`);
+                });
+            }
+        });
     </script>
 </body>
 </html>

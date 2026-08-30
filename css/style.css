@@ -885,4 +885,78 @@ body {
     border-color: rgba(2, 132, 199, 0.3);
 }
 
+/* ==========================================================================
+   Universal Global System Navigation Bar
+   ========================================================================== */
+.global-nav-bar {
+    height: 44px;
+    background: #08110e;
+    border-bottom: 1px solid var(--border-subtle, rgba(16, 185, 129, 0.15));
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 6px;
+    overflow-x: auto;
+    white-space: nowrap;
+    z-index: 45;
+}
+
+.global-nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 11px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary, #94a3b8);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.global-nav-item:hover {
+    color: var(--text-primary, #f1f5f9);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.global-nav-item.active {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #34d399;
+}
+
+.global-nav-item.sos-badge {
+    background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #ef4444;
+    animation: sosPulse 2s infinite ease-in-out;
+}
+
+@keyframes sosPulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
+    50% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.5); }
+}
+
+[data-theme="light"] .global-nav-bar {
+    background: #e2e8f0;
+    border-bottom: 1px solid #cbd5e1;
+}
+
+[data-theme="light"] .global-nav-item {
+    color: #475569;
+}
+
+[data-theme="light"] .global-nav-item:hover {
+    color: #0f172a;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .global-nav-item.active {
+    background: rgba(2, 132, 199, 0.15);
+    border-color: rgba(2, 132, 199, 0.4);
+    color: #0284c7;
+}
+
+
 

@@ -306,18 +306,104 @@ class UserDataStore {
         this.notify('subscribers_updated', subs);
     }
 
-    // --- Cloud Saved Shelter Projects ---
-    async saveShelterProject(project) {
-        try {
-            const list = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROJECTS)) || [];
-            const item = { id: 'proj_' + Date.now(), savedAt: new Date().toISOString(), ...project };
-            list.unshift(item);
-            localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(list));
-            await apiClient.saveProject(item);
-            return item;
-        } catch (e) {
-            return project;
+    // --- Aliases & Extended Selectors ---
+    getShelters(query = '', zone = '') {
+        let shelters = this.getCommunityShelters();
+        if (query) {
+            const q = query.toLowerCase();
+            shelters = shelters.filter(s => 
+                (s.name && s.name.toLowerCase().includes(q)) || 
+                (s.location && s.location.toLowerCase().includes(q)) ||
+                (s.coolingStrategy && s.coolingStrategy.toLowerCase().includes(q))
+            );
         }
+        if (zone && zone !== 'all') {
+            shelters = shelters.filter(s => s.climateZone === zone);
+        }
+        return shelters;
+    }
+
+    getHazards(severity = '') {
+        let hazards = this.getHazardReports();
+        if (severity && severity !== 'all') {
+            hazards = hazards.filter(h => h.severity === severity);
+        }
+        return hazards;
+    }
+
+    // --- Emergency Broadcast Logs ---
+    getSosLogs() {
+        return this.getBroadcastLogs();
+    }
+
+    getBroadcastLogs() {
+        const DEFAULT_BROADCAST_LOGS = [
+            {
+                id: 'sos_seed_1',
+                scenario: 'extreme_heatwave',
+                title: 'CRITICAL: Severe Heatwave Emergency (50°C)',
+                epicenter: 'Thar Desert Basin (Sector 7)',
+                evacuationRoute: 'Route 14 -> Subterranean Shelter Hub 02',
+                totalSubscribers: 342,
+                dispatchedAt: new Date(Date.now() - 3600000 * 3).toISOString()
+            },
+            {
+                id: 'sos_seed_2',
+                scenario: 'flash_flood',
+                title: 'CRITICAL: Severe Flash Flood Surge (1.8m)',
+                epicenter: 'Sundarbans River Delta Zone B',
+                evacuationRoute: 'Elevated High-Stilt Refuge Platform 01',
+                totalSubscribers: 284,
+                dispatchedAt: new Date(Date.now() - 3600000 * 8).toISOString()
+            }
+        ];
+        try {
+            const saved = localStorage.getItem('bioshelter_broadcast_logs_v2');
+            return saved ? JSON.parse(saved) : DEFAULT_BROADCAST_LOGS;
+        } catch {
+            return DEFAULT_BROADCAST_LOGS;
+        }
+    }
+
+    addBroadcastLog(log) {
+        return this.saveBroadcastLog(log);
+    }
+
+    saveBroadcastLog(log) {
+        const logs = this.getBroadcastLogs();
+        const newLog = {
+            id: 'sos_' + Date.now(),
+            dispatchedAt: new Date().toISOString(),
+            totalSubscribers: this.getSosSubscribers().length || 248,
+            ...log
+        };
+        logs.unshift(newLog);
+        localStorage.setItem('bioshelter_broadcast_logs_v2', JSON.stringify(logs));
+        this.notify('broadcasts_updated', logs);
+
+        try {
+            apiClient.triggerDisasterAlert(newLog.scenario || 'emergency', newLog.title, newLog.epicenter);
+        } catch (e) {}
+
+        return newLog;
+    }
+
+    // --- Full Data Backup & Export ---
+    exportAllData() {
+        const payload = {
+            exportedAt: new Date().toISOString(),
+            version: '2.4',
+            activeSession: JSON.parse(localStorage.getItem('bioshelter_user_session_v2') || '{}'),
+            preferences: JSON.parse(localStorage.getItem('bioshelter_user_preferences') || '{}'),
+            studioState: JSON.parse(localStorage.getItem('bioshelter_studio_state') || '{}'),
+            communityShelters: this.getCommunityShelters(),
+            hazardReports: this.getHazardReports(),
+            customMaterials: this.getCustomMaterials(),
+            sosSubscribers: this.getSosSubscribers(),
+            broadcastLogs: this.getBroadcastLogs(),
+            savedProjects: JSON.parse(localStorage.getItem(STORAGE_KEYS.PROJECTS) || '[]')
+        };
+        return JSON.stringify(payload, null, 2);
     }
 }
 

@@ -3,13 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citizen Disaster & Climate Hazard Crisis Feed - BioShelter Studio</title>
+    <title>Citizen Disaster &amp; Climate Hazard Crisis Feed - BioShelter Studio</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
+    <style>
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .filter-chip:hover {
+            background: rgba(255,255,255,0.08);
+            color: var(--text-primary);
+        }
+        .filter-chip.active {
+            background: rgba(239,68,68,0.2);
+            border-color: rgba(239,68,68,0.6);
+            color: #ef4444;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 580px;
+            padding: 28px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
     <!-- Top Navigation Header -->
@@ -29,25 +77,15 @@
             </a>
         </div>
 
-        <nav class="header-nav-links" style="display: flex; align-items: center; gap: 6px; overflow-x: auto;">
-            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
-            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
-            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
-            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
-            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
-            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
-            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
-            <a href="community.html" class="nav-link-btn">🤝 Community</a>
-            <a href="hazards.html" class="nav-link-btn active">⚠️ Hazards</a>
-            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
-            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
-        </nav>
-
         <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
+            <button id="btn-open-hazard-modal" class="export-btn-primary" style="background: linear-gradient(135deg, #ef4444, #dc2626); padding: 8px 16px; font-size: 12px; cursor: pointer;">
+                🚨 Report Hazard / Crisis
+            </button>
+
             <!-- Dark / Light Theme Mode Toggle -->
             <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Light / Dark Mode">
                 <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
-                    <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zm5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
+                    <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
                 </svg>
                 <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12.3 2a10 10 0 0 0-.19 20 10.04 10.04 0 0 0 9.8-7.9 1 1 0 0 0-1.12-1.22A8 8 0 1 1 11.1 3.21a1 1 0 0 0 1.2-1.21z"/>
@@ -60,16 +98,110 @@
         </div>
     </header>
 
+    <!-- Universal Global Navigation Menu Bar -->
+    <nav class="global-nav-bar" aria-label="Global System Navigation">
+        <a href="index.html" class="global-nav-item">🌐 3D BioShelter Studio</a>
+        <a href="world-map.html" class="global-nav-item">🗺️ World Map GIS</a>
+        <a href="sos-command.html" class="global-nav-item sos-badge">🚨 Emergency SOS Command</a>
+        <a href="hazards.html" class="global-nav-item active">⚠️ Hazards &amp; Crisis Feed</a>
+        <a href="nearby-bunkers.html" class="global-nav-item">🛡️ Nearby Bunkers</a>
+        <a href="comfort-places.html" class="global-nav-item">🌴 Comfort Havens</a>
+        <a href="physics-graphs.html" class="global-nav-item">📊 Multi-Physics</a>
+        <a href="bioclimatic-optimizer.html" class="global-nav-item">⚡ Optimizer</a>
+        <a href="soil-directory.html" class="global-nav-item">🌍 Soil Directory</a>
+        <a href="materials-lab.html" class="global-nav-item">🧪 Materials Lab</a>
+        <a href="custom-materials.html" class="global-nav-item">🧬 Custom Materials</a>
+        <a href="psychrometric.html" class="global-nav-item">📈 Psychrometric</a>
+        <a href="weather-solar.html" class="global-nav-item">☀️ Weather &amp; Solar</a>
+        <a href="community.html" class="global-nav-item">👥 Community Net</a>
+        <a href="sih_presentation.html" class="global-nav-item">🏆 SIH Deck</a>
+        <a href="college_guide.html" class="global-nav-item">📚 College Guide</a>
+        <a href="profile-settings.html" class="global-nav-item">👤 Profile</a>
+        <a href="login.html" class="global-nav-item">🔑 Member Portal</a>
+        <a href="otp.html" class="global-nav-item">📲 OTP Verification</a>
+        <a href="reports-exports.html" class="global-nav-item">📑 Reports &amp; Exports</a>
+    </nav>
+
     <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
-        <div class="page-header-bar" style="margin-bottom: 24px;">
+        <div class="page-header-bar" style="margin-bottom: 20px;">
             <div class="page-header-info">
                 <h2>Citizen Climate Crisis &amp; Extreme Disaster Hazard Feed</h2>
                 <p>Real-time citizen-reported climate anomalies, heatwave emergencies, flash flood warnings, and wildfire fronts with nearest subterranean shelter routing.</p>
             </div>
         </div>
 
+        <!-- Filter Chips & Search Bar -->
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 20px; background: var(--bg-card); padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Filter Severity:</span>
+                <button class="filter-chip active" data-severity="all">All Hazards</button>
+                <button class="filter-chip" data-severity="critical">🚨 Critical</button>
+                <button class="filter-chip" data-severity="high">⚠️ High</button>
+                <button class="filter-chip" data-severity="moderate">⚡ Moderate</button>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="text" id="hazard-search-input" class="input-text" placeholder="🔍 Search by location or type..." style="padding: 8px 12px; font-size: 12px; width: 240px;">
+            </div>
+        </div>
+
         <div id="hazard-reports-feed" class="community-grid"></div>
     </main>
+
+    <!-- Citizen Hazard Report Modal -->
+    <div id="modal-hazard-report" class="modal-overlay">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 18px; font-weight: 800; color: #ef4444;">🚨 Report Climate Crisis / Incident</h3>
+                <button id="btn-close-hazard-modal" style="background: transparent; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer;">&times;</button>
+            </div>
+            <form id="form-submit-hazard" style="display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                    <label class="control-label">Incident Title</label>
+                    <input type="text" id="input-hz-title" class="input-text" placeholder="e.g. Extreme 50°C Heatwave Spike" required style="width: 100%; margin-top: 4px;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="control-label">Crisis Type</label>
+                        <select id="select-hz-type" class="input-select" style="width: 100%; margin-top: 4px;">
+                            <option value="extreme_heatwave">Extreme Heatwave</option>
+                            <option value="flash_flood">Flash Flood Surge</option>
+                            <option value="wildfire_front">Wildfire Front</option>
+                            <option value="sandstorm">Haboob Sandstorm</option>
+                            <option value="structural_damage">Structural Failure</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="control-label">Severity Level</label>
+                        <select id="select-hz-severity" class="input-select" style="width: 100%; margin-top: 4px;">
+                            <option value="critical">🚨 Critical (Immediate Hazard)</option>
+                            <option value="high">⚠️ High (Elevated Risk)</option>
+                            <option value="moderate">⚡ Moderate (Advisory)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="control-label">Location / Coordinates</label>
+                    <input type="text" id="input-hz-location" class="input-text" placeholder="e.g. Jaisalmer North Sector, Rajasthan" required style="width: 100%; margin-top: 4px;">
+                </div>
+
+                <div>
+                    <label class="control-label">Situation Description</label>
+                    <textarea id="input-hz-desc" class="input-text" rows="3" placeholder="Describe the environmental conditions, wet-bulb temp, road blocks, or structural hazards..." required style="width: 100%; margin-top: 4px; resize: vertical;"></textarea>
+                </div>
+
+                <div>
+                    <label class="control-label">Recommended Citizen Protocol</label>
+                    <input type="text" id="input-hz-action" class="input-text" placeholder="e.g. Evacuate to Subterranean Bunker Hub 02 immediately." style="width: 100%; margin-top: 4px;">
+                </div>
+
+                <button type="submit" class="export-btn-primary" style="background: linear-gradient(135deg, #ef4444, #dc2626); padding: 12px; font-size: 13px; font-weight: 700; justify-content: center; margin-top: 8px; cursor: pointer;">
+                    🚀 Publish Hazard Report &amp; Alert Net
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- Script Module -->
     <script type="module">
@@ -77,18 +209,45 @@
         import { themeManager } from './js/themeManager.js';
         import { userDataStore } from './js/userDataStore.js';
 
+        let currentSeverity = 'all';
+        let searchQuery = '';
+
         async function loadHazards() {
             const hazards = await userDataStore.getHazardReports();
             const grid = document.getElementById('hazard-reports-feed');
 
-            grid.innerHTML = hazards.map(h => `
+            let filtered = hazards;
+            if (currentSeverity !== 'all') {
+                filtered = filtered.filter(h => h.severity === currentSeverity);
+            }
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(h => 
+                    (h.title && h.title.toLowerCase().includes(q)) ||
+                    (h.location && h.location.toLowerCase().includes(q)) ||
+                    (h.description && h.description.toLowerCase().includes(q))
+                );
+            }
+
+            if (!filtered || filtered.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                        <div style="font-size: 36px; margin-bottom: 8px;">✅</div>
+                        <h3>No Active Hazard Alerts in this Category</h3>
+                        <p style="font-size: 12px; margin-top: 4px;">All regional districts reporting normal bioclimatic parameters.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(h => `
                 <div class="community-card" style="border-left: 4px solid ${h.severity === 'critical' ? '#ef4444' : (h.severity === 'high' ? '#f97316' : '#f59e0b')};">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                         <div>
                             <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">${h.title}</h3>
                             <div style="font-size: 11px; color: var(--accent-sky); font-weight: 600; margin-top: 2px;">📍 ${h.location}</div>
                         </div>
-                        <span class="rec-priority-badge ${h.severity === 'critical' ? 'critical' : 'high'}">${h.severity.toUpperCase()}</span>
+                        <span class="rec-priority-badge ${h.severity === 'critical' ? 'critical' : (h.severity === 'high' ? 'high' : 'low')}">${h.severity ? h.severity.toUpperCase() : 'ALERT'}</span>
                     </div>
 
                     <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 10px 0;">
@@ -100,17 +259,74 @@
                         <span style="color: var(--text-primary);">${h.actionsRecommended || 'Seek nearest subterranean thermal shelter.'}</span>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted); border-top: 1px solid var(--border-glass); padding-top: 8px;">
-                        <span>Reported by: ${h.reportedBy || 'Citizen Responder'}</span>
-                        <a href="sos-command.html" style="color: #ef4444; font-weight: 700; text-decoration: none;">
-                            🚨 Broadcast SOS Alert &rarr;
-                        </a>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-muted); border-top: 1px solid var(--border-glass); padding-top: 10px;">
+                        <span>Reported: ${new Date(h.reportedAt || Date.now()).toLocaleTimeString()} &bull; ${h.reportedBy || 'Citizen Responder'}</span>
+                        <div style="display: flex; gap: 8px;">
+                            <a href="nearby-bunkers.html" style="color: var(--accent-sky); font-weight: 700; text-decoration: none;">
+                                🛡️ Find Refuges ↗
+                            </a>
+                            <a href="sos-command.html" style="color: #ef4444; font-weight: 700; text-decoration: none;">
+                                🚨 Broadcast SOS &rarr;
+                            </a>
+                        </div>
                     </div>
                 </div>
             `).join('');
         }
 
-        document.addEventListener('DOMContentLoaded', loadHazards);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHazards();
+
+            // Filter chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    currentSeverity = chip.dataset.severity;
+                    loadHazards();
+                });
+            });
+
+            // Search
+            const searchInput = document.getElementById('hazard-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchQuery = e.target.value;
+                    loadHazards();
+                });
+            }
+
+            // Modal
+            const modal = document.getElementById('modal-hazard-report');
+            const openBtn = document.getElementById('btn-open-hazard-modal');
+            const closeBtn = document.getElementById('btn-close-hazard-modal');
+            const form = document.getElementById('form-submit-hazard');
+
+            if (openBtn) openBtn.addEventListener('click', () => modal.classList.add('active'));
+            if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const title = document.getElementById('input-hz-title').value;
+                    const type = document.getElementById('select-hz-type').value;
+                    const severity = document.getElementById('select-hz-severity').value;
+                    const location = document.getElementById('input-hz-location').value;
+                    const description = document.getElementById('input-hz-desc').value;
+                    const actionsRecommended = document.getElementById('input-hz-action').value;
+
+                    await userDataStore.addHazardReport({
+                        title, type, severity, location, description, actionsRecommended,
+                        reportedBy: 'Citizen Network Responder'
+                    });
+
+                    modal.classList.remove('active');
+                    form.reset();
+                    loadHazards();
+                    alert(`🚨 Hazard report "${title}" has been published and broadcasted to local emergency channels!`);
+                });
+            }
+        });
     </script>
 </body>
 </html>

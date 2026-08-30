@@ -1,245 +1,886 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Climate & World Weather Map - BioShelter Studio</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <!-- Leaflet Map CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/components.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google World Map GIS &amp; Bioclimatic Satellite Explorer | BioShelter Studio</title>
+  <meta name="description" content="Fetch real-time world map through Google Maps satellite, terrain, and streets with live solar radiation, bioclimatic solving, and 3D bioshelter integration.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet GIS Map Library (Local with CDN Fallback) -->
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';">
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script>
+    if (typeof L === 'undefined') {
+      document.write('<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">');
+      document.write('<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>');
+    }
+  </script>
+
+  <!-- Core Theme & Stylesheet -->
+  <link rel="stylesheet" href="styles/main.css">
+  
+  <style>
+    .global-nav-bar {
+      height: 44px;
+      background: #08110e;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 6px;
+      overflow-x: auto;
+      white-space: nowrap;
+      z-index: 45;
+    }
+
+    .global-nav-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 11px;
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      border: 1px solid transparent;
+    }
+
+    .global-nav-item:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .global-nav-item.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: var(--emerald-400);
+    }
+
+    .global-nav-item.sos-badge {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #ef4444;
+      animation: sosPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes sosPulse {
+      0%, 100% { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
+      50% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.5); }
+    }
+
+    .world-map-layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      height: calc(100vh - 64px - 44px);
+      overflow: hidden;
+    }
+
+    .map-sidebar {
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-subtle);
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .map-viewport-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #060a08;
+    }
+
+    #interactive-world-map-leaflet {
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Google Layer Switcher Floating Dock */
+    .google-layers-dock {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 1200 !important;
+      pointer-events: auto !important;
+      background: rgba(14, 24, 21, 0.95);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+    }
+
+    .map-layer-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      font-family: var(--font-heading);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+    }
+
+    .map-layer-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .map-layer-btn.active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--emerald-400);
+      color: var(--emerald-400);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Floating Diagnostic HUD */
+    .map-hud-overlay {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 1200 !important;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .map-hud-panel {
+      background: rgba(14, 24, 21, 0.95);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      pointer-events: auto !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .station-card-item {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .station-card-item:hover, .station-card-item.selected {
+      border-color: var(--emerald-400);
+      background: rgba(16, 185, 129, 0.12);
+      transform: translateY(-1px);
+    }
+
+    /* Custom Leaflet Pin Animations */
+    .custom-map-pin {
+      background: transparent;
+      border: none;
+    }
+
+    .pulse-red {
+      animation: pinPulseRed 1.5s infinite;
+    }
+    .pulse-green {
+      animation: pinPulseGreen 1.5s infinite;
+    }
+
+    @keyframes pinPulseRed {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    @keyframes pinPulseGreen {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* Floating Map Zoom Toolbar Dock */
+    .map-zoom-dock {
+      position: absolute;
+      top: 75px;
+      left: 16px;
+      z-index: 1200 !important;
+      pointer-events: auto !important;
+      background: rgba(14, 24, 21, 0.96);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.8);
+      width: 52px;
+    }
+
+    .zoom-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      user-select: none;
+    }
+
+    .zoom-btn:hover {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: var(--emerald-400);
+      color: var(--emerald-400);
+      transform: scale(1.1);
+    }
+
+    .zoom-btn:active {
+      transform: scale(0.92);
+    }
+
+    .zoom-level-indicator {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--cyan-400);
+      text-align: center;
+      padding: 3px 2px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      width: 100%;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .zoom-slider-vertical {
+      -webkit-appearance: slider-vertical;
+      width: 8px;
+      height: 85px;
+      margin: 4px 0;
+      accent-color: var(--emerald-400);
+      cursor: pointer;
+    }
+
+    /* Floating Region Presets Dock */
+    .map-presets-dock {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1200 !important;
+      pointer-events: auto !important;
+      background: rgba(14, 24, 21, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8);
+      max-width: 90%;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .preset-pill-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 4px 11px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .preset-pill-btn:hover {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: var(--emerald-400);
+      color: var(--emerald-400);
+      transform: translateY(-1px);
+    }
+  </style>
 </head>
 <body>
-    <!-- Top Navigation Header -->
-    <header class="app-header">
-        <div class="header-left">
-            <a href="index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
-                <div class="logo-mark">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                </div>
-                <div class="header-title-group">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <h1 class="app-title">BioShelter Studio</h1>
-                        <span class="app-badge">MAP SUITE</span>
-                    </div>
-                    <span class="app-subtitle">Interactive Google World Map &amp; Real-Time Online Weather Radar</span>
-                </div>
-            </a>
+
+  <!-- Top Application Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-icon">🗺️</div>
+      <div>
+        <h1 class="brand-title" style="margin: 0; line-height: 1.1;">GOOGLE WORLD MAP GIS</h1>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+          <span class="brand-tag">GOOGLE SATELLITE &amp; SENSORS</span>
+          <span style="font-size: 11px; color: var(--text-muted);">Real-Time Satellite Weather &amp; Geocoding</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Global Telemetry -->
+    <div class="header-telemetry">
+      <div class="telemetry-pill">
+        <span class="label">Google Map Engine</span>
+        <span class="value" style="color: #38bdf8;">Satellite / Streets Online</span>
+      </div>
+      <div class="telemetry-pill">
+        <span class="label">Active Stations</span>
+        <span class="value" id="telemetry-station-count">42 Global</span>
+      </div>
+      <div class="telemetry-pill">
+        <span class="label">Extreme Max</span>
+        <span class="value" style="color: #ef4444;">51.2°C (Jacobabad)</span>
+      </div>
+      <div class="telemetry-pill">
+        <span class="label">Paradise Min</span>
+        <span class="value" style="color: #10b981;">21.4°C (Medellín)</span>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <a href="sos-command.html" class="btn-secondary" style="color: #ef4444; border-color: rgba(239,68,68,0.4); text-decoration: none;">
+        <span>🚨 Emergency SOS</span>
+      </a>
+      <a href="index.html" class="btn-primary" style="text-decoration: none;">
+        <span>🌱 Launch 3D BioShelter Studio &rarr;</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Universal Global Navigation Menu Bar -->
+  <nav class="global-nav-bar" aria-label="Global System Navigation">
+    <a href="index.html" class="global-nav-item">🌐 3D BioShelter Studio</a>
+    <a href="world-map.html" class="global-nav-item active">🗺️ World Map GIS</a>
+    <a href="sos-command.html" class="global-nav-item sos-badge">🚨 Emergency SOS Command</a>
+    <a href="hazards.html" class="global-nav-item">⚠️ Hazards &amp; Crisis Feed</a>
+    <a href="nearby-bunkers.html" class="global-nav-item">🛡️ Nearby Bunkers</a>
+    <a href="comfort-places.html" class="global-nav-item">🌡️ Comfort Havens</a>
+    <a href="physics-graphs.html" class="global-nav-item">📊 Multi-Physics</a>
+    <a href="bioclimatic-optimizer.html" class="global-nav-item">⚡ Optimizer</a>
+    <a href="soil-directory.html" class="global-nav-item">🌾 Soil Directory</a>
+    <a href="materials-lab.html" class="global-nav-item">🧪 Materials Lab</a>
+    <a href="custom-materials.html" class="global-nav-item">🧬 Custom Materials</a>
+    <a href="psychrometric.html" class="global-nav-item">📈 Psychrometric</a>
+    <a href="weather-solar.html" class="global-nav-item">☀️ Weather &amp; Solar</a>
+    <a href="community.html" class="global-nav-item">👥 Community Net</a>
+    <a href="sih_presentation.html" class="global-nav-item">🏆 SIH Deck</a>
+    <a href="college_guide.html" class="global-nav-item">📚 College Guide</a>
+    <a href="profile-settings.html" class="global-nav-item">👤 Profile</a>
+    <a href="login.html" class="global-nav-item">🔑 Member Portal</a>
+    <a href="otp.html" class="global-nav-item">📲 OTP Verification</a>
+    <a href="reports-exports.html" class="global-nav-item">📑 Reports &amp; Exports</a>
+  </nav>
+
+  <!-- Main World Map Workspace Layout -->
+  <main class="world-map-layout">
+    
+    <!-- Sidebar: Search, Layer Pickers, Global Stations List -->
+    <aside class="map-sidebar">
+      
+      <!-- Live Search Box (Google Geocoding & Open-Meteo) -->
+      <div class="section-card">
+        <div class="section-header">
+          <span class="section-title">🔍 Google Place &amp; GPS Search</span>
+          <span class="section-badge">ONLINE</span>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <input type="text" id="input-map-city-search" class="input-text" placeholder="e.g. Phoenix, Ahmedabad, Leh, Dubai, Tokyo..." />
+          <button id="btn-map-city-search" class="btn-primary" style="padding: 6px 14px;">Query</button>
+        </div>
+        <div style="display: flex; gap: 6px; margin-top: 4px;">
+          <button id="btn-map-gps-locate" class="btn-secondary" style="width: 100%; justify-content: center; font-size: 11px;">
+            <span>📍 Acquire My Live GPS Location</span>
+          </button>
+        </div>
+        <div id="search-online-status" style="font-size: 11px; color: var(--text-muted); line-height: 1.3;">
+          Click anywhere on the Google map or enter any location on Earth to solve real-time solar irradiance, temperature, and bioclimates.
+        </div>
+      </div>
+
+      <!-- Station Filter Category Tabs -->
+      <div class="section-card">
+        <div class="section-header">
+          <span class="section-title">📍 Climate Contours</span>
+        </div>
+        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+          <button class="btn-secondary active station-filter-btn" data-map-filter="all">All (42)</button>
+          <button class="btn-secondary station-filter-btn" data-map-filter="extreme_hot" style="color: #ef4444;">🔥 Heatwaves</button>
+          <button class="btn-secondary station-filter-btn" data-map-filter="comfort" style="color: #10b981;">🌿 Havens</button>
+          <button class="btn-secondary station-filter-btn" data-map-filter="polar" style="color: #38bdf8;">❄️ Sub-Arctic</button>
+          <button class="btn-secondary station-filter-btn" data-map-filter="gujarat" style="color: #f59e0b;">🇮🇳 Gujarat</button>
+        </div>
+      </div>
+
+      <!-- Active Station Details / Recommendations -->
+      <div class="section-card" id="card-active-map-station" style="border-color: var(--emerald-500); background: rgba(16,185,129,0.06);">
+        <div class="section-header">
+          <span class="section-title" id="card-active-map-station-name">Jacobabad / Indus Basin</span>
+          <span class="section-badge" id="card-active-map-station-badge" style="background: rgba(239,68,68,0.2); color: #ef4444;">CRITICAL HEAT</span>
         </div>
 
-        <nav class="header-nav-links" style="display: flex; align-items: center; gap: 6px; overflow-x: auto;">
-            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
-            <a href="world-map.html" class="nav-link-btn active">🗺️ World Map</a>
-            <a href="comfort-places.html" class="nav-link-btn">🌴 Comfort Havens</a>
-            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
-            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
-            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
-            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
-            <a href="community.html" class="nav-link-btn">🤝 Community</a>
-            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
-            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
-            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
-        </nav>
-
-        <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
-            <!-- Dark / Light Theme Mode Toggle -->
-            <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Light / Dark Mode">
-                <svg id="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
-                    <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41s-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
-                </svg>
-                <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12.3 2a10 10 0 0 0-.19 20 10.04 10.04 0 0 0 9.8-7.9 1 1 0 0 0-1.12-1.22A8 8 0 1 1 11.1 3.21a1 1 0 0 0 1.2-1.21z"/>
-                </svg>
-            </button>
-
-            <div id="backend-health-chip" style="display: flex; align-items: center; gap: 6px; padding: 5px 11px; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); border-radius: 20px; font-size: 11px; color: #10b981; font-weight: 700; cursor: pointer;">
-                <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-                <span id="backend-status-text">Backend Connected</span>
-            </div>
-
-            <a href="login.html" class="btn-sign-in-nav" style="padding: 6px 14px; font-size: 12px; font-weight: 700; text-decoration: none;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                <span>Member Portal</span>
-            </a>
-        </div>
-    </header>
-
-    <main class="page-container" style="padding: 20px; max-width: 1600px; margin: 0 auto;">
-        <div class="page-header-bar" style="margin-bottom: 20px;">
-            <div class="page-header-info">
-                <h2>Planetary Bioclimatic Weather &amp; Temperature Heatmap Grid</h2>
-                <p>Google Maps street, satellite, terrain, and dark thermal radar layers connected to live global meteorological stations (Open-Meteo &amp; OpenStreetMap APIs). Search ANY city worldwide or click anywhere on Earth to inspect live online temperature and wind vectors!</p>
-            </div>
+        <div style="font-size: 26px; font-weight: 800; font-family: var(--font-mono); color: #ef4444;" id="card-active-map-station-temp">
+          51.2°C <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">(124.2°F)</span>
         </div>
 
-        <!-- Global Search Bar & Live Online Weather Query Toolbar -->
-        <div class="assembly-card" style="padding: 16px; margin-bottom: 16px; background: linear-gradient(135deg, rgba(2,132,199,0.1), rgba(16,185,129,0.08)); border-color: rgba(56,189,248,0.35);">
-            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;">
-                <div style="display: flex; flex: 1; min-width: 300px; gap: 8px;">
-                    <input type="text" id="input-map-city-search" class="input-text" placeholder="🔍 Search ANY city, country or district (e.g. Tokyo, Paris, Mumbai, London, Dubai, New York, Cairo)..." style="flex: 1; padding: 10px 14px; font-size: 13px; border-radius: 8px; background: rgba(0,0,0,0.35); border: 1px solid var(--border-glass); color: var(--text-primary);">
-                    <button id="btn-map-city-search" class="export-btn-primary" style="padding: 10px 18px; font-size: 12px; background: linear-gradient(135deg, #0284c7, #10b981); white-space: nowrap; cursor: pointer;">
-                        ⚡ Fetch Live Online Weather
-                    </button>
-                </div>
-                <button id="btn-map-gps-locate" class="btn-resend-otp" style="font-size: 12px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                    📍 My GPS Location
-                </button>
-            </div>
-
-            <!-- Map Layer Switcher & Pin Filters -->
-            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-top: 14px; gap: 10px;">
-                <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="map-layer-selector-group">
-                    <button class="map-layer-btn active" data-map-layer="google_street" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; background: #0284c7; color: white; border: 1px solid #0284c7; cursor: pointer; font-weight: 700;">
-                        🗺️ Google Street
-                    </button>
-                    <button class="map-layer-btn" data-map-layer="google_satellite" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; background: rgba(0,0,0,0.4); border: 1px solid var(--border-glass); color: var(--text-secondary); cursor: pointer; font-weight: 600;">
-                        🛰️ Google Satellite
-                    </button>
-                    <button class="map-layer-btn" data-map-layer="carto_dark" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; background: rgba(0,0,0,0.4); border: 1px solid var(--border-glass); color: var(--text-secondary); cursor: pointer; font-weight: 600;">
-                        🌌 Dark Thermal Radar
-                    </button>
-                    <button class="map-layer-btn" data-map-layer="google_terrain" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; background: rgba(0,0,0,0.4); border: 1px solid var(--border-glass); color: var(--text-secondary); cursor: pointer; font-weight: 600;">
-                        🏔️ Google Terrain
-                    </button>
-                </div>
-
-                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                    <button class="map-filter-chip active" data-map-filter="all" style="padding: 6px 12px; font-size: 11px; border-radius: 20px; background: var(--accent-emerald); color: white; border: none; cursor: pointer; font-weight: 700;">
-                        🌐 All Stations
-                    </button>
-                    <button class="map-filter-chip" data-map-filter="heatwave" style="padding: 6px 12px; font-size: 11px; border-radius: 20px; background: rgba(239,68,68,0.15); border: 1px solid #ef4444; color: #ef4444; cursor: pointer; font-weight: 600;">
-                        🔴 Heatwave Hotspots (>38°C)
-                    </button>
-                    <button class="map-filter-chip" data-map-filter="comfort_eden" style="padding: 6px 12px; font-size: 11px; border-radius: 20px; background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #10b981; cursor: pointer; font-weight: 600;">
-                        🟢 Paradise Comfort Havens
-                    </button>
-                    <button class="map-filter-chip" data-map-filter="cold_alpine" style="padding: 6px 12px; font-size: 11px; border-radius: 20px; background: rgba(129,140,248,0.15); border: 1px solid #818cf8; color: #818cf8; cursor: pointer; font-weight: 600;">
-                        ❄️ Cold Alpine (Purple)
-                    </button>
-                </div>
-            </div>
+        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;" id="card-active-map-station-desc">
+          Extreme wet-bulb heatwave breach. Ambient 51.2°C with wet-bulb exceeding human tolerance. Subterranean earth-sheltered cooling mandatory.
         </div>
 
-        <!-- Interactive Leaflet / Google Map Card -->
-        <div class="assembly-card" style="padding: 14px; background: var(--bg-card); position: relative; margin-bottom: 20px;">
-            <div id="interactive-world-map-leaflet" style="width: 100%; height: 560px; border-radius: 10px; z-index: 1; border: 1px solid var(--border-glass);"></div>
-
-            <!-- Global Temp Scale Legend -->
-            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; width: 100%; margin-top: 14px; font-size: 11px; color: var(--text-secondary); gap: 8px;">
-                <span><strong>Planetary Thermal Spectrum:</strong></span>
-                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
-                    <span style="color: #818cf8; font-weight: 600;">&le; 10°C (Alpine/Cold)</span>
-                    <span style="color: #38bdf8; font-weight: 600;">10°C - 20°C (Cool)</span>
-                    <span style="color: #10b981; font-weight: 700;">20°C - 28°C (Paradise Comfort 🟢)</span>
-                    <span style="color: #f59e0b; font-weight: 600;">28°C - 38°C (Warm)</span>
-                    <span style="color: #f97316; font-weight: 600;">38°C - 45°C (Extreme)</span>
-                    <span style="color: #ef4444; font-weight: 800;">&gt; 45°C+ (Catastrophic Heatwave 🔴)</span>
-                </div>
-            </div>
-
-            <!-- Real-Time Selected Location Telemetry Card (Hover / Click Overlay) -->
-            <div id="map-selected-telemetry-hud" style="margin-top: 14px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); border-radius: 10px; padding: 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
-                <div style="flex: 1; min-width: 250px;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span id="live-map-inspect-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; background: rgba(239,68,68,0.2); color: #ef4444;">🔴 EXTREME HEATWAVE</span>
-                        <span id="live-map-inspect-coords" style="font-size: 11px; color: var(--text-muted);">28.2819° N, 68.4386° E</span>
-                    </div>
-                    <h3 id="live-map-inspect-name" style="font-size: 17px; font-weight: 800; color: var(--text-primary); margin: 4px 0;">Jacobabad / Indus Valley Basin, Pakistan</h3>
-                    <p id="live-map-inspect-statement" style="font-size: 11px; color: var(--text-secondary); line-height: 1.45;">Extreme wet-bulb emergency: Ambient temp 51.2°C with wet-bulb exceeding human survival threshold. Subterranean earth-sheltered cooling mandatory.</p>
-                </div>
-
-                <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
-                    <div style="text-align: center; min-width: 80px;">
-                        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Live Temperature</div>
-                        <div id="live-map-inspect-temp" style="font-size: 22px; font-weight: 900; color: #ef4444;">51.2°C</div>
-                        <div id="live-map-inspect-temp-f" style="font-size: 10px; color: var(--text-muted);">124.2°F</div>
-                    </div>
-                    <div style="text-align: center; min-width: 100px;">
-                        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Wind Speed &amp; Vector</div>
-                        <div id="live-map-inspect-wind" style="font-size: 15px; font-weight: 800; color: #f59e0b;">4.8 m/s (17.3 km/h)</div>
-                        <div id="live-map-inspect-wind-dir" style="font-size: 10px; color: var(--text-muted);">SW (220°) ➔ NE (40°)</div>
-                    </div>
-                    <div style="text-align: center; min-width: 70px;">
-                        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">Humidity</div>
-                        <div id="live-map-inspect-humidity" style="font-size: 16px; font-weight: 800; color: var(--accent-sky);">44%</div>
-                        <div id="live-map-inspect-source" style="font-size: 9px; color: var(--accent-emerald); font-weight: 600;">⚡ Live Online</div>
-                    </div>
-                    <button id="btn-open-in-3d-studio" class="export-btn-primary" style="text-decoration: none; padding: 10px 18px; font-size: 12px; background: linear-gradient(135deg, #0284c7, #10b981); cursor: pointer; border: none; border-radius: 6px; color: white; font-weight: 800; display: flex; align-items: center; gap: 6px;">
-                        🚀 Simulate in 3D BioShelter Studio &rarr;
-                    </button>
-                </div>
-            </div>
-
-            <!-- Dynamic Bioclimatic & Architectural Analysis Output Panel -->
-            <div id="map-bioclimatic-analysis-panel"></div>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border-subtle); padding-top: 8px;">
+          <span>Solar GHI: <strong style="color: var(--amber-400);" id="card-active-map-station-ghi">1,010 W/m²</strong></span>
+          <span>Humidity: <strong style="color: var(--cyan-400);" id="card-active-map-station-rh">44% RH</strong></span>
+          <span>Wind: <strong style="color: var(--emerald-400);" id="card-active-map-station-wind">4.8 m/s</strong></span>
         </div>
 
-        <!-- Regional Stations Grid Table -->
-        <div class="comparison-container">
-            <div class="chart-title">Global Weather Stations &amp; Bioclimatic Telemetry Grid</div>
-            <div id="world-stations-table-container"></div>
+        <!-- Live Solar Radiation Meter Box -->
+        <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: 6px; padding: 8px 10px; margin-top: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--accent-amber);">☀️ Live Solar Meter:</span>
+            <a href="weather-solar.html" style="font-size: 10px; color: var(--accent-sky); text-decoration: none; font-weight: 600;">Open Observatory &rarr;</a>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
+            <span>Direct DNI: <strong style="color: var(--accent-amber);" id="card-active-map-station-dni">980 W/m²</strong></span>
+            <span>Diffuse DHI: <strong style="color: var(--accent-sky);" id="card-active-map-station-dhi">180 W/m²</strong></span>
+            <span>UV: <strong style="color: #c084fc;" id="card-active-map-station-uv">11.4</strong></span>
+          </div>
         </div>
-    </main>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script type="module">
-        import { WorldMapEngine, GLOBAL_STATIONS } from './js/worldMapEngine.js';
-        import { themeManager } from './js/themeManager.js';
+        <button id="btn-apply-selected-map-station" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 8px;">
+          <span>🌱 Inject Site into 3D BioShelter Studio &rarr;</span>
+        </button>
+      </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const mapEngine = new WorldMapEngine('interactive-world-map-leaflet', (station) => {
-                console.log('Selected station:', station);
-            });
+      <!-- Station List Catalog -->
+      <div class="section-header" style="margin-top: 4px;">
+        <span class="section-title" style="font-size: 12px; text-transform: uppercase; color: var(--text-muted);">Global Weather Telemetry Stations</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;" id="stations-list-container">
+        <!-- Dynamically rendered station cards -->
+      </div>
 
-            // 1-Click Take Station to 3D Studio Button
-            const btnOpen3D = document.getElementById('btn-open-in-3d-studio');
-            if (btnOpen3D) {
-                btnOpen3D.addEventListener('click', () => {
-                    if (mapEngine && mapEngine.selectedStation) {
-                        mapEngine.applyStationToStudio(mapEngine.selectedStation);
-                    } else {
-                        window.location.href = 'index.html';
-                    }
-                });
-            }
+    </aside>
 
-            window.addEventListener('bioshelter-theme-changed', (e) => {
-                if (mapEngine && typeof mapEngine.setTheme === 'function') {
-                    mapEngine.setTheme(e.detail.isDark);
-                }
-            });
+    <!-- Center Leaflet Map Viewport Stage -->
+    <section class="map-viewport-container">
+      
+      <!-- Floating Google Maps Layer Switcher Dock -->
+      <div class="google-layers-dock">
+        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-right: 4px;">Google Tiles:</span>
+        <button class="map-layer-btn active" data-map-layer="google_street">
+          <span>🗺️ Google Streets</span>
+        </button>
+        <button class="map-layer-btn" data-map-layer="google_satellite">
+          <span>🛰️ Google Satellite HD</span>
+        </button>
+        <button class="map-layer-btn" data-map-layer="google_terrain">
+          <span>⛰️ Google Terrain</span>
+        </button>
+        <button class="map-layer-btn" data-map-layer="carto_dark">
+          <span>🌑 Carto Dark Radar</span>
+        </button>
+      </div>
 
-            // Layer buttons
-            document.querySelectorAll('#map-layer-selector-group .map-layer-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('#map-layer-selector-group .map-layer-btn').forEach(b => {
-                        b.classList.remove('active');
-                        b.style.background = 'rgba(0,0,0,0.4)';
-                        b.style.color = 'var(--text-secondary)';
-                        b.style.borderColor = 'var(--border-glass)';
-                    });
-                    btn.classList.add('active');
-                    btn.style.background = '#0284c7';
-                    btn.style.color = 'white';
-                    btn.style.borderColor = '#0284c7';
-                    mapEngine.switchLayer(btn.getAttribute('data-map-layer'));
-                });
-            });
+      <!-- Floating Map Zoom & Navigation Controls Dock -->
+      <div class="map-zoom-dock" id="map-zoom-dock-controls" aria-label="Map Zoom and Navigation Controls">
+        <button id="btn-map-zoom-in" class="zoom-btn" onclick="window.mapEngine &amp;&amp; window.mapEngine.zoomIn()" title="Zoom In (+ or Scroll Up)">➕</button>
+        
+        <input type="range" id="map-zoom-slider" class="zoom-slider-vertical" min="2" max="18" step="1" value="2" oninput="window.mapEngine &amp;&amp; window.mapEngine.setZoom(this.value)" title="Drag to adjust zoom scale">
+        
+        <div id="map-zoom-val-badge" class="zoom-level-indicator" title="Current Zoom Level">2x</div>
+        
+        <button id="btn-map-zoom-out" class="zoom-btn" onclick="window.mapEngine &amp;&amp; window.mapEngine.zoomOut()" title="Zoom Out (- or Scroll Down)">➖</button>
+        
+        <div style="width: 24px; height: 1px; background: var(--border-subtle); margin: 2px 0;"></div>
+        
+        <button id="btn-map-reset-view" class="zoom-btn" onclick="window.mapEngine &amp;&amp; window.mapEngine.resetGlobalView()" title="Reset to Global World View (Key 0)">🌍</button>
+        <button id="btn-map-fit-bounds" class="zoom-btn" onclick="window.mapEngine &amp;&amp; window.mapEngine.fitAllStations()" title="Fit All Stations in View (Key F)">📐</button>
+        <button id="btn-map-my-location-dock" class="zoom-btn" onclick="window.mapEngine &amp;&amp; window.mapEngine.locateUserAndZoom()" title="Center & Zoom to My GPS">🎯</button>
+        <button id="btn-map-save-viewport" class="zoom-btn" onclick="window.mapEngine &amp;&amp; window.mapEngine.saveViewportToBackend()" title="Save Current View to Backend Cloud">💾</button>
+      </div>
 
-            // Filter chips
-            document.querySelectorAll('.map-filter-chip').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    document.querySelectorAll('.map-filter-chip').forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    mapEngine.setFilter(chip.getAttribute('data-map-filter'));
-                });
-            });
+      <!-- Leaflet Map Canvas Container -->
+      <div id="interactive-world-map-leaflet"></div>
+
+      <!-- Floating Region Zoom Presets Dock -->
+      <div class="map-presets-dock" id="map-presets-ribbon" aria-label="Quick Regional Zoom Presets">
+        <span style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Quick Zoom:</span>
+        <button class="preset-pill-btn" data-preset-id="preset_global">🌍 Global (2x)</button>
+        <button class="preset-pill-btn" data-preset-id="preset_thar">🏜️ Thar Desert (9x)</button>
+        <button class="preset-pill-btn" data-preset-id="preset_deathvalley">🔥 Death Valley (12x)</button>
+        <button class="preset-pill-btn" data-preset-id="preset_jacobabad">⚡ Jacobabad (11x)</button>
+        <button class="preset-pill-btn" data-preset-id="preset_sundarbans">🌊 Sundarbans (8x)</button>
+        <button class="preset-pill-btn" data-preset-id="preset_ladakh">❄️ Ladakh (10x)</button>
+        <button class="preset-pill-btn" data-preset-id="preset_medellin">🌸 Medellín (11x)</button>
+        <button class="preset-pill-btn" data-preset-id="preset_dubai">🏙️ Dubai (11x)</button>
+      </div>
+
+      <!-- Floating Map Diagnostics HUD Overlay -->
+      <div class="map-hud-overlay">
+        <div class="map-hud-panel" style="width: 290px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Satellite Live Telemetry</div>
+            <span id="hud-cloud-sync-badge" style="font-size: 9px; font-weight: 700; color: var(--emerald-400); background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 4px;">CLOUD SYNCED</span>
+          </div>
+
+          <div style="font-size: 13px; font-weight: 600; color: var(--emerald-400); display: flex; align-items: center; gap: 6px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--emerald-400); display: inline-block;"></span>
+            Google Maps &amp; Open-Meteo Connected
+          </div>
+
+          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 4px; font-size: 11px;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">Current Scale:</span>
+              <strong style="color: var(--cyan-400);" id="hud-zoom-scale-text">2x (Global Overview)</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">Center Coordinates:</span>
+              <span style="font-family: var(--font-mono); color: var(--text-secondary);" id="hud-center-coords">24.00° N, 10.00° E</span>
+            </div>
+          </div>
+
+          <div style="font-size: 10px; color: var(--text-secondary); margin-top: 6px; line-height: 1.4;" id="hud-scale-desc">
+            Use [+] and [-] buttons, mouse wheel, or presets to zoom from planetary to building level.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ES6 Module Script -->
+  <script type="module">
+    import { WorldMapEngine, GLOBAL_STATIONS } from './js/worldMapEngine.js';
+
+    let mapEngine = null;
+
+    // Regional Zoom & Coordinates Presets
+    const REGION_PRESETS = {
+      preset_global: { name: 'Planetary Global', lat: 24.0, lng: 10.0, zoom: 2 },
+      preset_thar: { name: 'Thar Desert Basin', lat: 26.9157, lng: 70.9083, zoom: 9 },
+      preset_deathvalley: { name: 'Death Valley', lat: 36.4614, lng: -116.8656, zoom: 12 },
+      preset_jacobabad: { name: 'Jacobabad Indus Basin', lat: 28.2819, lng: 68.4386, zoom: 11 },
+      preset_sundarbans: { name: 'Sundarbans Delta', lat: 21.9500, lng: 89.1800, zoom: 8 },
+      preset_ladakh: { name: 'Ladakh Plateau', lat: 34.1526, lng: 77.5771, zoom: 10 },
+      preset_medellin: { name: 'Medellín Comfort Valley', lat: 6.2442, lng: -75.5812, zoom: 11 },
+      preset_dubai: { name: 'Dubai Coastal', lat: 25.2048, lng: 55.2708, zoom: 11 }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Initialize Google-Enabled World Map Engine
+      mapEngine = new WorldMapEngine('interactive-world-map-leaflet', (station) => {
+        updateActiveStationCard(station);
+      });
+      window.mapEngine = mapEngine;
+      window.worldMapEngine = mapEngine;
+
+      // 2. Setup Interactive Zoom Controls Immediately
+      setupZoomControls();
+
+      // 3. Render Station List Catalog
+      renderStationsList(GLOBAL_STATIONS);
+
+      // 4. Restore saved viewport from backend / cloud in background
+      mapEngine.restoreViewportFromBackend().catch(err => console.log('Viewport restore info:', err));
+
+      // 5. Layer Switchers for Google Tiles
+      document.querySelectorAll('.map-layer-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          document.querySelectorAll('.map-layer-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const layerKey = btn.getAttribute('data-map-layer');
+          if (mapEngine && mapEngine.tileLayers[layerKey]) {
+            mapEngine.setLayer(layerKey);
+          }
         });
-    </script>
+      });
+
+      // 6. Category Filters
+      document.querySelectorAll('.station-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.station-filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const cat = btn.getAttribute('data-map-filter');
+          let filtered = GLOBAL_STATIONS;
+          if (cat === 'extreme_hot') filtered = GLOBAL_STATIONS.filter(s => s.category === 'extreme_hot' || s.tempC > 40);
+          else if (cat === 'comfort') filtered = GLOBAL_STATIONS.filter(s => s.category === 'comfort_haven' || (s.tempC >= 18 && s.tempC <= 26));
+          else if (cat === 'polar') filtered = GLOBAL_STATIONS.filter(s => s.category === 'polar_cold' || s.tempC < 10);
+          else if (cat === 'gujarat') filtered = GLOBAL_STATIONS.filter(s => (s.country || '').includes('Gujarat') || (s.country || '').includes('India'));
+
+          renderStationsList(filtered);
+          if (mapEngine) mapEngine.setFilter(cat);
+        });
+      });
+
+      // 7. Inject into BioShelter Button
+      document.getElementById('btn-apply-selected-map-station').addEventListener('click', () => {
+        const st = (mapEngine && mapEngine.selectedStation) ? mapEngine.selectedStation : GLOBAL_STATIONS[0];
+        injectStationToBioShelter(st);
+      });
+    });
+
+    function setupZoomControls() {
+      // Prevent clicks/drags from propagating to the Leaflet map container
+      ['.map-zoom-dock', '.google-layers-dock', '.map-presets-dock', '.map-hud-panel'].forEach(sel => {
+        const el = document.querySelector(sel);
+        if (el) {
+          if (typeof L !== 'undefined' && L.DomEvent) {
+            L.DomEvent.disableClickPropagation(el);
+            L.DomEvent.disableScrollPropagation(el);
+          }
+          ['click', 'dblclick', 'mousedown', 'pointerdown', 'touchstart'].forEach(evt => {
+            el.addEventListener(evt, (e) => e.stopPropagation());
+          });
+        }
+      });
+
+      const btnZoomIn = document.getElementById('btn-map-zoom-in');
+      const btnZoomOut = document.getElementById('btn-map-zoom-out');
+      const sliderZoom = document.getElementById('map-zoom-slider');
+      const badgeZoom = document.getElementById('map-zoom-val-badge');
+      const btnReset = document.getElementById('btn-map-reset-view');
+      const btnFitBounds = document.getElementById('btn-map-fit-bounds');
+      const btnLocate = document.getElementById('btn-map-my-location-dock');
+      const btnSaveView = document.getElementById('btn-map-save-viewport');
+
+      // Zoom In / Out Buttons
+      if (btnZoomIn) {
+        btnZoomIn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (mapEngine) mapEngine.zoomIn();
+        });
+      }
+
+      if (btnZoomOut) {
+        btnZoomOut.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (mapEngine) mapEngine.zoomOut();
+        });
+      }
+
+      // Vertical Zoom Slider
+      if (sliderZoom) {
+        sliderZoom.addEventListener('input', (e) => {
+          e.stopPropagation();
+          if (mapEngine) mapEngine.setZoom(Number(e.target.value));
+        });
+      }
+
+      // Reset & Fit Bounds & GPS
+      if (btnReset) {
+        btnReset.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (mapEngine) mapEngine.resetGlobalView();
+        });
+      }
+
+      if (btnFitBounds) {
+        btnFitBounds.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (mapEngine) mapEngine.fitAllStations();
+        });
+      }
+
+      if (btnLocate) {
+        btnLocate.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (mapEngine) mapEngine.locateUserAndZoom();
+        });
+      }
+
+      // Save Viewport to Backend Cloud
+      if (btnSaveView) {
+        btnSaveView.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!mapEngine) return;
+          btnSaveView.innerHTML = '⏳';
+          const res = await mapEngine.saveViewportToBackend();
+          btnSaveView.innerHTML = '✅';
+          const syncBadge = document.getElementById('hud-cloud-sync-badge');
+          if (syncBadge) {
+            syncBadge.textContent = 'SAVED TO CLOUD';
+            syncBadge.style.color = '#38bdf8';
+            setTimeout(() => {
+              syncBadge.textContent = 'CLOUD SYNCED';
+              syncBadge.style.color = 'var(--emerald-400)';
+              btnSaveView.innerHTML = '💾';
+            }, 2000);
+          }
+        });
+      }
+
+      // Quick Zoom Preset Buttons
+      document.querySelectorAll('#map-presets-ribbon .preset-pill-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const presetId = btn.getAttribute('data-preset-id');
+          const preset = REGION_PRESETS[presetId];
+          if (preset && mapEngine) {
+            mapEngine.flyTo(preset.lat, preset.lng, preset.zoom);
+          }
+        });
+      });
+
+      // Listen for Map Zoom & Pan updates
+      window.addEventListener('bioshelter-map-zoom-changed', (e) => {
+        const { zoom, center, info } = e.detail;
+        if (sliderZoom) sliderZoom.value = Math.round(zoom);
+        if (badgeZoom) badgeZoom.textContent = `${Math.round(zoom)}x`;
+
+        const hudScaleText = document.getElementById('hud-zoom-scale-text');
+        const hudCoords = document.getElementById('hud-center-coords');
+        const hudDesc = document.getElementById('hud-scale-desc');
+
+        if (hudScaleText && info) hudScaleText.textContent = info.badge || `${Math.round(zoom)}x`;
+        if (hudCoords && center) {
+          const ns = center.lat >= 0 ? 'N' : 'S';
+          const ew = center.lng >= 0 ? 'E' : 'W';
+          hudCoords.textContent = `${Math.abs(center.lat).toFixed(2)}° ${ns}, ${Math.abs(center.lng).toFixed(2)}° ${ew}`;
+        }
+        if (hudDesc && info) hudDesc.textContent = info.desc;
+      });
+
+      // Keyboard Shortcuts (+, -, 0, f, s)
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === '+' || e.key === '=') {
+          if (mapEngine) mapEngine.zoomIn();
+        } else if (e.key === '-' || e.key === '_') {
+          if (mapEngine) mapEngine.zoomOut();
+        } else if (e.key === '0') {
+          if (mapEngine) mapEngine.resetGlobalView();
+        } else if (e.key === 'f' || e.key === 'F') {
+          if (mapEngine) mapEngine.fitAllStations();
+        }
+      });
+    }
+
+    function updateActiveStationCard(station) {
+      if (!station) return;
+      document.getElementById('card-active-map-station-name').textContent = station.name;
+      
+      const badge = document.getElementById('card-active-map-station-badge');
+      if (station.tempC > 40) {
+        badge.style.background = 'rgba(239,68,68,0.2)';
+        badge.style.color = '#ef4444';
+        badge.textContent = 'EXTREME HEAT';
+      } else if (station.tempC < 10) {
+        badge.style.background = 'rgba(56,189,248,0.2)';
+        badge.style.color = '#38bdf8';
+        badge.textContent = 'SUB-ZERO / COLD';
+      } else {
+        badge.style.background = 'rgba(16,185,129,0.2)';
+        badge.style.color = '#10b981';
+        badge.textContent = 'COMFORT HAVEN';
+      }
+
+      document.getElementById('card-active-map-station-temp').innerHTML = `${station.tempC}°C <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">(${(station.tempC * 1.8 + 32).toFixed(1)}°F)</span>`;
+      document.getElementById('card-active-map-station-desc').textContent = station.weatherStatement || station.climateType || 'Live geographic bioclimatic station.';
+      
+      const ghi = station.solarGhi || 850;
+      const dni = station.solarDni || Math.round(ghi * 0.88);
+      const dhi = Math.round(ghi * 0.20);
+      const uv = Math.round((ghi / 85.0) * 10) / 10;
+
+      document.getElementById('card-active-map-station-ghi').textContent = `${ghi} W/m²`;
+      document.getElementById('card-active-map-station-dni').textContent = `${dni} W/m²`;
+      document.getElementById('card-active-map-station-dhi').textContent = `${dhi} W/m²`;
+      document.getElementById('card-active-map-station-uv').textContent = `${uv}`;
+      document.getElementById('card-active-map-station-rh').textContent = `${station.humidity || 45}% RH`;
+      document.getElementById('card-active-map-station-wind').textContent = `${station.windSpeedMps || 4.2} m/s`;
+    }
+
+    function renderStationsList(stations) {
+      const container = document.getElementById('stations-list-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      stations.forEach(st => {
+        const card = document.createElement('div');
+        card.className = 'station-card-item';
+        const isHot = st.tempC > 40;
+        const isCold = st.tempC < 10;
+        const color = isHot ? '#ef4444' : (isCold ? '#38bdf8' : '#10b981');
+
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="font-size: 12px; color: var(--text-primary);">${st.name}</strong>
+            <span style="font-family: var(--font-mono); font-weight: 800; color: ${color}; font-size: 13px;">${st.tempC}°C</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between;">
+            <span>${st.country || ''}</span>
+            <span>Solar: ${st.solarGhi || 800} W/m²</span>
+          </div>
+        `;
+
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.station-card-item').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          if (mapEngine && mapEngine.map) {
+            mapEngine.map.flyTo([st.lat, st.lng], 8, { duration: 1.2 });
+            mapEngine.selectedStation = st;
+            updateActiveStationCard(st);
+          }
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    function injectStationToBioShelter(station) {
+      if (!station) return;
+      try {
+        let biome = 'temperate';
+        const lat = Math.abs(station.lat);
+        if (lat >= 55 || station.tempC < 5) biome = 'subarctic';
+        else if (station.tempC > 35 || (station.humidity < 30 && lat > 18)) biome = 'arid';
+        else if (lat < 30 && station.humidity > 60) biome = 'subtropical';
+
+        const raw = localStorage.getItem('bioshelter_studio_state');
+        const st = raw ? JSON.parse(raw) : {};
+        st.biomeId = biome;
+        st.customLatitude = Math.max(0, Math.min(75, Math.round(lat * 10) / 10));
+        st.projectName = `BioShelter ${station.name}`;
+        localStorage.setItem('bioshelter_studio_state', JSON.stringify(st));
+        window.location.href = 'index.html';
+      } catch(e) {
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
 </body>
 </html>

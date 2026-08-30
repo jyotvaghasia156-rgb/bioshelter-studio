@@ -31,20 +31,6 @@
             </a>
         </div>
 
-        <nav class="header-nav-links" style="display: flex; align-items: center; gap: 6px; overflow-x: auto;">
-            <a href="index.html" class="nav-link-btn">🏠 3D Studio</a>
-            <a href="world-map.html" class="nav-link-btn">🗺️ World Map</a>
-            <a href="comfort-places.html" class="nav-link-btn active">🌴 Comfort Havens</a>
-            <a href="soil-directory.html" class="nav-link-btn">🌍 Soil Directory</a>
-            <a href="psychrometric.html" class="nav-link-btn">📈 Psychrometric</a>
-            <a href="physics-graphs.html" class="nav-link-btn">📊 Multi-Physics</a>
-            <a href="materials-lab.html" class="nav-link-btn">🧪 Materials Lab</a>
-            <a href="community.html" class="nav-link-btn">🤝 Community</a>
-            <a href="hazards.html" class="nav-link-btn">⚠️ Hazards</a>
-            <a href="sos-command.html" class="nav-link-btn" style="color: #ef4444;">🚨 SOS Command</a>
-            <a href="reports-exports.html" class="nav-link-btn">📑 Exports</a>
-        </nav>
-
         <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
             <!-- Dark / Light Theme Mode Toggle -->
             <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Light / Dark Mode">
@@ -61,6 +47,29 @@
             </a>
         </div>
     </header>
+
+    <!-- Universal Global Navigation Menu Bar -->
+    <nav class="global-nav-bar" aria-label="Global System Navigation">
+        <a href="index.html" class="global-nav-item">🌐 3D BioShelter Studio</a>
+        <a href="world-map.html" class="global-nav-item">🗺️ World Map GIS</a>
+        <a href="sos-command.html" class="global-nav-item sos-badge">🚨 Emergency SOS Command</a>
+        <a href="hazards.html" class="global-nav-item">⚠️ Hazards &amp; Crisis Feed</a>
+        <a href="nearby-bunkers.html" class="global-nav-item">🛡️ Nearby Bunkers</a>
+        <a href="comfort-places.html" class="global-nav-item active">🌴 Comfort Havens</a>
+        <a href="physics-graphs.html" class="global-nav-item">📊 Multi-Physics</a>
+        <a href="bioclimatic-optimizer.html" class="global-nav-item">⚡ Optimizer</a>
+        <a href="soil-directory.html" class="global-nav-item">🌍 Soil Directory</a>
+        <a href="materials-lab.html" class="global-nav-item">🧪 Materials Lab</a>
+        <a href="custom-materials.html" class="global-nav-item">🧬 Custom Materials</a>
+        <a href="psychrometric.html" class="global-nav-item">📈 Psychrometric</a>
+        <a href="weather-solar.html" class="global-nav-item">☀️ Weather &amp; Solar</a>
+        <a href="community.html" class="global-nav-item">👥 Community Net</a>
+        <a href="sih_presentation.html" class="global-nav-item">🏆 SIH Deck</a>
+        <a href="college_guide.html" class="global-nav-item">📚 College Guide</a>
+        <a href="profile-settings.html" class="global-nav-item">👤 Profile</a>
+        <a href="login.html" class="global-nav-item">🔑 Member Portal</a>
+        <a href="otp.html" class="global-nav-item">📲 OTP Verification</a>
+    </nav>
 
     <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
         <div class="page-header-bar" style="margin-bottom: 24px;">
@@ -335,13 +344,38 @@
                             <a href="${d.googleMapsUrl || `https://www.google.com/maps/search/?api=1&query=${d.lat},${d.lng}`}" target="_blank" rel="noopener noreferrer" class="btn-sign-in-nav" style="text-decoration: none; justify-content: center; font-size: 11px; padding: 7px; background: rgba(56,189,248,0.12); border-color: rgba(56,189,248,0.3); color: var(--accent-sky); font-weight: 700;">
                                 📍 Explore on Google Maps ↗
                             </a>
-                            <a href="index.html" class="export-btn-primary" style="text-decoration: none; justify-content: center; font-size: 11px; padding: 7px; background: linear-gradient(135deg, #0284c7, #10b981); text-align: center;">
+                            <button class="btn-sim-haven export-btn-primary" data-id="${d.id}" style="justify-content: center; font-size: 11px; padding: 7px; background: linear-gradient(135deg, #0284c7, #10b981); text-align: center; border: none; cursor: pointer;">
                                 🚀 Simulate in 3D &rarr;
-                            </a>
+                            </button>
                         </div>
                     </div>
                 `;
             }).join('');
+
+            // Wire 3D Simulation Launchers
+            document.querySelectorAll('.btn-sim-haven').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const destination = ranked.find(r => r.id === id);
+                    if (destination) {
+                        try {
+                            const raw = localStorage.getItem('bioshelter_studio_state');
+                            const st = raw ? JSON.parse(raw) : {};
+                            let biome = 'temperate';
+                            const lat = Math.abs(destination.lat);
+                            if (lat >= 55 || destination.tempAvg < 10) biome = 'subarctic';
+                            else if (destination.tempAvg > 30 || destination.humidityAvg < 35) biome = 'arid';
+                            else if (destination.humidityAvg > 65) biome = 'subtropical';
+
+                            st.biomeId = biome;
+                            st.customLatitude = Math.max(0, Math.min(75, Math.round(lat * 10) / 10));
+                            st.projectName = `BioShelter ${destination.name}`;
+                            localStorage.setItem('bioshelter_studio_state', JSON.stringify(st));
+                        } catch (e) {}
+                    }
+                    window.location.href = 'index.html';
+                });
+            });
         }
 
         document.getElementById('slider-comfort-target-temp').addEventListener('input', (e) => {
