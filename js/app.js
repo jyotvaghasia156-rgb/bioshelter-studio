@@ -8,6 +8,7 @@ import { SimulationEngine } from './simulation-engine.js';
 import { ThreeViewport } from './three-viewport.js';
 import { BlueprintRenderer } from './blueprint-renderer.js';
 import { ExportManager } from './export-manager.js';
+import { formatAzimuthLabel } from './utils.js'; // BUG-01 FIX: shared utility
 
 class BioShelterApp {
   constructor() {
@@ -17,8 +18,14 @@ class BioShelterApp {
     this.blueprintRenderer = null;
     this.charts = {};
     this.simTimer = null;
+    this.activeSpeciesFilter = 'all'; // UI-08 FIX: preserve filter across tab switches
 
-    document.addEventListener('DOMContentLoaded', () => this.init());
+    // UI-14 FIX: handle case where DOMContentLoaded already fired (deferred modules)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.init());
+    } else {
+      this.init();
+    }
   }
 
   init() {
@@ -88,6 +95,13 @@ class BioShelterApp {
           if (stageBlueprint) stageBlueprint.style.display = 'none';
           if (stageCharts) stageCharts.style.display = 'grid';
           this.updateSimulationCharts();
+        } else if (step === 5) {
+          // Ecosystem tab — re-apply active filter to keep catalog in sync (UI-08 FIX)
+          if (stage3D) stage3D.style.display = 'block';
+          if (stageBlueprint) stageBlueprint.style.display = 'none';
+          if (stageCharts) stageCharts.style.display = 'none';
+          if (this._renderSpecies) this._renderSpecies(this.activeSpeciesFilter);
+          if (this.threeViewport) this.threeViewport.onResize();
         } else if (step === 6) {
           // Blueprint / BOM View
           if (stage3D) stage3D.style.display = 'none';
@@ -107,6 +121,16 @@ class BioShelterApp {
         }
       });
     });
+
+    // UI-11 FIX: Mobile sidebar toggle handler
+    const mobileToggle = document.getElementById('mobile-sidebar-toggle');
+    const sidebar = document.querySelector('.process-sidebar');
+    if (mobileToggle && sidebar) {
+      mobileToggle.addEventListener('click', () => {
+        const isOpen = sidebar.classList.toggle('mobile-open');
+        mobileToggle.textContent = isOpen ? '✕' : '⚙️';
+      });
+    }
   }
 
   // --- PROCESS 1: SITE & SOLAR CLIMATE ---
@@ -151,25 +175,18 @@ class BioShelterApp {
         stateStore.set('customLatitude', lat);
         if (latSlider) latSlider.value = lat;
         if (latVal) latVal.textContent = `${lat}° N`;
+        // UI-06 FIX: auto-select matching biome if button has data-biome attribute
+        const matchedBiome = btn.dataset.biome;
+        if (matchedBiome && biomeSelect) {
+          biomeSelect.value = matchedBiome;
+          stateStore.set('biomeId', matchedBiome);
+          const biome = BIOMES[matchedBiome];
+          if (biome && biomeDesc) biomeDesc.textContent = biome.description;
+        }
       });
     });
 
-    const formatAzimuthLabel = (az) => {
-      let card = 'South';
-      if (az === 180) card = 'True Solar South (Optimal)';
-      else if (az > 170 && az < 190) card = 'South';
-      else if (az >= 150 && az <= 170) card = 'SSE (Morning Warm-Up)';
-      else if (az >= 120 && az < 150) card = 'South-East';
-      else if (az >= 70 && az < 120) card = 'Due East';
-      else if (az > 190 && az <= 210) card = 'SSW (Evening Heat)';
-      else if (az > 210 && az <= 240) card = 'South-West';
-      else if (az > 240 && az <= 290) card = 'Due West';
-      else if (az > 290 && az <= 340) card = 'North-West';
-      else if (az >= 20 && az < 70) card = 'North-East';
-      else card = 'Due North';
-      return `${az}° (${card})`;
-    };
-
+    // BUG-01 FIX: use shared formatAzimuthLabel from utils.js (not a local copy)
     if (azimuthSlider) {
       azimuthSlider.addEventListener('input', (e) => {
         const az = parseFloat(e.target.value);
@@ -343,7 +360,8 @@ class BioShelterApp {
       playBtn.addEventListener('click', () => {
         const isPlaying = !stateStore.get('simPlaying');
         stateStore.set('simPlaying', isPlaying);
-        playBtn.innerHTML = isPlaying ? '⏸️' : '▶️';
+        // UI-05 FIX: use plain unicode symbols (not emoji) for consistent cross-platform rendering
+        playBtn.textContent = isPlaying ? '⏸' : '▶';
 
         if (isPlaying) {
           this.startSimulationLoop();
@@ -394,6 +412,7 @@ class BioShelterApp {
 
     const renderSpecies = (category = 'all') => {
       if (!catalogContainer) return;
+      this.activeSpeciesFilter = category; // UI-08 FIX: track current filter
       catalogContainer.innerHTML = '';
       const activeList = stateStore.get('activeSpecies') || [];
 
@@ -441,7 +460,9 @@ class BioShelterApp {
       });
     });
 
-    renderSpecies('all');
+    // UI-08 FIX: expose renderSpecies so process navigation can re-apply active filter on tab switch
+    this._renderSpecies = renderSpecies;
+    renderSpecies(this.activeSpeciesFilter);
   }
 
   // --- PROCESS 6: BLUEPRINTS & BOM EXPORT ---
@@ -499,10 +520,23 @@ class BioShelterApp {
         presetCards.forEach(c => c.classList.remove('active'));
         card.classList.add('active');
         const presetId = card.dataset.preset;
+        // BUG-06 FIX: stop any running simulation before applying new preset
+        this.stopSimulationLoop();
+        stateStore.set('simPlaying', false);
+        const playBtn = document.getElementById('sim-play-toggle');
+        if (playBtn) playBtn.textContent = '▶';
         stateStore.loadPreset(presetId);
         this.syncFormControlsWithState();
       });
     });
+
+    // UI-04 FIX: on page load, restore the active class to the saved preset card
+    const savedPresetId = stateStore.get('presetId');
+    if (savedPresetId) {
+      presetCards.forEach(c => c.classList.remove('active'));
+      const savedCard = document.querySelector(`.preset-card[data-preset="${savedPresetId}"]`);
+      if (savedCard) savedCard.classList.add('active');
+    }
   }
 
   syncFormControlsWithState() {
@@ -525,20 +559,8 @@ class BioShelterApp {
     }
     if (s.orientationAzimuth !== undefined) {
       setVal('azimuth-slider', s.orientationAzimuth);
-      const az = s.orientationAzimuth;
-      let card = 'South';
-      if (az === 180) card = 'True Solar South (Optimal)';
-      else if (az > 170 && az < 190) card = 'South';
-      else if (az >= 150 && az <= 170) card = 'SSE (Morning Warm-Up)';
-      else if (az >= 120 && az < 150) card = 'South-East';
-      else if (az >= 70 && az < 120) card = 'Due East';
-      else if (az > 190 && az <= 210) card = 'SSW (Evening Heat)';
-      else if (az > 210 && az <= 240) card = 'South-West';
-      else if (az > 240 && az <= 290) card = 'Due West';
-      else if (az > 290 && az <= 340) card = 'North-West';
-      else if (az >= 20 && az < 70) card = 'North-East';
-      else card = 'Due North';
-      setText('azimuth-val', `${az}° (${card})`);
+      // BUG-01 FIX: use shared utility, not local duplicate
+      setText('azimuth-val', formatAzimuthLabel(s.orientationAzimuth));
     }
     setVal('structure-select', s.structureType);
     setVal('glazing-select', s.glazingType);
@@ -546,9 +568,10 @@ class BioShelterApp {
       setVal('glazing-ratio-slider', Math.round(s.glazingRatio * 100));
       setText('glazing-ratio-val', `${Math.round(s.glazingRatio * 100)}%`);
     }
-    if (s.insulationRValue !== undefined) {
-      setVal('insulation-slider', s.insulationRValue);
-      setText('insulation-val', `R-${s.insulationRValue}`);
+    // BUG-02 FIX: corrected key name from insulationRValue → northWallInsulationR
+    if (s.northWallInsulationR !== undefined) {
+      setVal('insulation-slider', s.northWallInsulationR);
+      setText('insulation-val', `R-${s.northWallInsulationR}`);
     }
     setVal('diameter-slider', s.diameter);
     setText('diameter-val', `${s.diameter} m`);
@@ -556,9 +579,10 @@ class BioShelterApp {
     setText('height-val', `${s.height} m`);
     setVal('thermal-mass-slider', s.thermalMassLiters);
     setText('thermal-mass-val', `${s.thermalMassLiters.toLocaleString()} L`);
-    if (s.gahtLengthMeters !== undefined) {
-      setVal('gaht-slider', s.gahtLengthMeters);
-      setText('gaht-val', `${s.gahtLengthMeters} m`);
+    // BUG-03 FIX: corrected key name from gahtLengthMeters → gahtPipeLengthM
+    if (s.gahtPipeLengthM !== undefined) {
+      setVal('gaht-slider', s.gahtPipeLengthM);
+      setText('gaht-val', `${s.gahtPipeLengthM} m`);
     }
     setVal('solar-pv-slider', s.solarPvKw);
     setText('solar-pv-val', `${s.solarPvKw} kW`);
@@ -574,7 +598,10 @@ class BioShelterApp {
 
     this.renderBOMTable();
     this.updateTelemetry();
-    this.updateSimulationCharts();
+    // UI-09 FIX: only recalculate charts when Simulation tab (Process 4) is active
+    if (stateStore.get('currentProcess') === 4) {
+      this.updateSimulationCharts();
+    }
   }
 
   // --- VIEWPORT OVERLAY CONTROLS ---
@@ -646,6 +673,7 @@ class BioShelterApp {
     }
 
     // 2. CO2 & Relative Humidity Chart
+    // BUG-05 FIX: declare BOTH y and y1 axes at init time — Chart.js v4 requires this
     const ctxCo2 = document.getElementById('chart-co2-humidity');
     if (ctxCo2) {
       this.charts.co2 = new Chart(ctxCo2, {
@@ -656,8 +684,9 @@ class BioShelterApp {
           maintainAspectRatio: false,
           plugins: { legend: { labels: { color: '#94a3b8' } } },
           scales: {
-            x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-            y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+            x:  { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            y:  { position: 'left',  ticks: { color: '#a855f7' }, grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: 'CO₂ (ppm)', color: '#a855f7' } },
+            y1: { position: 'right', ticks: { color: '#38bdf8' }, grid: { drawOnChartArea: false },           title: { display: true, text: 'Humidity (%)', color: '#38bdf8' } }
           }
         }
       });

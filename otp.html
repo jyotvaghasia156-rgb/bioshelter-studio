@@ -79,6 +79,31 @@
             color: #38bdf8;
             box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
         }
+        /* UI-07 FIX: visible back-to-studio link */
+        .back-to-studio-link {
+            position: fixed;
+            top: 16px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-decoration: none;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            backdrop-filter: blur(20px);
+            z-index: 101;
+            transition: all 0.2s ease;
+        }
+        .back-to-studio-link:hover {
+            color: #f8fafc;
+            background: rgba(56, 189, 248, 0.12);
+            border-color: rgba(56, 189, 248, 0.6);
+        }
         .form-input-styled {
             width: 100%;
             background: rgba(0, 0, 0, 0.4);
@@ -198,6 +223,11 @@
     </style>
 </head>
 <body>
+
+    <!-- UI-07 FIX: Prominent back link so users are never stranded on the OTP page -->
+    <a href="index.html" class="back-to-studio-link" title="Return to BioShelter Studio">
+        ← Return to Studio
+    </a>
 
     <!-- Top Navigation Bar -->
     <nav class="portal-nav-bar" style="max-width: 95vw; overflow-x: auto; display: flex; align-items: center; gap: 8px;">

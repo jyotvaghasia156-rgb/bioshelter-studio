@@ -98,6 +98,27 @@ export class ThreeViewport {
     this.store.on('orientationAzimuth', (az) => this.updateStructureOrientation(az));
     this.store.on('viewportMode', () => this.rebuildModel());
 
+    // UI-13 FIX: Handle GPU context loss gracefully
+    this.renderer.domElement.addEventListener('webglcontextlost', (e) => {
+      e.preventDefault();
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+      // Show overlay message
+      const overlay = document.createElement('div');
+      overlay.id = 'webgl-lost-overlay';
+      overlay.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(7,11,20,0.92);color:#94a3b8;font-size:14px;gap:8px;z-index:10;border-radius:inherit;';
+      overlay.innerHTML = '<span style="font-size:32px">⚠️</span><strong style="color:#f8fafc">3D View Paused</strong><span>GPU context lost — switch back to this tab to restore</span>';
+      if (this.container) { this.container.style.position = 'relative'; this.container.appendChild(overlay); }
+    });
+
+    this.renderer.domElement.addEventListener('webglcontextrestored', () => {
+      // Remove overlay and restart animation loop
+      const overlay = document.getElementById('webgl-lost-overlay');
+      if (overlay) overlay.remove();
+      this.rebuildModel();
+      this.animate();
+    });
+
     // 10. Start Animation Loop
     this.animate();
   }

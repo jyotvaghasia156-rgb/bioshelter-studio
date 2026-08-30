@@ -47,6 +47,29 @@ export const BIOMES = {
     solarIrradiance: 5.4,
     annualRainfall: 1400,
     description: 'High ambient humidity and warm winters. Requires high thermal chimney ventilation, shaded solar angles, and dehumidification.'
+  },
+  // UI-06 FIX: Indian biomes added for accurate local simulation
+  tropical_monsoon: {
+    id: 'tropical_monsoon',
+    name: 'Tropical Monsoon (India / SE Asia)',
+    icon: '🌧️',
+    latitude: 23,
+    avgSummerTemp: 36,
+    avgWinterTemp: 18,
+    solarIrradiance: 5.8,
+    annualRainfall: 2200,
+    description: 'Monsoon-dominated climate with extreme humidity peaks June–September. Requires aggressive natural ventilation, rainwater harvesting, and evaporative cooling. Winter is ideal growing season.'
+  },
+  semi_arid_deccan: {
+    id: 'semi_arid_deccan',
+    name: 'Semi-Arid Deccan Plateau (India)',
+    icon: '🌵',
+    latitude: 17,
+    avgSummerTemp: 38,
+    avgWinterTemp: 14,
+    solarIrradiance: 6.2,
+    annualRainfall: 550,
+    description: 'Hot dry summers with mild winters. Highest solar potential in India. Prioritize earth-sheltered design, Badgir wind-catchers, and maximum rainwater capture during 3-month monsoon.'
   }
 };
 

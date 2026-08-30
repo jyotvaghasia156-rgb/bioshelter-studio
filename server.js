@@ -113,19 +113,33 @@ function handleRequest(req, res) {
             }
 
             // 2. Multi-Channel OTP Request (Phone SMS, Gmail, Microsoft)
+            // BUG-07 FIX: OTP code is stored server-side only; never returned in response.
             if (pathname === '/api/auth/otp/send' && req.method === 'POST') {
                 const channel = jsonBody.channel || 'phone';
                 const target = jsonBody.target || jsonBody.phone || '+91 98765 43210';
                 const name = jsonBody.name || 'Citizen Engineer';
-                const country = jsonBody.countryCode || '+91';
                 const code = Math.floor(100000 + Math.random() * 900000).toString();
+                const messageId = `GATEWAY_${channel.toUpperCase()}_${Math.floor(10000 + Math.random() * 90000)}`;
+
+                // Store OTP server-side with 10-minute expiry
+                if (!global.otpStore) global.otpStore = {};
+                global.otpStore[target] = {
+                    code,
+                    channel,
+                    name,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes
+                };
+
+                // In production, send via SMS/email gateway here.
+                // For development, log to server console only (never to client).
+                console.log(`[OTP DEV LOG] Code for ${target}: ${code}`);
 
                 return sendJson(200, {
                     success: true,
                     channel,
                     target,
-                    code,
-                    gatewayMessageId: `GATEWAY_${channel.toUpperCase()}_${Math.floor(10000 + Math.random() * 90000)}`,
+                    messageId,
                     message: `6-Digit OTP verification code sent to ${target} via ${channel.toUpperCase()}`
                 });
             }
@@ -134,7 +148,23 @@ function handleRequest(req, res) {
             if (pathname === '/api/auth/otp/verify' && req.method === 'POST') {
                 const channel = jsonBody.channel || 'phone';
                 const target = jsonBody.target || jsonBody.phone || '+91 98765 43210';
+                const submittedCode = (jsonBody.code || '').toString().trim();
                 const name = jsonBody.name || (channel === 'gmail' ? 'Dr. Sarah Lin' : 'Alex Henderson');
+
+                // BUG-07 FIX: Validate code server-side
+                const storedEntry = global.otpStore && global.otpStore[target];
+                if (!storedEntry) {
+                    return sendJson(400, { success: false, error: 'No OTP found for this contact. Please request a new code.' });
+                }
+                if (Date.now() > storedEntry.expiresAt) {
+                    delete global.otpStore[target];
+                    return sendJson(400, { success: false, error: 'OTP has expired. Please request a new code.' });
+                }
+                if (storedEntry.code !== submittedCode) {
+                    return sendJson(400, { success: false, error: 'Incorrect OTP. Please check your code and try again.' });
+                }
+                // Valid — consume the OTP (one-time use)
+                delete global.otpStore[target];
 
                 const avatar = channel === 'gmail' 
                     ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80'

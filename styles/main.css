@@ -761,26 +761,160 @@ body {
   to { stroke-dashoffset: 0; }
 }
 
-/* Print Stylesheet for CAD Specification Document */
-@media print {
+/* =========================================================================
+   BUG-04 FIX: Print Stylesheet — clean, legible engineering BOM output
+   Triggered by body.print-mode class (set by export-manager.js before window.print())
+   ========================================================================= */
+@media print, body.print-mode {
   body {
-    background: white;
-    color: black;
-    height: auto;
+    background: white !important;
+    color: #111 !important;
+    height: auto !important;
+    font-family: 'Inter', sans-serif;
   }
-  .app-header, .process-ribbon, .viewport-hud, .sim-playback-dock, .btn-primary, .btn-secondary {
+  /* Hide all UI chrome */
+  .app-header,
+  .global-nav-bar,
+  .process-ribbon,
+  .viewport-hud,
+  .sim-playback-dock,
+  .btn-primary,
+  .btn-secondary,
+  .process-sidebar,
+  #three-stage-view,
+  #blueprint-stage-view,
+  #charts-stage-view,
+  .preset-grid {
     display: none !important;
   }
+  /* Show only the BOM content */
   .app-workspace {
-    display: block;
-    height: auto;
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
   }
-  .process-sidebar {
-    display: none;
+  #blueprint-stage-view {
+    display: block !important;
+    width: 100% !important;
   }
-  .bom-table-container, .charts-grid {
-    background: white;
-    color: black;
+  .bom-table-container {
+    display: block !important;
+    width: 100%;
+    background: white !important;
+    color: #111 !important;
+    border: none !important;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  th, td {
     border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: left;
+    color: #111 !important;
+    background: white !important;
   }
+  th {
+    background: #f0f4f8 !important;
+    font-weight: 700;
+  }
+}
+
+/* =========================================================================
+   UI-11 FIX: Mobile Responsive Breakpoints
+   The sidebar is fixed at 440px which completely breaks on mobile.
+   Below 768px, we hide the sidebar and add a toggle button.
+   ========================================================================= */
+@media (max-width: 768px) {
+  /* Stack app layout vertically */
+  .app-workspace {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto 1fr !important;
+    height: auto !important;
+    min-height: 100vh;
+  }
+
+  /* Hide sidebar by default on mobile; shown via JS toggle */
+  .process-sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 55vh;
+    overflow-y: auto;
+    background: var(--bg-sidebar, rgba(11,19,38,0.97));
+    border-top: 1px solid var(--border-glass, rgba(255,255,255,0.12));
+    border-radius: 16px 16px 0 0;
+    z-index: 200;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    padding: 16px;
+  }
+
+  .process-sidebar.mobile-open {
+    transform: translateY(0);
+  }
+
+  /* Mobile sidebar toggle button */
+  .mobile-sidebar-toggle {
+    display: flex !important;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--cyan-500, #06b6d4);
+    color: white;
+    border: none;
+    font-size: 22px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
+    z-index: 201;
+  }
+
+  /* Viewport fills full width */
+  .main-viewport-area {
+    width: 100% !important;
+    height: 50vh !important;
+  }
+
+  /* Process ribbon wraps on small screens */
+  .process-ribbon {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    gap: 4px;
+    padding: 6px 8px;
+  }
+
+  .process-step-btn {
+    min-width: max-content;
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  /* Header stacks on very narrow screens */
+  .app-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .header-telemetry {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+}
+
+/* Hide mobile toggle on desktop */
+.mobile-sidebar-toggle {
+  display: none;
 }

@@ -35,37 +35,32 @@
     </div>
 
     <!-- Live Ecological Telemetry -->
+    <!-- UI-03 FIX: em dash placeholders prevent stale hardcoded values flashing before JS runs -->
     <div class="header-telemetry">
       <div class="telemetry-pill" title="Enclosed footprint area">
         <span class="label">Area</span>
-        <span class="value" id="telemetry-floor-area">85 m²</span>
+        <span class="value" id="telemetry-floor-area">&mdash;</span>
       </div>
       <div class="telemetry-pill" title="Total water thermal buffer mass">
         <span class="label">Water Mass</span>
-        <span class="value" id="telemetry-water-mass">18.5 tons</span>
+        <span class="value" id="telemetry-water-mass">&mdash;</span>
       </div>
       <div class="telemetry-pill" title="Estimated annual harvest food yield">
         <span class="label">Food Yield</span>
-        <span class="value" id="telemetry-food-yield">2,850 kg/yr</span>
+        <span class="value" id="telemetry-food-yield">&mdash;</span>
       </div>
       <div class="telemetry-pill" title="Annual solar PV electrical generation">
         <span class="label">Solar PV</span>
-        <span class="value" id="telemetry-solar-gen">12,650 kWh/yr</span>
+        <span class="value" id="telemetry-solar-gen">&mdash;</span>
       </div>
       <div class="telemetry-pill" title="Aquaponic Nitrogen Conversion Balance">
         <span class="label">Bio-Loop</span>
-        <span class="value" id="telemetry-nitro-status" style="color: var(--emerald-400);">Equilibrium</span>
+        <span class="value" id="telemetry-nitro-status" style="color: var(--emerald-400);">&mdash;</span>
       </div>
     </div>
 
-    <!-- Header Actions -->
+    <!-- UI-01/UI-02 FIX: header only shows Export/Print. All navigation is in the nav bar below. -->
     <div class="header-actions">
-      <a href="world-map.html" class="btn-secondary" style="text-decoration: none;">
-        <span>🗺️ World Map</span>
-      </a>
-      <a href="sos-command.html" class="btn-secondary" style="color: #ef4444; border-color: rgba(239,68,68,0.4); text-decoration: none;">
-        <span>🚨 SOS Command</span>
-      </a>
       <button class="btn-secondary" id="export-json-btn" title="Export full JSON project specification">
         <span>💾 Export Spec</span>
       </button>
@@ -75,28 +70,23 @@
     </div>
   </header>
 
-  <!-- Universal Global Navigation Menu Bar -->
+  <!-- Global Navigation — UI-01 FIX: condensed labels, no horizontal overflow -->
   <nav class="global-nav-bar" aria-label="Global System Navigation">
-    <a href="index.html" class="global-nav-item active">🌐 3D BioShelter Studio</a>
-    <a href="world-map.html" class="global-nav-item">🗺️ World Map GIS</a>
-    <a href="sos-command.html" class="global-nav-item sos-badge">🚨 Emergency SOS Command</a>
-    <a href="hazards.html" class="global-nav-item">⚠️ Hazards &amp; Crisis Feed</a>
-    <a href="nearby-bunkers.html" class="global-nav-item">🛡️ Nearby Bunkers</a>
-    <a href="comfort-places.html" class="global-nav-item">🌡️ Comfort Havens</a>
-    <a href="physics-graphs.html" class="global-nav-item">📊 Multi-Physics</a>
+    <a href="index.html" class="global-nav-item active">🌐 Studio</a>
+    <a href="world-map.html" class="global-nav-item">🗺️ World Map</a>
+    <a href="sos-command.html" class="global-nav-item sos-badge">🚨 SOS</a>
+    <a href="hazards.html" class="global-nav-item">⚠️ Hazards</a>
+    <a href="nearby-bunkers.html" class="global-nav-item">🛡️ Bunkers</a>
+    <a href="comfort-places.html" class="global-nav-item">🌡️ Comfort</a>
+    <a href="physics-graphs.html" class="global-nav-item">📊 Physics</a>
     <a href="bioclimatic-optimizer.html" class="global-nav-item">⚡ Optimizer</a>
-    <a href="soil-directory.html" class="global-nav-item">🌾 Soil Directory</a>
-    <a href="materials-lab.html" class="global-nav-item">🧪 Materials Lab</a>
-    <a href="custom-materials.html" class="global-nav-item">🧬 Custom Materials</a>
-    <a href="psychrometric.html" class="global-nav-item">📈 Psychrometric</a>
-    <a href="weather-solar.html" class="global-nav-item">☀️ Weather &amp; Solar</a>
-    <a href="community.html" class="global-nav-item">👥 Community Net</a>
-    <a href="sih_presentation.html" class="global-nav-item">🏆 SIH Deck</a>
-    <a href="college_guide.html" class="global-nav-item">📚 College Guide</a>
+    <a href="soil-directory.html" class="global-nav-item">🌾 Soil</a>
+    <a href="materials-lab.html" class="global-nav-item">🧪 Materials</a>
+    <a href="psychrometric.html" class="global-nav-item">📈 Psychro</a>
+    <a href="weather-solar.html" class="global-nav-item">☀️ Weather</a>
+    <a href="community.html" class="global-nav-item">👥 Community</a>
     <a href="profile-settings.html" class="global-nav-item">👤 Profile</a>
-    <a href="login.html" class="global-nav-item">🔑 Member Portal</a>
-    <a href="otp.html" class="global-nav-item">📲 OTP Verification</a>
-    <a href="reports-exports.html" class="global-nav-item">📑 Reports &amp; Exports</a>
+    <a href="login.html" class="global-nav-item">🔑 Login</a>
   </nav>
 
   <!-- Process Navigation Ribbon (All 6 Processes) -->
@@ -174,6 +164,9 @@
               <option value="arid">🏜️ Arid / High Desert</option>
               <option value="subarctic">❄️ Sub-Arctic / High Alpine</option>
               <option value="subtropical">🌴 Humid Subtropical</option>
+              <!-- UI-06 FIX: Indian biomes for accurate simulation output -->
+              <option value="tropical_monsoon">🌧️ Tropical Monsoon (India / SE Asia)</option>
+              <option value="semi_arid_deccan">🌵 Semi-Arid Deccan Plateau (India)</option>
             </select>
           </div>
 
@@ -184,19 +177,21 @@
           <div class="control-group">
             <label class="control-label" for="latitude-slider">
               <span>Site Latitude</span>
-              <span class="val-display" id="latitude-val">23.2° N</span>
+              <!-- UI-12 FIX: initial display matches JS default (45° N) -->
+              <span class="val-display" id="latitude-val">45° N</span>
             </label>
-            <input type="range" class="input-slider" id="latitude-slider" min="0" max="75" value="23.2" step="0.5">
+            <!-- UI-12 FIX: value=45 matches JS state default (customLatitude: 45) -->
+            <input type="range" class="input-slider" id="latitude-slider" min="0" max="75" value="45" step="0.5">
           </div>
 
-          <!-- Quick Latitude Presets -->
+          <!-- Quick Latitude Presets — UI-06 FIX: data-biome auto-selects the right biome -->
           <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px;">
-            <button class="btn-secondary lat-preset-btn" data-lat="0" style="padding: 2px 7px; font-size: 10px;">🌴 Equator (0°)</button>
-            <button class="btn-secondary lat-preset-btn active" data-lat="23.2" style="padding: 2px 7px; font-size: 10px;">🏜️ Gujarat (23.2°)</button>
-            <button class="btn-secondary lat-preset-btn" data-lat="28.6" style="padding: 2px 7px; font-size: 10px;">☀️ Delhi (28.6°)</button>
-            <button class="btn-secondary lat-preset-btn" data-lat="34.2" style="padding: 2px 7px; font-size: 10px;">🏔️ Ladakh (34.2°)</button>
-            <button class="btn-secondary lat-preset-btn" data-lat="45.0" style="padding: 2px 7px; font-size: 10px;">🌲 Temperate (45°)</button>
-            <button class="btn-secondary lat-preset-btn" data-lat="65.0" style="padding: 2px 7px; font-size: 10px;">❄️ Arctic (65°)</button>
+            <button class="btn-secondary lat-preset-btn" data-lat="0"    data-biome="subtropical"    style="padding: 2px 7px; font-size: 10px;">🌴 Equator (0°)</button>
+            <button class="btn-secondary lat-preset-btn" data-lat="23.2" data-biome="tropical_monsoon" style="padding: 2px 7px; font-size: 10px;">🌧️ Gujarat (23.2°)</button>
+            <button class="btn-secondary lat-preset-btn" data-lat="28.6" data-biome="tropical_monsoon" style="padding: 2px 7px; font-size: 10px;">☀️ Delhi (28.6°)</button>
+            <button class="btn-secondary lat-preset-btn" data-lat="34.2" data-biome="subarctic"       style="padding: 2px 7px; font-size: 10px;">🏔️ Ladakh (34.2°)</button>
+            <button class="btn-secondary lat-preset-btn active" data-lat="45.0" data-biome="temperate" style="padding: 2px 7px; font-size: 10px;">🌲 Temperate (45°)</button>
+            <button class="btn-secondary lat-preset-btn" data-lat="65.0" data-biome="subarctic"       style="padding: 2px 7px; font-size: 10px;">❄️ Arctic (65°)</button>
           </div>
 
           <div class="control-group">
@@ -596,6 +591,11 @@
     </section>
 
   </main>
+
+  <!-- UI-11 FIX: Mobile Sidebar Toggle Button -->
+  <button class="mobile-sidebar-toggle" id="mobile-sidebar-toggle" title="Toggle Control Panel">
+    ⚙️
+  </button>
 
   <!-- ES6 Module Entrypoint -->
   <script type="module" src="js/app.js"></script>

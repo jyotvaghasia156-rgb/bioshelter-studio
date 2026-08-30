@@ -9,6 +9,11 @@ export class ExportManager {
     this.store = stateStore;
   }
 
+  // UI-10: Currency symbol helper
+  getCurrencySymbol() {
+    const map = { USD: '$', INR: '₹', EUR: '€', GBP: '£', AUD: 'A$', CAD: 'C$' };
+    return map[this.store.getState().currency] || '$';
+  }
   generateBOM() {
     const state = this.store.getState();
     const metrics = this.store.getCalculatedMetrics();
@@ -149,11 +154,13 @@ export class ExportManager {
     });
 
     const grandTotal = items.reduce((acc, it) => acc + it.totalPrice, 0);
+    const sym = this.getCurrencySymbol(); // UI-10 FIX: respect currency setting
 
     return {
       items,
       grandTotal: Math.round(grandTotal),
-      costPerSqm: Math.round(grandTotal / Math.max(1, metrics.floorArea))
+      costPerSqm: Math.round(grandTotal / Math.max(1, metrics.floorArea)),
+      currencySymbol: sym
     };
   }
 
@@ -202,6 +209,15 @@ export class ExportManager {
   }
 
   printEngineeringReport() {
+    // BUG-04 FIX: Apply print-mode class so @media print CSS can style a clean output;
+    // this hides the 3D viewport, sidebar, and nav, showing only the BOM table.
+    document.body.classList.add('print-mode');
     window.print();
+    // Remove class after the print dialog is dismissed
+    window.addEventListener('afterprint', () => {
+      document.body.classList.remove('print-mode');
+    }, { once: true });
+    // Fallback: also remove after a timeout in case afterprint doesn't fire
+    setTimeout(() => document.body.classList.remove('print-mode'), 3000);
   }
 }
