@@ -64,7 +64,7 @@ const MIME_TYPES = {
     '.webp': 'image/webp'
 };
 
-const server = http.createServer((req, res) => {
+function handleRequest(req, res) {
     const parsedUrl = url.parse(req.url, true);
     let pathname = parsedUrl.pathname;
 
@@ -947,7 +947,9 @@ const server = http.createServer((req, res) => {
             res.end(content);
         });
     });
-});
+}
+
+const server = http.createServer(handleRequest);
 
 if (!process.env.VERCEL) {
     server.listen(PORT, () => {
@@ -958,4 +960,4 @@ if (!process.env.VERCEL) {
     });
 }
 
-module.exports = server;
+module.exports = handleRequest;
