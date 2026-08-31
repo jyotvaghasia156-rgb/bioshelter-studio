@@ -16,6 +16,7 @@ import math
 import time
 import urllib.parse
 import urllib.request
+import threading
 import sys
 
 if hasattr(sys.stdout, 'reconfigure'):
@@ -494,59 +495,68 @@ def compute_live_wind_telemetry(lat, lng, location_name="Regional Station"):
 # =========================================================================
 ALL_DISTRICTS_DIRECTORY = [
     # --- 33 GUJARAT DISTRICTS ---
-    { "id": "gj_ahmedabad", "name": "Ahmedabad", "state": "Gujarat", "region": "Central Gujarat", "lat": 23.0225, "lng": 72.5714, "baseTemp": 42.5, "baseRh": 32, "vernacular": "Pol house courtyard stack effect, Otla porches & Tanka cisterns." },
-    { "id": "gj_surat", "name": "Surat", "state": "Gujarat", "region": "South Gujarat Coastal", "lat": 21.1702, "lng": 72.8311, "baseTemp": 36.8, "baseRh": 78, "vernacular": "Elevated timber stilt plinths & continuous cross-ventilation jharokhas." },
-    { "id": "gj_vadodara", "name": "Vadodara", "state": "Gujarat", "region": "Central Gujarat", "lat": 22.3072, "lng": 73.1812, "baseTemp": 41.2, "baseRh": 38, "vernacular": "Thick brick-lime masonry with shaded arched colonnades." },
-    { "id": "gj_rajkot", "name": "Rajkot", "state": "Gujarat", "region": "Saurashtra Semi-Arid", "lat": 22.3039, "lng": 70.8022, "baseTemp": 43.1, "baseRh": 28, "vernacular": "High thermal mass stone walls & reflective cool-roof coatings." },
-    { "id": "gj_bhavnagar", "name": "Bhavnagar", "state": "Gujarat", "region": "Saurashtra Coastal", "lat": 21.7645, "lng": 72.1519, "baseTemp": 38.5, "baseRh": 62, "vernacular": "Gulf of Khambhat sea breeze capture with shaded courtyard verandas." },
-    { "id": "gj_jamnagar", "name": "Jamnagar", "state": "Gujarat", "region": "Saurashtra Coast", "lat": 22.4707, "lng": 70.0577, "baseTemp": 37.4, "baseRh": 65, "vernacular": "Marine lime plasters & deep eaves to resist coastal solar glare." },
-    { "id": "gj_junagadh", "name": "Junagadh", "state": "Gujarat", "region": "Saurashtra Gir Foothills", "lat": 21.5222, "lng": 70.4579, "baseTemp": 39.8, "baseRh": 52, "vernacular": "Girnar hill microclimate integration with shaded rock-cut thermal sinks." },
-    { "id": "gj_gandhinagar", "name": "Gandhinagar", "state": "Gujarat", "region": "North-Central Green Capital", "lat": 23.2156, "lng": 72.6369, "baseTemp": 42.0, "baseRh": 30, "vernacular": "Dense green canopy tree shading with wide cross-ventilated road axes." },
-    { "id": "gj_kutch", "name": "Kutch (Bhuj / White Rann)", "state": "Gujarat", "region": "North-West Arid Desert", "lat": 23.2420, "lng": 69.6669, "baseTemp": 44.8, "baseRh": 18, "vernacular": "Circular Bhunga with conical thatched roofs & Lippan mud-mirror insulation." },
-    { "id": "gj_banaskantha", "name": "Banaskantha (Palanpur)", "state": "Gujarat", "region": "North Gujarat Arid Border", "lat": 24.1724, "lng": 72.4346, "baseTemp": 43.6, "baseRh": 24, "vernacular": "Rammed earth earth-sheltered subterranean berming against desert heatwaves." },
-    { "id": "gj_patan", "name": "Patan", "state": "Gujarat", "region": "North Gujarat Saraswati Basin", "lat": 23.8493, "lng": 72.1266, "baseTemp": 43.2, "baseRh": 26, "vernacular": "Stepwell (Vav) evaporative subterranean microclimate principles." },
-    { "id": "gj_mehsana", "name": "Mehsana", "state": "Gujarat", "region": "North Gujarat Solar Axis", "lat": 23.5880, "lng": 72.3693, "baseTemp": 42.8, "baseRh": 29, "vernacular": "Sunken courtyards with thick terracotta cavity wall construction." },
-    { "id": "gj_sabarkantha", "name": "Sabarkantha (Himmatnagar)", "state": "Gujarat", "region": "North Gujarat Foothills", "lat": 23.5977, "lng": 72.9698, "baseTemp": 41.5, "baseRh": 34, "vernacular": "Aravalli stone plinths & high thermal mass composite earth walls." },
-    { "id": "gj_aravalli", "name": "Aravalli (Modasa)", "state": "Gujarat", "region": "North-East Hill Range", "lat": 23.4623, "lng": 73.2988, "baseTemp": 41.0, "baseRh": 36, "vernacular": "Terraced hillside construction with passive earth cooling tunnels." },
-    { "id": "gj_mahisagar", "name": "Mahisagar (Lunawada)", "state": "Gujarat", "region": "East Central Forest Belt", "lat": 23.1332, "lng": 73.6166, "baseTemp": 40.8, "baseRh": 42, "vernacular": "Mahi river humidity moderation & timber bamboo roofing structures." },
-    { "id": "gj_panchmahal", "name": "Panchmahal (Godhra / Champaner)", "state": "Gujarat", "region": "East Central Plateau", "lat": 22.7758, "lng": 73.6149, "baseTemp": 41.4, "baseRh": 38, "vernacular": "Pavagadh basalt stone architecture with natural gravity stack vents." },
-    { "id": "gj_dahod", "name": "Dahod", "state": "Gujarat", "region": "Eastern Tribal Highland", "lat": 22.8340, "lng": 74.2555, "baseTemp": 40.2, "baseRh": 40, "vernacular": "Wattle-and-daub organic mud walls with broad protective thatched eaves." },
-    { "id": "gj_kheda", "name": "Kheda (Nadiad)", "state": "Gujarat", "region": "Charotar Alluvial Plains", "lat": 22.6916, "lng": 72.8634, "baseTemp": 41.8, "baseRh": 35, "vernacular": "Central chowk courtyards with perforated jali brick ventilation." },
-    { "id": "gj_anand", "name": "Anand (Milk Capital)", "state": "Gujarat", "region": "Charotar Alluvial Plains", "lat": 22.5645, "lng": 72.9289, "baseTemp": 41.6, "baseRh": 36, "vernacular": "Lush agrarian tree shelterbelts & passive double-roof air cavities." },
-    { "id": "gj_chhota_udeypur", "name": "Chhota Udaipur", "state": "Gujarat", "region": "Eastern Forest Foothills", "lat": 22.3082, "lng": 74.0136, "baseTemp": 39.5, "baseRh": 44, "vernacular": "Pithora mud-plastered walls with earthen breathable floor envelopes." },
-    { "id": "gj_narmada", "name": "Narmada (Rajpipla / Kevadia)", "state": "Gujarat", "region": "South-East River Gorge", "lat": 21.8708, "lng": 73.5027, "baseTemp": 38.6, "baseRh": 55, "vernacular": "Narmada valley canyon breezes & river cooling air-induction shafts." },
-    { "id": "gj_bharuch", "name": "Bharuch", "state": "Gujarat", "region": "South Coastal Estuary", "lat": 21.7051, "lng": 72.9959, "baseTemp": 37.8, "baseRh": 70, "vernacular": "High-humidity cross-ventilation louvers & saline-resistant lime finishes." },
-    { "id": "gj_tapi", "name": "Tapi (Vyara)", "state": "Gujarat", "region": "South Tribal Woodlands", "lat": 21.1189, "lng": 73.3934, "baseTemp": 37.2, "baseRh": 68, "vernacular": "Bamboo reinforced mud composite walls with natural forest shade." },
-    { "id": "gj_dang", "name": "Dang (Ahwa / Saputara)", "state": "Gujarat", "region": "South Mountain Hill Station", "lat": 20.7570, "lng": 73.6934, "baseTemp": 27.5, "baseRh": 72, "vernacular": "Sahyadri high-altitude sanctuary with steep pitched timber monsoon roofs." },
-    { "id": "gj_navsari", "name": "Navsari", "state": "Gujarat", "region": "South Coastal Basin", "lat": 20.9500, "lng": 72.9300, "baseTemp": 36.5, "baseRh": 76, "vernacular": "Purna river estuarine breeze capture & shaded outdoor otlas." },
-    { "id": "gj_valsad", "name": "Valsad / Vapi", "state": "Gujarat", "region": "South Arabian Coast", "lat": 20.5992, "lng": 72.9342, "baseTemp": 35.8, "baseRh": 80, "vernacular": "Deep 1.2m verandas to shield torrential monsoon rains & marine humidity." },
-    { "id": "gj_porbandar", "name": "Porbandar", "state": "Gujarat", "region": "Saurashtra Western Coast", "lat": 21.6417, "lng": 69.6293, "baseTemp": 35.2, "baseRh": 74, "vernacular": "White Porbandar limestone blocks with high thermal reflectance & salt durability." },
-    { "id": "gj_dwarka", "name": "Devbhumi Dwarka (Khambhalia)", "state": "Gujarat", "region": "Saurashtra Arabian Tip", "lat": 22.2442, "lng": 68.9685, "baseTemp": 34.6, "baseRh": 76, "vernacular": "Strong coastal wind turbines & marine lime thick stone construction." },
-    { "id": "gj_gir_somnath", "name": "Gir Somnath (Veraval)", "state": "Gujarat", "region": "Saurashtra Southern Coast", "lat": 20.9000, "lng": 70.3667, "baseTemp": 34.8, "baseRh": 75, "vernacular": "Arabian sea humidity relief with high-volume ocean breeze cross-ducting." },
-    { "id": "gj_amreli", "name": "Amreli", "state": "Gujarat", "region": "Saurashtra Central Basin", "lat": 21.6032, "lng": 71.2221, "baseTemp": 42.0, "baseRh": 35, "vernacular": "Dense stone plinths with nocturnal sky radiation cooling roofs." },
-    { "id": "gj_botad", "name": "Botad", "state": "Gujarat", "region": "Saurashtra Gateway", "lat": 22.1700, "lng": 71.6600, "baseTemp": 42.4, "baseRh": 32, "vernacular": "Massive compressed stabilized earth blocks (CSEB) with internal air shafts." },
-    { "id": "gj_morbi", "name": "Morbi", "state": "Gujarat", "region": "Saurashtra Ceramic Hub", "lat": 22.8173, "lng": 70.8377, "baseTemp": 43.0, "baseRh": 30, "vernacular": "High-albedo ceramic cool-roof tiles with double-skin vented facades." },
-    { "id": "gj_surendranagar", "name": "Surendranagar (Zalawad)", "state": "Gujarat", "region": "Saurashtra Salt Frontier", "lat": 22.7275, "lng": 71.6370, "baseTemp": 44.0, "baseRh": 22, "vernacular": "Thick stone cavity insulation to combat extreme diurnal desert variations." },
+    { "id": "gj_ahmedabad", "name": "Ahmedabad", "aliases": ["Ahmedabad City", "Amdavad", "Sanand", "Dholera", "Viramgam"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 23.0225, "lng": 72.5714, "baseTemp": 42.5, "baseRh": 32, "vernacular": "Pol house courtyard stack effect, Otla porches & Tanka cisterns." },
+    { "id": "gj_surat", "name": "Surat", "aliases": ["Surat City", "Rander", "Bardoli", "Hazira", "Olpad"], "state": "Gujarat", "region": "South Gujarat Coastal", "lat": 21.1702, "lng": 72.8311, "baseTemp": 36.8, "baseRh": 78, "vernacular": "Elevated timber stilt plinths & continuous cross-ventilation jharokhas." },
+    { "id": "gj_vadodara", "name": "Vadodara", "aliases": ["Baroda", "Padra", "Savli", "Dabhoi", "Waghodia"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 22.3072, "lng": 73.1812, "baseTemp": 41.2, "baseRh": 38, "vernacular": "Thick brick-lime masonry with shaded arched colonnades." },
+    { "id": "gj_rajkot", "name": "Rajkot", "aliases": ["Rajkot City", "Gondal", "Jetpur", "Jasdan", "Dhoraji"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 22.3039, "lng": 70.8022, "baseTemp": 43.1, "baseRh": 28, "vernacular": "High thermal mass stone walls & reflective cool-roof coatings." },
+    { "id": "gj_bhavnagar", "name": "Bhavnagar", "aliases": ["Bhavnagar Coast", "Palitana", "Mahuva", "Alang", "Sihor"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 21.7645, "lng": 72.1519, "baseTemp": 38.5, "baseRh": 62, "vernacular": "Gulf of Khambhat sea breeze capture with shaded courtyard verandas." },
+    { "id": "gj_jamnagar", "name": "Jamnagar", "aliases": ["Jamnagar Coast", "Dhrol", "Jodiya", "Kalavad", "Lalpur", "Sikka"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 22.4707, "lng": 70.0577, "baseTemp": 37.4, "baseRh": 65, "vernacular": "Marine lime plasters & deep eaves to resist coastal solar glare." },
+    { "id": "gj_junagadh", "name": "Junagadh", "aliases": ["Junagadh Gir", "Girnar", "Keshod", "Mangrol", "Manavadar"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 21.5222, "lng": 70.4579, "baseTemp": 39.8, "baseRh": 52, "vernacular": "Girnar hill microclimate integration with shaded rock-cut thermal sinks." },
+    { "id": "gj_gandhinagar", "name": "Gandhinagar", "aliases": ["Gandhinagar Capital", "Kalol", "Mansa", "Dehgam", "GIFT City"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 23.2156, "lng": 72.6369, "baseTemp": 42.0, "baseRh": 30, "vernacular": "Dense green canopy tree shading with wide cross-ventilated road axes." },
+    { "id": "gj_kutch", "name": "Kutch (Bhuj / White Rann)", "aliases": ["Kutch", "Bhuj", "Gandhidham", "Mandvi", "Anjar", "Rann of Kutch", "Khavda"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 23.2420, "lng": 69.6669, "baseTemp": 44.8, "baseRh": 18, "vernacular": "Circular Bhunga with conical thatched roofs & Lippan mud-mirror insulation." },
+    { "id": "gj_banaskantha", "name": "Banaskantha (Palanpur)", "aliases": ["Banaskantha", "Palanpur", "Ambaji", "Deesa", "Dhanera", "Tharad"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 24.1724, "lng": 72.4346, "baseTemp": 43.6, "baseRh": 24, "vernacular": "Rammed earth earth-sheltered subterranean berming against desert heatwaves." },
+    { "id": "gj_patan", "name": "Patan", "aliases": ["Patan", "Siddhpur", "Chanasma", "Radhanpur", "Rani ki Vav"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 23.8493, "lng": 72.1266, "baseTemp": 43.2, "baseRh": 26, "vernacular": "Stepwell (Vav) evaporative subterranean microclimate principles." },
+    { "id": "gj_mehsana", "name": "Mehsana", "aliases": ["Mehsana", "Modhera", "Vadnagar", "Kadi", "Visnagar", "Unjha"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 23.5880, "lng": 72.3693, "baseTemp": 42.8, "baseRh": 29, "vernacular": "Sunken courtyards with thick terracotta cavity wall construction." },
+    { "id": "gj_sabarkantha", "name": "Sabarkantha (Himmatnagar)", "aliases": ["Sabarkantha", "Himmatnagar", "Idar", "Prantij", "Khedbrahma"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 23.5977, "lng": 72.9698, "baseTemp": 41.5, "baseRh": 34, "vernacular": "Aravalli stone plinths & high thermal mass composite earth walls." },
+    { "id": "gj_aravalli", "name": "Aravalli (Modasa)", "aliases": ["Aravalli", "Modasa", "Shamlaji", "Bayad", "Malpur"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 23.4623, "lng": 73.2988, "baseTemp": 41.0, "baseRh": 36, "vernacular": "Terraced hillside construction with passive earth cooling tunnels." },
+    { "id": "gj_mahisagar", "name": "Mahisagar (Lunawada)", "aliases": ["Mahisagar", "Lunawada", "Santrampur", "Balasinor"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 23.1332, "lng": 73.6166, "baseTemp": 40.8, "baseRh": 42, "vernacular": "Mahi river humidity moderation & timber bamboo roofing structures." },
+    { "id": "gj_panchmahal", "name": "Panchmahal (Godhra / Champaner)", "aliases": ["Panchmahal", "Godhra", "Champaner", "Halol", "Pavagadh"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 22.7758, "lng": 73.6149, "baseTemp": 41.4, "baseRh": 38, "vernacular": "Pavagadh basalt stone architecture with natural gravity stack vents." },
+    { "id": "gj_dahod", "name": "Dahod", "aliases": ["Dahod", "Devgadh Baria", "Garbada", "Limkheda", "Jhalod"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 22.8340, "lng": 74.2555, "baseTemp": 40.2, "baseRh": 40, "vernacular": "Wattle-and-daub organic mud walls with broad protective thatched eaves." },
+    { "id": "gj_kheda", "name": "Kheda (Nadiad)", "aliases": ["Kheda", "Nadiad", "Kapadvanj", "Mehmedabad", "Matar"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 22.6916, "lng": 72.8634, "baseTemp": 41.8, "baseRh": 35, "vernacular": "Central chowk courtyards with perforated jali brick ventilation." },
+    { "id": "gj_anand", "name": "Anand (Milk Capital)", "aliases": ["Anand", "Vallabh Vidyanagar", "Khambhat", "Petlad", "Borsad"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 22.5645, "lng": 72.9289, "baseTemp": 41.6, "baseRh": 36, "vernacular": "Lush agrarian tree shelterbelts & passive double-roof air cavities." },
+    { "id": "gj_chhota_udeypur", "name": "Chhota Udaipur", "aliases": ["Chhota Udaipur", "Bodeli", "Sankheda", "Pavi Jetpur"], "state": "Gujarat", "region": "North & Central Gujarat", "lat": 22.3082, "lng": 74.0136, "baseTemp": 39.5, "baseRh": 44, "vernacular": "Pithora mud-plastered walls with earthen breathable floor envelopes." },
+    { "id": "gj_narmada", "name": "Narmada (Rajpipla / Kevadia)", "aliases": ["Narmada", "Rajpipla", "Kevadia", "Statue of Unity", "Garudeshwar"], "state": "Gujarat", "region": "South Gujarat Coastal", "lat": 21.8708, "lng": 73.5027, "baseTemp": 38.6, "baseRh": 55, "vernacular": "Narmada valley canyon breezes & river cooling air-induction shafts." },
+    { "id": "gj_bharuch", "name": "Bharuch", "aliases": ["Bharuch", "Ankleshwar", "Dahej", "Jambusar", "Hansot"], "state": "Gujarat", "region": "South Gujarat Coastal", "lat": 21.7051, "lng": 72.9959, "baseTemp": 37.8, "baseRh": 70, "vernacular": "High-humidity cross-ventilation louvers & saline-resistant lime finishes." },
+    { "id": "gj_tapi", "name": "Tapi (Vyara)", "aliases": ["Tapi", "Vyara", "Songadh", "Valod", "Ukai Dam"], "state": "Gujarat", "region": "South Gujarat Coastal", "lat": 21.1189, "lng": 73.3934, "baseTemp": 37.2, "baseRh": 68, "vernacular": "Bamboo reinforced mud composite walls with natural forest shade." },
+    { "id": "gj_dang", "name": "Dang (Ahwa / Saputara)", "aliases": ["Dang", "Ahwa", "Saputara", "Saputara Hill Station", "Waghai"], "state": "Gujarat", "region": "South Gujarat Coastal", "lat": 20.7570, "lng": 73.6934, "baseTemp": 27.5, "baseRh": 72, "vernacular": "Sahyadri high-altitude sanctuary with steep pitched timber monsoon roofs." },
+    { "id": "gj_navsari", "name": "Navsari", "aliases": ["Navsari City", "Bilimora", "Gandevi", "Jalalpore", "Vansda", "Dandi"], "state": "Gujarat", "region": "South Gujarat Coastal", "lat": 20.9500, "lng": 72.9300, "baseTemp": 36.5, "baseRh": 76, "vernacular": "Purna river estuarine breeze capture & shaded outdoor otlas." },
+    { "id": "gj_valsad", "name": "Valsad / Vapi", "aliases": ["Valsad", "Vapi", "Umbergaon", "Dharampur", "Pardi"], "state": "Gujarat", "region": "South Gujarat Coastal", "lat": 20.5992, "lng": 72.9342, "baseTemp": 35.8, "baseRh": 80, "vernacular": "Deep 1.2m verandas to shield torrential monsoon rains & marine humidity." },
+    { "id": "gj_porbandar", "name": "Porbandar", "aliases": ["Porbandar", "Ranavav", "Kutiyana", "Chhaya"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 21.6417, "lng": 69.6293, "baseTemp": 35.2, "baseRh": 74, "vernacular": "White Porbandar limestone blocks with high thermal reflectance & salt durability." },
+    { "id": "gj_dwarka", "name": "Devbhumi Dwarka (Khambhalia)", "aliases": ["Devbhumi Dwarka", "Dwarka", "Khambhalia", "Okha", "Bet Dwarka"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 22.2442, "lng": 68.9685, "baseTemp": 34.6, "baseRh": 76, "vernacular": "Strong coastal wind turbines & marine lime thick stone construction." },
+    { "id": "gj_gir_somnath", "name": "Gir Somnath (Veraval)", "aliases": ["Gir Somnath", "Veraval", "Somnath", "Talala Gir", "Una", "Gir Forest"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 20.9000, "lng": 70.3667, "baseTemp": 34.8, "baseRh": 75, "vernacular": "Arabian sea humidity relief with high-volume ocean breeze cross-ducting." },
+    { "id": "gj_amreli", "name": "Amreli", "aliases": ["Amreli", "Dhari", "Rajula", "Jafrabad", "Savarkundla"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 21.6032, "lng": 71.2221, "baseTemp": 42.0, "baseRh": 35, "vernacular": "Dense stone plinths with nocturnal sky radiation cooling roofs." },
+    { "id": "gj_botad", "name": "Botad", "aliases": ["Botad", "Gadhada", "Barwala", "Salangpur"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 22.1700, "lng": 71.6600, "baseTemp": 42.4, "baseRh": 32, "vernacular": "Massive compressed stabilized earth blocks (CSEB) with internal air shafts." },
+    { "id": "gj_morbi", "name": "Morbi", "aliases": ["Morbi", "Wankaner", "Maliya Miyana", "Tankara"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 22.8173, "lng": 70.8377, "baseTemp": 43.0, "baseRh": 30, "vernacular": "High-albedo ceramic cool-roof tiles with double-skin vented facades." },
+    { "id": "gj_surendranagar", "name": "Surendranagar (Zalawad)", "aliases": ["Surendranagar", "Wadhwan", "Dhrangadhra", "Limbdi", "Chotila"], "state": "Gujarat", "region": "Saurashtra & Kutch", "lat": 22.7275, "lng": 71.6370, "baseTemp": 44.0, "baseRh": 22, "vernacular": "Thick stone cavity insulation to combat extreme diurnal desert variations." },
 
     # --- MAJOR INDIAN STATE DISTRICTS ---
-    { "id": "in_delhi", "name": "New Delhi Central", "state": "Delhi", "region": "North India Composite", "lat": 28.6139, "lng": 77.2090, "baseTemp": 43.8, "baseRh": 32, "vernacular": "Jali screens, Mughal water channel cooling & thick brick cavity walls." },
-    { "id": "in_mumbai", "name": "Mumbai Suburban", "state": "Maharashtra", "region": "Konkan Coastal Humid", "lat": 19.0760, "lng": 72.8777, "baseTemp": 34.5, "baseRh": 82, "vernacular": "High ceiling double-pitch roofs with maximum cross-ventilation louvers." },
-    { "id": "in_bengaluru", "name": "Bengaluru Urban", "state": "Karnataka", "region": "Deccan Plateau Temperate", "lat": 12.9716, "lng": 77.5946, "baseTemp": 28.4, "baseRh": 55, "vernacular": "Year-round temperate Goldilocks climate with open bioclimatic verandas." },
-    { "id": "in_chennai", "name": "Chennai Central", "state": "Tamil Nadu", "region": "Coromandel Warm-Humid", "lat": 13.0827, "lng": 80.2707, "baseTemp": 37.6, "baseRh": 78, "vernacular": "Thinnai entrance verandas with ventilated terra-cotta Madras terrace roofs." },
-    { "id": "in_hyderabad", "name": "Hyderabad Urban", "state": "Telangana", "region": "Deccan Semi-Arid", "lat": 17.3850, "lng": 78.4867, "baseTemp": 40.5, "baseRh": 38, "vernacular": "Granite stone thermal mass with subterranean passive cooling basements." },
-    { "id": "in_kolkata", "name": "Kolkata Metropolitan", "state": "West Bengal", "region": "Gangetic Delta Humid", "lat": 22.5726, "lng": 88.3639, "baseTemp": 36.2, "baseRh": 84, "vernacular": "Slatted louvered green shutters (Khadkhadi) & deep shaded balconies." },
-    { "id": "in_jaipur", "name": "Jaipur (Pink City)", "state": "Rajasthan", "region": "North-West Hot Arid", "lat": 26.9124, "lng": 75.7873, "baseTemp": 43.5, "baseRh": 22, "vernacular": "Hawa Mahal wind-tunnel lattice screens & sandstone heat barriers." },
-    { "id": "in_jaisalmer", "name": "Jaisalmer (Thar Desert)", "state": "Rajasthan", "region": "Thar Desert Hyper-Arid", "lat": 26.9157, "lng": 70.9083, "baseTemp": 46.2, "baseRh": 15, "vernacular": "Deep subterranean earth basements (Tahkhana) & yellow sandstone screens." },
-    { "id": "in_ladakh", "name": "Leh Ladakh", "state": "Ladakh", "region": "Himalayan Cold Alpine", "lat": 34.1526, "lng": 77.5771, "baseTemp": 14.5, "baseRh": 25, "vernacular": "Trombe walls, direct solar gain sunrooms & thick timber straw-clay insulation." },
-    { "id": "in_pune", "name": "Pune", "state": "Maharashtra", "region": "Western Ghats Leeward", "lat": 18.5204, "lng": 73.8567, "baseTemp": 33.2, "baseRh": 48, "vernacular": "Stone wada courtyards with natural stack ventilation towers." },
+    { "id": "in_delhi", "name": "New Delhi Central", "aliases": ["Delhi", "NCR", "Noida", "Gurgaon", "Gurugram"], "state": "Delhi NCR", "region": "Major Indian Metro Districts", "lat": 28.6139, "lng": 77.2090, "baseTemp": 43.8, "baseRh": 32, "vernacular": "Jali screens, Mughal water channel cooling & thick brick cavity walls." },
+    { "id": "in_mumbai", "name": "Mumbai Suburban", "aliases": ["Mumbai", "Bombay", "Thane", "Navi Mumbai", "Bandra"], "state": "Maharashtra", "region": "Major Indian Metro Districts", "lat": 19.0760, "lng": 72.8777, "baseTemp": 34.5, "baseRh": 82, "vernacular": "High ceiling double-pitch roofs with maximum cross-ventilation louvers." },
+    { "id": "in_bengaluru", "name": "Bengaluru Urban", "aliases": ["Bangalore", "Bengaluru", "Electronic City", "Whitefield"], "state": "Karnataka", "region": "Major Indian Metro Districts", "lat": 12.9716, "lng": 77.5946, "baseTemp": 28.4, "baseRh": 55, "vernacular": "Year-round temperate Goldilocks climate with open bioclimatic verandas." },
+    { "id": "in_chennai", "name": "Chennai Central", "aliases": ["Chennai", "Madras", "OMR", "Adyar", "Mylapore"], "state": "Tamil Nadu", "region": "Major Indian Metro Districts", "lat": 13.0827, "lng": 80.2707, "baseTemp": 37.6, "baseRh": 78, "vernacular": "Thinnai entrance verandas with ventilated terra-cotta Madras terrace roofs." },
+    { "id": "in_hyderabad", "name": "Hyderabad Urban", "aliases": ["Hyderabad", "Cyberabad", "Secunderabad", "HITEC City"], "state": "Telangana", "region": "Major Indian Metro Districts", "lat": 17.3850, "lng": 78.4867, "baseTemp": 40.5, "baseRh": 38, "vernacular": "Granite stone thermal mass with subterranean passive cooling basements." },
+    { "id": "in_kolkata", "name": "Kolkata Metropolitan", "aliases": ["Kolkata", "Calcutta", "Howrah", "Salt Lake"], "state": "West Bengal", "region": "Major Indian Metro Districts", "lat": 22.5726, "lng": 88.3639, "baseTemp": 36.2, "baseRh": 84, "vernacular": "Slatted louvered green shutters (Khadkhadi) & deep shaded balconies." },
+    { "id": "in_jaipur", "name": "Jaipur (Pink City)", "aliases": ["Jaipur", "Amber", "Pink City"], "state": "Rajasthan", "region": "Major Indian Metro Districts", "lat": 26.9124, "lng": 75.7873, "baseTemp": 43.5, "baseRh": 22, "vernacular": "Hawa Mahal wind-tunnel lattice screens & sandstone heat barriers." },
+    { "id": "in_jodhpur", "name": "Jodhpur (Sun City)", "aliases": ["Jodhpur", "Blue City", "Mehrangarh"], "state": "Rajasthan", "region": "Major Indian Metro Districts", "lat": 26.2389, "lng": 73.0243, "baseTemp": 44.5, "baseRh": 20, "vernacular": "Indigo blue lime wash reflecting 78% solar radiation with shaded alleys." },
+    { "id": "in_jaisalmer", "name": "Jaisalmer (Thar Desert)", "aliases": ["Jaisalmer", "Thar Desert", "Sam Sand Dunes"], "state": "Rajasthan", "region": "Major Indian Metro Districts", "lat": 26.9157, "lng": 70.9083, "baseTemp": 46.2, "baseRh": 15, "vernacular": "Deep subterranean earth basements (Tahkhana) & yellow sandstone screens." },
+    { "id": "in_udaipur", "name": "Udaipur (City of Lakes)", "aliases": ["Udaipur", "Lake Pichola", "Mewar"], "state": "Rajasthan", "region": "Major Indian Metro Districts", "lat": 24.5854, "lng": 73.7125, "baseTemp": 39.5, "baseRh": 45, "vernacular": "Water evaporative cooling corridors & white marble thermal sinks." },
+    { "id": "in_ladakh", "name": "Leh Ladakh", "aliases": ["Leh", "Ladakh", "Nubra Valley", "Pangong"], "state": "Ladakh", "region": "Major Indian Metro Districts", "lat": 34.1526, "lng": 77.5771, "baseTemp": 14.5, "baseRh": 25, "vernacular": "Trombe walls, direct solar gain sunrooms & thick timber straw-clay insulation." },
+    { "id": "in_srinagar", "name": "Srinagar (Kashmir Valley)", "aliases": ["Srinagar", "Kashmir", "Dal Lake", "Gulmarg"], "state": "Jammu & Kashmir", "region": "Major Indian Metro Districts", "lat": 34.0837, "lng": 74.7973, "baseTemp": 22.0, "baseRh": 58, "vernacular": "Dhajji Dewari timber-masonry with Hamam subterranean floor heating." },
+    { "id": "in_shimla", "name": "Shimla", "aliases": ["Shimla", "Himachal", "Kufri"], "state": "Himachal Pradesh", "region": "Major Indian Metro Districts", "lat": 31.1048, "lng": 77.1734, "baseTemp": 21.5, "baseRh": 62, "vernacular": "Kath-Kuni stone-wood interlocking architecture with direct passive solar heating." },
+    { "id": "in_chandigarh", "name": "Chandigarh Capital", "aliases": ["Chandigarh", "Mohali", "Panchkula"], "state": "Punjab / Haryana", "region": "Major Indian Metro Districts", "lat": 30.7333, "lng": 76.7794, "baseTemp": 41.5, "baseRh": 35, "vernacular": "Le Corbusier brise-soleil concrete sunscreens & integrated green microclimate belts." },
+    { "id": "in_pune", "name": "Pune", "aliases": ["Pune", "Pimpri-Chinchwad", "Lonavala"], "state": "Maharashtra", "region": "Major Indian Metro Districts", "lat": 18.5204, "lng": 73.8567, "baseTemp": 33.2, "baseRh": 48, "vernacular": "Stone wada courtyards with natural stack ventilation towers." },
+    { "id": "in_goa", "name": "Goa Coastal", "aliases": ["Goa", "Panaji", "Margao", "Calangute"], "state": "Goa", "region": "Major Indian Metro Districts", "lat": 15.2993, "lng": 74.1240, "baseTemp": 33.0, "baseRh": 82, "vernacular": "Indo-Portuguese balcões (wrap-around verandas), red laterite stone & oyster windows." },
+    { "id": "in_kochi", "name": "Kochi (Cochin)", "aliases": ["Kochi", "Cochin", "Ernakulam"], "state": "Kerala", "region": "Major Indian Metro Districts", "lat": 9.9312, "lng": 76.2673, "baseTemp": 32.5, "baseRh": 86, "vernacular": "Sloped Mangalore tile gables, open attic air vents & shaded timber verandas." },
 
     # --- GLOBAL METROPOLITAN DISTRICTS ---
-    { "id": "gl_tokyo", "name": "Tokyo Metropolis", "state": "Japan", "region": "East Asia Temperate", "lat": 35.6762, "lng": 139.6503, "baseTemp": 26.4, "baseRh": 65, "vernacular": "Shoji sliding screens, Engawa transition corridors & wood joinery." },
-    { "id": "gl_london", "name": "Greater London", "state": "United Kingdom", "region": "North-West Europe Oceanic", "lat": 51.5074, "lng": -0.1278, "baseTemp": 19.5, "baseRh": 70, "vernacular": "Cavity insulation with southern solar thermal capture glazing." },
-    { "id": "gl_newyork", "name": "New York City", "state": "United States", "region": "North America Continental", "lat": 40.7128, "lng": -74.0060, "baseTemp": 24.8, "baseRh": 58, "vernacular": "Thermal envelope double glazing with active seasonal heat pumps." },
-    { "id": "gl_dubai", "name": "Dubai Metropolis", "state": "United Arab Emirates", "region": "Arabian Desert Coastal", "lat": 25.2048, "lng": 55.2708, "baseTemp": 43.5, "baseRh": 60, "vernacular": "Traditional Barjeel windcatcher towers & high-performance solar glazing." },
-    { "id": "gl_cairo", "name": "Cairo Governorate", "state": "Egypt", "region": "North Africa Nile Basin", "lat": 30.0444, "lng": 31.2357, "baseTemp": 39.2, "baseRh": 32, "vernacular": "Mashrabiya timber lattices, courtyards & Malqaf windcatchers." },
-    { "id": "gl_singapore", "name": "Singapore District", "state": "Singapore", "region": "Equatorial Tropical", "lat": 1.3521, "lng": 103.8198, "baseTemp": 31.5, "baseRh": 84, "vernacular": "Permeable open-plan facades with massive biophilic green sky-gardens." }
+    { "id": "gl_tokyo", "name": "Tokyo Metropolis", "aliases": ["Tokyo", "Japan", "Shinjuku"], "state": "Japan", "region": "Global Metropolitan Districts", "lat": 35.6762, "lng": 139.6503, "baseTemp": 26.4, "baseRh": 65, "vernacular": "Shoji sliding screens, Engawa transition corridors & wood joinery." },
+    { "id": "gl_london", "name": "Greater London", "aliases": ["London", "UK", "England"], "state": "United Kingdom", "region": "Global Metropolitan Districts", "lat": 51.5074, "lng": -0.1278, "baseTemp": 19.5, "baseRh": 70, "vernacular": "Cavity insulation with southern solar thermal capture glazing." },
+    { "id": "gl_newyork", "name": "New York City", "aliases": ["New York", "NYC", "Manhattan"], "state": "United States", "region": "Global Metropolitan Districts", "lat": 40.7128, "lng": -74.0060, "baseTemp": 24.8, "baseRh": 58, "vernacular": "Thermal envelope double glazing with active seasonal heat pumps." },
+    { "id": "gl_phoenix", "name": "Phoenix (Sonoran Desert)", "aliases": ["Phoenix", "Arizona", "Scottsdale"], "state": "United States", "region": "Global Metropolitan Districts", "lat": 33.4484, "lng": -112.0740, "baseTemp": 45.2, "baseRh": 16, "vernacular": "Earth-bermed rammed earth rammed monoliths with exterior deep shade trellises." },
+    { "id": "gl_dubai", "name": "Dubai Metropolis", "aliases": ["Dubai", "UAE", "Emirates"], "state": "United Arab Emirates", "region": "Global Metropolitan Districts", "lat": 25.2048, "lng": 55.2708, "baseTemp": 43.5, "baseRh": 60, "vernacular": "Traditional Barjeel windcatcher towers & high-performance solar glazing." },
+    { "id": "gl_cairo", "name": "Cairo Governorate", "aliases": ["Cairo", "Egypt", "Giza"], "state": "Egypt", "region": "Global Metropolitan Districts", "lat": 30.0444, "lng": 31.2357, "baseTemp": 39.2, "baseRh": 32, "vernacular": "Mashrabiya timber lattices, courtyards & Malqaf windcatchers." },
+    { "id": "gl_singapore", "name": "Singapore District", "aliases": ["Singapore", "Marina Bay"], "state": "Singapore", "region": "Global Metropolitan Districts", "lat": 1.3521, "lng": 103.8198, "baseTemp": 31.5, "baseRh": 84, "vernacular": "Permeable open-plan facades with massive biophilic green sky-gardens." },
+    { "id": "gl_sydney", "name": "Sydney Metropolitan", "aliases": ["Sydney", "Australia", "Bondi"], "state": "Australia", "region": "Global Metropolitan Districts", "lat": -33.8688, "lng": 151.2093, "baseTemp": 23.5, "baseRh": 64, "vernacular": "Wide verandas with louvers oriented to catch afternoon Southerly Buster cooling fronts." }
 ]
 
 def calculate_wet_bulb_temp(temp_c, rh_pct):
@@ -587,32 +597,20 @@ def calculate_heat_index(temp_c, rh_pct):
 # In-Memory Cache for Real-Time Satellite Weather Data (300s TTL)
 DISTRICT_LIVE_WEATHER_CACHE = {}
 DISTRICT_LIVE_CACHE_TIMESTAMP = 0
+DISTRICT_FETCH_LOCK = threading.Lock()
 
-def fetch_realtime_weather_for_districts(districts):
-    """
-    Fetches real-time, live current meteorological observations from Open-Meteo & Google Satellite feeds
-    for a list of districts with in-memory TTL caching.
-    """
-    global DISTRICT_LIVE_WEATHER_CACHE, DISTRICT_LIVE_CACHE_TIMESTAMP
-    now_ts = time.time()
-    
-    needed = []
-    for d in districts:
-        k = (round(d["lat"], 2), round(d["lng"], 2))
-        if k not in DISTRICT_LIVE_WEATHER_CACHE or (now_ts - DISTRICT_LIVE_WEATHER_CACHE[k].get("ts", 0)) > 300:
-            needed.append(d)
-
-    if needed:
-        try:
-            for chunk_start in range(0, len(needed), 50):
-                chunk = needed[chunk_start:chunk_start+50]
-                lats = ",".join(str(d["lat"]) for d in chunk)
-                lngs = ",".join(str(d["lng"]) for d in chunk)
-                url = f"https://api.open-meteo.com/v1/forecast?latitude={lats}&longitude={lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,direct_radiation"
-                req = urllib.request.Request(url, headers={"User-Agent": "BioShelter-LiveObservatory/2.0"})
-                with urllib.request.urlopen(req, timeout=4.5) as resp:
-                    if resp.status == 200:
-                        payload = json.loads(resp.read().decode("utf-8"))
+def _bg_fetch_satellite_weather(needed, now_ts):
+    try:
+        for chunk_start in range(0, len(needed), 50):
+            chunk = needed[chunk_start:chunk_start+50]
+            lats = ",".join(str(d["lat"]) for d in chunk)
+            lngs = ",".join(str(d["lng"]) for d in chunk)
+            url = f"https://api.open-meteo.com/v1/forecast?latitude={lats}&longitude={lngs}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,direct_radiation"
+            req = urllib.request.Request(url, headers={"User-Agent": "BioShelter-LiveObservatory/2.0"})
+            with urllib.request.urlopen(req, timeout=3.0) as resp:
+                if resp.status == 200:
+                    payload = json.loads(resp.read().decode("utf-8"))
+                    with DISTRICT_FETCH_LOCK:
                         if isinstance(payload, list):
                             for idx, item in enumerate(payload):
                                 if idx < len(chunk) and "current" in item:
@@ -639,8 +637,25 @@ def fetch_realtime_weather_for_districts(districts):
                                 "directRadiation": float(curr.get("direct_radiation", 350.0)),
                                 "ts": now_ts
                             }
-        except Exception as e:
-            print(f"[LiveWeather] Remote weather feed notice: {e}, serving calibrated fallback.")
+    except Exception as e:
+        pass
+
+def fetch_realtime_weather_for_districts(districts):
+    """
+    Fetches real-time, live current meteorological observations from Open-Meteo & Google Satellite feeds
+    for a list of districts with in-memory TTL caching in a non-blocking background thread.
+    """
+    now_ts = time.time()
+    needed = []
+    with DISTRICT_FETCH_LOCK:
+        for d in districts:
+            k = (round(d["lat"], 2), round(d["lng"], 2))
+            if k not in DISTRICT_LIVE_WEATHER_CACHE or (now_ts - DISTRICT_LIVE_WEATHER_CACHE[k].get("ts", 0)) > 300:
+                needed.append(d)
+
+    if needed:
+        t = threading.Thread(target=_bg_fetch_satellite_weather, args=(needed, now_ts), daemon=True)
+        t.start()
 
 def get_live_districts_telemetry(state_filter=None, query_str=None, sort_mode="temp_desc"):
     """
@@ -651,7 +666,7 @@ def get_live_districts_telemetry(state_filter=None, query_str=None, sort_mode="t
     hour_utc = now.hour + now.minute / 60.0
     epoch_sec = now.timestamp()
     
-    filtered_list = ALL_DISTRICTS_DIRECTORY
+    filtered_list = list(ALL_DISTRICTS_DIRECTORY)
 
     if state_filter and state_filter.lower() != "all":
         sf = state_filter.lower().strip()
@@ -664,13 +679,17 @@ def get_live_districts_telemetry(state_filter=None, query_str=None, sort_mode="t
         elif sf in ["north_gujarat", "central_gujarat", "north", "central"]:
             filtered_list = [d for d in filtered_list if "North" in d.get("region", "") or "Central" in d.get("region", "")]
         elif sf in ["india", "national"]:
-            filtered_list = [d for d in filtered_list if d.get("state") != "Gujarat" and d.get("state") in ["Delhi", "Maharashtra", "Karnataka", "Tamil Nadu", "Telangana", "West Bengal", "Rajasthan", "Ladakh"]]
+            filtered_list = [d for d in filtered_list if "Major Indian Metro" in d.get("region", "")]
         elif sf in ["global", "world"]:
-            filtered_list = [d for d in filtered_list if d.get("state") not in ["Gujarat", "Delhi", "Maharashtra", "Karnataka", "Tamil Nadu", "Telangana", "West Bengal", "Rajasthan", "Ladakh"]]
+            filtered_list = [d for d in filtered_list if "Global Metropolitan" in d.get("region", "")]
 
-    if query_str:
+    if query_str and query_str.strip():
         qs = query_str.lower().strip()
-        filtered_list = [d for d in filtered_list if qs in d["name"].lower() or qs in d["region"].lower() or qs in d["state"].lower()]
+        matched = [d for d in filtered_list if qs in d["name"].lower() or qs in d["region"].lower() or qs in d["state"].lower() or qs in d.get("vernacular", "").lower() or any(qs in a.lower() for a in d.get("aliases", []))]
+        if not matched:
+            # Broaden search to all districts if not found in current scope
+            matched = [d for d in ALL_DISTRICTS_DIRECTORY if qs in d["name"].lower() or qs in d["region"].lower() or qs in d["state"].lower() or qs in d.get("vernacular", "").lower() or any(qs in a.lower() for a in d.get("aliases", []))]
+        filtered_list = matched
 
     # Fetch real live weather observations from satellite feeds
     fetch_realtime_weather_for_districts(filtered_list)

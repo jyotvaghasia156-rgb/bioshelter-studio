@@ -754,7 +754,7 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 11px;">
                             <div style="background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 6px;">
                                 <span style="color: var(--text-muted);">Feels Like (HI):</span>
-                                <strong style="color: var(--text-primary); display: block; font-family: var(--font-mono); font-size: 13px;">${d.feelsLikeC}°C</strong>
+                                <strong style="color: var(--text-primary); display: block; font-family: var(--font-mono); font-size: 13px;">${d.feelsLikeC ?? d.heatIndexC ?? d.temperatureC}°C</strong>
                             </div>
                             <div style="background: rgba(255,255,255,0.03); padding: 6px 10px; border-radius: 6px;">
                                 <span style="color: var(--text-muted);">Wet-Bulb (Twb):</span>
@@ -780,7 +780,7 @@
 
                         <!-- Vernacular Architecture Tip -->
                         <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 14px; border-left: 2px solid ${d.statusColor}; padding-left: 8px;">
-                            🏛️ <em>${d.vernacularTip}</em>
+                            🏛️ <em>${d.vernacularTip || d.vernacularSummary || 'Bioclimatic regional envelope.'}</em>
                         </div>
                     </div>
 
