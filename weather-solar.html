@@ -491,15 +491,15 @@
                 </div>
 
                 <div class="telemetry-card" style="--card-accent: #ef4444;">
-                    <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Facade Stagnation Pressure ($q$)</div>
+                    <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Facade Stagnation Pressure (q)</div>
                     <div id="stat-wind-pressure-pa" style="font-size: 26px; font-weight: 800; color: #f87171; font-family: var(--font-mono); margin: 4px 0;">15.6 Pa</div>
-                    <div id="stat-wind-load-cat" style="font-size: 11px; color: var(--text-secondary); line-height: 1.3;">Low Wind Load ($q = \frac{1}{2}\rho v^2$)</div>
+                    <div id="stat-wind-load-cat" style="font-size: 11px; color: var(--text-secondary); line-height: 1.3;">Low Wind Load (q = &frac12;&rho;v&sup2;)</div>
                 </div>
 
                 <div class="telemetry-card" style="--card-accent: #10b981;">
                     <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Windcatcher Airflow (Badgir)</div>
                     <div id="stat-wind-flow-m3h" style="font-size: 26px; font-weight: 800; color: #10b981; font-family: var(--font-mono); margin: 4px 0;">22,200 m³/h</div>
-                    <div id="stat-wind-flow-cfm" style="font-size: 11px; color: var(--text-secondary); line-height: 1.3;">13,066 CFM &bull; Convective $h_c = 27.9\text{ W/m²K}$</div>
+                    <div id="stat-wind-flow-cfm" style="font-size: 11px; color: var(--text-secondary); line-height: 1.3;">13,066 CFM &bull; Convective hc = 27.9 W/m²K</div>
                 </div>
             </div>
 
@@ -830,6 +830,12 @@
                     currentWindData = windEngine.computeLocalWind(26.9157, 70.9083, 'Thar Desert (Jaisalmer)');
                 }
                 updateWindDisplay(currentWindData);
+                requestAnimationFrame(() => {
+                    if (currentWindData && currentWindData.hourlyProfile) {
+                        renderWindChart(currentWindData.hourlyProfile);
+                    }
+                    if (chartWind) chartWind.resize();
+                });
             } else {
                 tabSolar.classList.add('active');
                 secSolar.style.display = 'block';
@@ -837,6 +843,12 @@
                     currentSolarData = solarEngine.computeLocalSolarProfile(26.9157, 70.9083, 'Thar Desert (Jaisalmer)');
                 }
                 updateSolarDisplay(currentSolarData);
+                requestAnimationFrame(() => {
+                    if (currentSolarData && currentSolarData.hourlyProfile) {
+                        renderSolarHourlyChart(currentSolarData.hourlyProfile);
+                    }
+                    if (chartSolar) chartSolar.resize();
+                });
             }
         }
 
@@ -907,7 +919,9 @@
             document.getElementById('val-wind-max-gust').textContent = `${telemetry.gustKmh.toFixed(1)} km/h`;
             document.getElementById('val-wind-cooling-pot').textContent = aerodynamicsAndBuilding.passiveCoolingPotential;
 
-            if (hourlyProfile) renderWindChart(hourlyProfile);
+            if (hourlyProfile && activeTab === 'wind') {
+                renderWindChart(hourlyProfile);
+            }
         }
 
         function startAnemometerAnimLoop() {
@@ -965,26 +979,38 @@
             const canvasCompass = document.getElementById('canvas-sun-compass');
             solarEngine.renderSunCompassCanvas(canvasCompass, solarGeometry.solarAltitudeDeg, solarGeometry.solarAzimuthDeg);
 
-            renderSolarHourlyChart(hourlyProfile);
+            if (hourlyProfile && activeTab === 'solar') {
+                renderSolarHourlyChart(hourlyProfile);
+            }
         }
 
         function renderWindChart(hourly) {
             const ctx = document.getElementById('chart-wind-velocity');
-            if (!ctx) return;
+            if (!ctx || !hourly || !hourly.length) return;
             const isDark = themeManager.isDark();
             const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.08)';
             const textColor = isDark ? '#94a3b8' : '#475569';
 
-            if (chartWind) chartWind.destroy();
+            const labels = hourly.map(h => h.hour);
+            const speedData = hourly.map(h => h.speedKmh);
+            const gustData = hourly.map(h => (h.gustMps != null ? h.gustMps * 3.6 : (h.gustKmh || h.speedKmh * 1.35)));
+
+            if (chartWind) {
+                chartWind.data.labels = labels;
+                chartWind.data.datasets[0].data = speedData;
+                chartWind.data.datasets[1].data = gustData;
+                chartWind.update('none');
+                return;
+            }
 
             chartWind = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: hourly.map(h => h.hour),
+                    labels: labels,
                     datasets: [
                         {
                             label: 'Mean Wind Speed (km/h)',
-                            data: hourly.map(h => h.speedKmh),
+                            data: speedData,
                             borderColor: '#38bdf8',
                             backgroundColor: 'rgba(56, 189, 248, 0.18)',
                             fill: true,
@@ -993,7 +1019,7 @@
                         },
                         {
                             label: 'Peak Wind Gusts (km/h)',
-                            data: hourly.map(h => h.gustMps * 3.6),
+                            data: gustData,
                             borderColor: '#f43f5e',
                             backgroundColor: 'transparent',
                             borderDash: [5, 5],
@@ -1005,6 +1031,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: { duration: 400 },
                     scales: {
                         x: { grid: { color: gridColor }, ticks: { color: textColor } },
                         y: { grid: { color: gridColor }, ticks: { color: textColor }, title: { display: true, text: 'km / hour', color: textColor } }
@@ -1018,21 +1045,35 @@
 
         function renderSolarHourlyChart(hourly) {
             const ctx = document.getElementById('chart-solar-radiation');
-            if (!ctx) return;
+            if (!ctx || !hourly || !hourly.length) return;
             const isDark = themeManager.isDark();
             const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.08)';
             const textColor = isDark ? '#94a3b8' : '#475569';
 
-            if (chartSolar) chartSolar.destroy();
+            const labels = hourly.map(h => h.hour);
+            const ghiData = hourly.map(h => h.ghi);
+            const dniData = hourly.map(h => h.dni);
+            const dhiData = hourly.map(h => h.dhi);
+            const tempData = hourly.map(h => h.tempC);
+
+            if (chartSolar) {
+                chartSolar.data.labels = labels;
+                chartSolar.data.datasets[0].data = ghiData;
+                chartSolar.data.datasets[1].data = dniData;
+                chartSolar.data.datasets[2].data = dhiData;
+                chartSolar.data.datasets[3].data = tempData;
+                chartSolar.update('none');
+                return;
+            }
 
             chartSolar = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: hourly.map(h => h.hour),
+                    labels: labels,
                     datasets: [
                         {
                             label: 'Global Irradiance GHI (W/m²)',
-                            data: hourly.map(h => h.ghi),
+                            data: ghiData,
                             borderColor: '#f59e0b',
                             backgroundColor: 'rgba(245, 158, 11, 0.22)',
                             fill: true,
@@ -1042,7 +1083,7 @@
                         },
                         {
                             label: 'Direct Beam DNI (W/m²)',
-                            data: hourly.map(h => h.dni),
+                            data: dniData,
                             borderColor: '#ef4444',
                             backgroundColor: 'transparent',
                             borderDash: [5, 5],
@@ -1052,7 +1093,7 @@
                         },
                         {
                             label: 'Diffuse Sky DHI (W/m²)',
-                            data: hourly.map(h => h.dhi),
+                            data: dhiData,
                             borderColor: '#38bdf8',
                             backgroundColor: 'rgba(56, 189, 248, 0.1)',
                             fill: true,
@@ -1062,7 +1103,7 @@
                         },
                         {
                             label: 'Ambient Temp (°C)',
-                            data: hourly.map(h => h.tempC),
+                            data: tempData,
                             borderColor: '#10b981',
                             backgroundColor: 'transparent',
                             tension: 0.35,
@@ -1074,6 +1115,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: { duration: 400 },
                     scales: {
                         x: { grid: { color: gridColor }, ticks: { color: textColor } },
                         y: {
