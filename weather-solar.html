@@ -444,7 +444,7 @@
                     </div>
 
                     <div style="width: 100%; text-align: center; border-top: 1px solid var(--border-subtle); padding-top: 10px; margin-top: 4px; font-size: 11px; color: var(--text-secondary);">
-                        Rotation speed reflects live Google satellite aerodynamic velocity ($1\text{ s}$ stream).
+                        Rotation speed reflects live Google satellite aerodynamic velocity (1-second live stream).
                     </div>
                 </div>
 
@@ -464,7 +464,7 @@
 
                     <div style="width: 100%; display: flex; justify-content: space-around; border-top: 1px solid var(--border-subtle); padding-top: 10px; margin-top: 4px; font-size: 11px;">
                         <div style="text-align: center;">
-                            <span style="color: var(--text-muted); display: block;">Air Density ($\rho$)</span>
+                            <span style="color: var(--text-muted); display: block;">Air Density (&rho;)</span>
                             <strong id="card-air-density" style="color: var(--text-primary); font-size: 13px; font-family: var(--font-mono);">1.184 kg/m³</strong>
                         </div>
                         <div style="text-align: center;">
@@ -543,15 +543,15 @@
 
                     <div style="width: 100%; display: flex; justify-content: space-around; border-top: 1px solid var(--border-subtle); padding-top: 12px; margin-top: 6px; font-size: 11px;">
                         <div style="text-align: center;">
-                            <span style="color: var(--text-muted); display: block;">Direct Beam ($DNI$)</span>
+                            <span style="color: var(--text-muted); display: block;">Direct Beam (DNI)</span>
                             <strong id="card-dni-val" style="color: var(--accent-amber); font-size: 15px; font-family: var(--font-mono);">980 W/m²</strong>
                         </div>
                         <div style="text-align: center;">
-                            <span style="color: var(--text-muted); display: block;">Diffuse Sky ($DHI$)</span>
+                            <span style="color: var(--text-muted); display: block;">Diffuse Sky (DHI)</span>
                             <strong id="card-dhi-val" style="color: var(--accent-sky); font-size: 15px; font-family: var(--font-mono)">180 W/m²</strong>
                         </div>
                         <div style="text-align: center;">
-                            <span style="color: var(--text-muted); display: block;">Sun Elevation ($\alpha$)</span>
+                            <span style="color: var(--text-muted); display: block;">Sun Elevation (&alpha;)</span>
                             <strong id="card-altitude-val" style="color: #10b981; font-size: 15px; font-family: var(--font-mono)">68.4°</strong>
                         </div>
                     </div>
@@ -826,23 +826,41 @@
             } else if (mode === 'wind') {
                 tabWind.classList.add('active');
                 secWind.style.display = 'block';
+                if (!currentWindData) {
+                    currentWindData = windEngine.computeLocalWind(26.9157, 70.9083, 'Thar Desert (Jaisalmer)');
+                }
+                updateWindDisplay(currentWindData);
             } else {
                 tabSolar.classList.add('active');
                 secSolar.style.display = 'block';
-                if (currentSolarData) updateSolarDisplay(currentSolarData);
+                if (!currentSolarData) {
+                    currentSolarData = solarEngine.computeLocalSolarProfile(26.9157, 70.9083, 'Thar Desert (Jaisalmer)');
+                }
+                updateSolarDisplay(currentSolarData);
             }
         }
 
-        async function loadLocationAll(lat, lng, name) {
-            const solarData = await solarEngine.fetchSolarRadiation(lat, lng, name);
-            if (solarData) {
-                currentSolarData = solarData;
-                updateSolarDisplay(solarData);
+        function loadLocationAll(lat, lng, name) {
+            // Provide immediate initial data fallback so UI is immediately populated
+            if (!currentWindData) {
+                currentWindData = windEngine.computeLocalWind(lat, lng, name);
+                if (activeTab === 'wind') updateWindDisplay(currentWindData);
             }
+            if (!currentSolarData) {
+                currentSolarData = solarEngine.computeLocalSolarProfile(lat, lng, name);
+                if (activeTab === 'solar') updateSolarDisplay(currentSolarData);
+            }
+
+            solarEngine.fetchSolarRadiation(lat, lng, name).then(solarData => {
+                if (solarData) {
+                    currentSolarData = solarData;
+                    if (activeTab === 'solar') updateSolarDisplay(solarData);
+                }
+            }).catch(e => console.warn('[Solar] Fetch fallback:', e));
 
             windEngine.startLiveStream(lat, lng, name, (windData) => {
                 currentWindData = windData;
-                updateWindDisplay(windData);
+                if (activeTab === 'wind') updateWindDisplay(windData);
             }, 1000);
         }
 
@@ -852,10 +870,19 @@
             const { telemetry, aerodynamicsAndBuilding, hourlyProfile } = data;
 
             const canvasSpeedo = document.getElementById('canvas-wind-speedometer');
-            windEngine.renderSpeedometerGaugeCanvas(canvasSpeedo, telemetry.speedMps, telemetry.gustMps, 25);
+            if (canvasSpeedo) {
+                windEngine.renderSpeedometerGaugeCanvas(canvasSpeedo, telemetry.speedMps, telemetry.gustMps, 25);
+            }
 
             const canvasVane = document.getElementById('canvas-windvane-compass');
-            windEngine.renderWindVaneCanvas(canvasVane, telemetry.directionDeg, telemetry.cardinalDirection);
+            if (canvasVane) {
+                windEngine.renderWindVaneCanvas(canvasVane, telemetry.directionDeg, telemetry.cardinalDirection);
+            }
+
+            const canvasCup = document.getElementById('canvas-cup-anemometer');
+            if (canvasCup) {
+                windEngine.renderAnemometerCanvas(canvasCup, telemetry.speedMps);
+            }
 
             document.getElementById('card-wind-knots').textContent = `${telemetry.speedKnots.toFixed(1)} kn`;
             document.getElementById('card-wind-mph').textContent = `${telemetry.speedMph.toFixed(1)} mph`;
@@ -864,8 +891,9 @@
             document.getElementById('card-surface-pressure').textContent = `${telemetry.surfacePressureHpa} hPa`;
 
             const bBadge = document.getElementById('badge-wind-beaufort');
-            bBadge.textContent = `BEAUFORT ${telemetry.beaufortScale}`;
-            document.getElementById('badge-wind-cardinal').textContent = `${Math.round(telemetry.directionDeg)}° ${telemetry.cardinalDirection}`;
+            if (bBadge) bBadge.textContent = `BEAUFORT ${telemetry.beaufortScale}`;
+            const cBadge = document.getElementById('badge-wind-cardinal');
+            if (cBadge) cBadge.textContent = `${Math.round(telemetry.directionDeg)}° ${telemetry.cardinalDirection}`;
 
             document.getElementById('stat-wind-mps').textContent = `${telemetry.speedMps.toFixed(2)} m/s`;
             document.getElementById('stat-wind-kmh').textContent = `${telemetry.speedKmh.toFixed(1)} km/h • ${telemetry.beaufortDescription}`;
@@ -884,15 +912,16 @@
 
         function startAnemometerAnimLoop() {
             function loop() {
-                const canvasCup = document.getElementById('canvas-cup-anemometer');
-                if (canvasCup && currentWindData && currentWindData.telemetry) {
-                    windEngine.renderAnemometerCanvas(canvasCup, currentWindData.telemetry.speedMps);
-                } else if (canvasCup) {
-                    windEngine.renderAnemometerCanvas(canvasCup, 4.5);
+                if (activeTab === 'wind') {
+                    const canvasCup = document.getElementById('canvas-cup-anemometer');
+                    if (canvasCup) {
+                        const speed = (currentWindData && currentWindData.telemetry) ? currentWindData.telemetry.speedMps : 4.5;
+                        windEngine.renderAnemometerCanvas(canvasCup, speed);
+                    }
                 }
                 requestAnimationFrame(loop);
             }
-            loop();
+            requestAnimationFrame(loop);
         }
 
         function updateSolarDisplay(data) {

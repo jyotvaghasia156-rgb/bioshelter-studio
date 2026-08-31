@@ -216,15 +216,15 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px;">
             <div class="feature-box">
               <h3 style="font-size: 14px; font-weight: 700; color: var(--emerald-400);">Unit I: Solar Geometry &amp; Microclimates</h3>
-              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Celestial sun-path azimuth, solar altitude angle ($\alpha$), direct normal irradiance ($DNI$), and psychrometric enthalpy analysis.</p>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Celestial sun-path azimuth, solar altitude angle (&alpha;), direct normal irradiance (DNI), and psychrometric enthalpy analysis.</p>
             </div>
             <div class="feature-box">
               <h3 style="font-size: 14px; font-weight: 700; color: var(--cyan-400);">Unit II: Geothermal &amp; Soil Physics</h3>
-              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Kusuda subsoil harmonic temperature attenuation, soil thermal conductivity ($k$), volumetric heat capacity, and Ground-to-Air Heat Transfer (GAHT).</p>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Kusuda subsoil harmonic temperature attenuation, soil thermal conductivity (k), volumetric heat capacity, and Ground-to-Air Heat Transfer (GAHT).</p>
             </div>
             <div class="feature-box">
               <h3 style="font-size: 14px; font-weight: 700; color: var(--amber-400);">Unit III: Transient Envelope Physics</h3>
-              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Multi-layer composite U-values, periodic thermal lag ($\phi$), decrement factor ($f$), and thermal mass water buffering.</p>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Multi-layer composite U-values, periodic thermal lag (&phi;), decrement factor (f), and thermal mass water buffering.</p>
             </div>
             <div class="feature-box">
               <h3 style="font-size: 14px; font-weight: 700; color: var(--coral-500);">Unit IV: Closed-Loop Regenerative Bio-Loops</h3>
@@ -237,7 +237,7 @@
         <section id="module-2" class="article-section">
           <h2 class="article-h2"><span>2.</span> Mathematical Foundations &amp; Thermal Lag Calculus</h2>
           <p style="color: var(--text-secondary); line-height: 1.6; font-size: 13px;">
-            In passive solar bioshelters, thermal inertia delays heat transmission through dense earthen envelope assemblies. For a homogeneous masonry monolith of thickness $L$, thermal diffusivity $\alpha = \frac{k}{\rho \cdot c_p}$, subjected to periodic diurnal solar radiation of period $\tau = 24\text{ hours}$:
+            In passive solar bioshelters, thermal inertia delays heat transmission through dense earthen envelope assemblies. For a homogeneous masonry monolith of thickness L, thermal diffusivity &alpha; = k / (&rho; &bull; cp), subjected to periodic diurnal solar radiation of period &tau; = 24 hours:
           </p>
 
           <div class="math-card">
@@ -247,7 +247,7 @@
           </div>
 
           <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-            <strong>Example Verification:</strong> A 300mm Rammed Earth Monolith ($k = 1.25\text{ W/m}\cdot\text{K}$, $\rho = 2100\text{ kg/m}^3$, $c_p = 1050\text{ J/kg}\cdot\text{K}$) yields $\alpha = 5.67 \times 10^{-7}\text{ m}^2/\text{s}$, producing an exact analytical time lag $\phi = 9.18\text{ hours}$ and decrement factor $f = 0.10$. Peak solar heat penetrating at 13:00 reaches the interior at 22:11, exactly when night heating is required.
+            <strong>Example Verification:</strong> A 300mm Rammed Earth Monolith (k = 1.25 W/m&bull;K, &rho; = 2100 kg/m&sup3;, cp = 1050 J/kg&bull;K) yields &alpha; = 5.67 &times; 10<sup>-7</sup> m&sup2;/s, producing an exact analytical time lag &phi; = 9.18 hours and decrement factor f = 0.10. Peak solar heat penetrating at 13:00 reaches the interior at 22:11, exactly when night heating is required.
           </p>
         </section>
 
@@ -255,7 +255,7 @@
         <section id="module-3" class="article-section">
           <h2 class="article-h2"><span>3.</span> Subsurface Geothermal Kusuda Equation</h2>
           <p style="color: var(--text-secondary); line-height: 1.6; font-size: 13px;">
-            Earth temperature at depth $z$ (meters) on day $t$ (0 to 365) is computed using the semi-infinite solid heat conduction formulation with periodic surface harmonic boundary condition:
+            Earth temperature at depth z (meters) on day t (0 to 365) is computed using the semi-infinite solid heat conduction formulation with periodic surface harmonic boundary condition:
           </p>
 
           <div class="math-card">
@@ -263,7 +263,7 @@
           </div>
 
           <p style="font-size: 12px; color: var(--text-muted);">
-            Where $T_{mean}$ is annual mean surface ambient temperature (°C), $A_s$ is annual surface temperature amplitude (°C), $\alpha$ is soil thermal diffusivity (m²/day), and $t_0$ is day of minimum surface temperature.
+            Where T_mean is annual mean surface ambient temperature (°C), A_s is annual surface temperature amplitude (°C), &alpha; is soil thermal diffusivity (m²/day), and t_0 is day of minimum surface temperature.
           </p>
         </section>
 
@@ -277,7 +277,7 @@
               <span style="font-family: var(--font-mono); font-size: 11px; color: var(--cyan-400);">Duration: 3 Hours</span>
             </div>
             <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">
-              <strong>Objective:</strong> Compare 300mm Rammed Earth, 200mm CEB Earthbag, and 16mm Polycarbonate under 1,000 W/m² halogen solar simulator in BioShelter Studio. Calculate time lag $\Delta t$ and amplitude damping.
+              <strong>Objective:</strong> Compare 300mm Rammed Earth, 200mm CEB Earthbag, and 16mm Polycarbonate under 1,000 W/m² halogen solar simulator in BioShelter Studio. Calculate time lag &Delta;t and amplitude damping.
             </p>
           </div>
 
