@@ -176,88 +176,101 @@ export class SolarEngine {
     /**
      * Draws an ultra-premium animated Radial Solar Irradiance Meter on an HTML5 canvas
      */
-    renderSolarGaugeCanvas(canvas, ghi = 0, dni = 0, maxGhi = 1200) {
+    renderSolarGaugeCanvas(canvas, ghi = 0, dni = 0, maxGhi = 1200, timeSec = 0) {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
+        if (!ctx) return;
+
+        // Auto-detect and sync canvas dimensions
+        const width = canvas.width || 440;
+        const height = canvas.height || 260;
         const centerX = width / 2;
-        const centerY = height * 0.72;
-        const radius = Math.min(width * 0.42, height * 0.58);
+        const centerY = height * 0.68;
+        const radius = Math.min(width * 0.38, height * 0.48);
 
         ctx.clearRect(0, 0, width, height);
+
+        // 1. Sleek Background Gauge Dial Plate
+        const bgGrad = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, radius + 30);
+        bgGrad.addColorStop(0, 'rgba(245, 158, 11, 0.08)');
+        bgGrad.addColorStop(0.7, 'rgba(15, 23, 42, 0.4)');
+        bgGrad.addColorStop(1, 'rgba(10, 15, 30, 0)');
+        ctx.fillStyle = bgGrad;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius + 25, 0, Math.PI * 2);
+        ctx.fill();
 
         const startAngle = Math.PI * 0.8;
         const endAngle = Math.PI * 2.2;
         const totalAngle = endAngle - startAngle;
 
-        // 1. Background Arc Track
+        // 2. Background Track Arc
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-        ctx.lineWidth = 18;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.10)';
+        ctx.lineWidth = 16;
         ctx.lineCap = 'round';
         ctx.stroke();
 
-        // 2. Active Glowing Gradient Solar Arc
+        // 3. Active Glowing Gradient Solar Arc
         const fillFraction = Math.max(0, Math.min(1.0, ghi / maxGhi));
         const currentAngle = startAngle + fillFraction * totalAngle;
 
-        if (fillFraction > 0.01) {
+        if (fillFraction > 0.005) {
             const grad = ctx.createLinearGradient(centerX - radius, centerY, centerX + radius, centerY);
             grad.addColorStop(0.0, '#10b981');  // Low (Green)
             grad.addColorStop(0.35, '#38bdf8'); // Mild (Sky Blue)
             grad.addColorStop(0.65, '#f59e0b'); // High (Amber)
-            grad.addColorStop(1.0, '#ef4444');  // Extreme (Red/Crimson)
+            grad.addColorStop(1.0, '#ef4444');  // Extreme (Crimson)
 
             ctx.save();
-            ctx.shadowColor = '#f59e0b';
-            ctx.shadowBlur = 14;
+            ctx.shadowColor = ghi > 800 ? '#ef4444' : '#f59e0b';
+            ctx.shadowBlur = 16;
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, startAngle, currentAngle);
             ctx.strokeStyle = grad;
-            ctx.lineWidth = 18;
+            ctx.lineWidth = 16;
             ctx.lineCap = 'round';
             ctx.stroke();
             ctx.restore();
         }
 
-        // 3. Tick Marks and Labels (0, 300, 600, 900, 1200 W/m²)
+        // 4. Tick Marks and Labels (0, 300, 600, 900, 1200 W/m²)
         const ticks = [0, 300, 600, 900, 1200];
         ticks.forEach(val => {
             const tickFraction = val / maxGhi;
             const tickAngle = startAngle + tickFraction * totalAngle;
-            const x1 = centerX + Math.cos(tickAngle) * (radius - 14);
-            const y1 = centerY + Math.sin(tickAngle) * (radius - 14);
-            const x2 = centerX + Math.cos(tickAngle) * (radius + 14);
-            const y2 = centerY + Math.sin(tickAngle) * (radius + 14);
+            const x1 = centerX + Math.cos(tickAngle) * (radius - 12);
+            const y1 = centerY + Math.sin(tickAngle) * (radius - 12);
+            const x2 = centerX + Math.cos(tickAngle) * (radius + 12);
+            const y2 = centerY + Math.sin(tickAngle) * (radius + 12);
 
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
             ctx.lineWidth = 2;
             ctx.stroke();
 
             // Label
-            const tx = centerX + Math.cos(tickAngle) * (radius - 28);
-            const ty = centerY + Math.sin(tickAngle) * (radius - 28);
+            const tx = centerX + Math.cos(tickAngle) * (radius - 26);
+            const ty = centerY + Math.sin(tickAngle) * (radius - 26);
             ctx.fillStyle = '#94a3b8';
-            ctx.font = '10px JetBrains Mono, monospace';
+            ctx.font = 'bold 10px monospace';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(`${val}`, tx, ty);
         });
 
-        // 4. Center Needle Pointer
+        // 5. Center Needle Pointer
         const needleAngle = startAngle + fillFraction * totalAngle;
-        const needleLen = radius - 16;
+        const needleLen = radius - 14;
         const tipX = centerX + Math.cos(needleAngle) * needleLen;
         const tipY = centerY + Math.sin(needleAngle) * needleLen;
 
         ctx.save();
         ctx.shadowColor = '#f59e0b';
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 12;
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
         ctx.lineTo(tipX, tipY);
@@ -267,57 +280,70 @@ export class SolarEngine {
         ctx.stroke();
         ctx.restore();
 
-        // 5. Center Pivot Hub
+        // 6. Center Rotating Corona Pulse
+        const t = timeSec || (Date.now() / 1000);
+        const pulse = 1.0 + Math.sin(t * 3.0) * 0.15;
+        ctx.save();
+        ctx.shadowColor = '#f59e0b';
+        ctx.shadowBlur = 14 * pulse;
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, 9 * pulse, 0, Math.PI * 2);
         ctx.fillStyle = '#f59e0b';
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
         ctx.stroke();
+        ctx.restore();
 
-        // 6. Central Numeric Reading
+        // 7. Central Numeric Reading
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 22px Outfit, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(`${Math.round(ghi)} W/m²`, centerX, centerY + 36);
+        ctx.fillText(`${Math.round(ghi)} W/m²`, centerX, centerY + 34);
 
         ctx.fillStyle = '#94a3b8';
-        ctx.font = '11px Inter, sans-serif';
-        ctx.fillText(`Beam DNI: ${Math.round(dni)} W/m²`, centerX, centerY + 54);
+        ctx.font = '11px sans-serif';
+        ctx.fillText(`Direct Beam DNI: ${Math.round(dni)} W/m²`, centerX, centerY + 52);
     }
 
     /**
-     * Draws Sun Position Solar Azimuth and Altitude Compass
+     * Draws Sun Position Solar Azimuth and Altitude Compass with animated solar corona
      */
-    renderSunCompassCanvas(canvas, altitudeDeg = 45, azimuthDeg = 180) {
+    renderSunCompassCanvas(canvas, altitudeDeg = 45, azimuthDeg = 180, timeSec = 0) {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
+        if (!ctx) return;
+
+        const width = canvas.width || 320;
+        const height = canvas.height || 260;
         const centerX = width / 2;
         const centerY = height / 2;
         const radius = Math.min(width, height) * 0.40;
 
         ctx.clearRect(0, 0, width, height);
 
-        // 1. Compass Rose Background
+        // 1. Celestial Rose Dome Background
+        const grad = ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, radius);
+        grad.addColorStop(0, 'rgba(14, 30, 24, 0.9)');
+        grad.addColorStop(1, 'rgba(6, 15, 12, 0.95)');
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(14, 24, 21, 0.6)';
+        ctx.fillStyle = grad;
         ctx.fill();
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        // Altitude Ring
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius * 0.5, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.setLineDash([3, 3]);
-        ctx.stroke();
-        ctx.setLineDash([]);
+        // Concentric Altitude Rings (30° & 60°)
+        [0.66, 0.33].forEach(ratio => {
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * ratio, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+            ctx.setLineDash([3, 3]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        });
 
         // Cardinal Directions
         const cardinals = [
@@ -330,33 +356,36 @@ export class SolarEngine {
             const x = centerX + Math.cos(c.angle) * (radius - 12);
             const y = centerY + Math.sin(c.angle) * (radius - 12);
             ctx.fillStyle = c.text === 'S' ? '#f59e0b' : '#94a3b8';
-            ctx.font = 'bold 11px JetBrains Mono, monospace';
+            ctx.font = 'bold 11px monospace';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(c.text, x, y);
         });
 
-        // 2. Sun Vector Heading
+        // 2. Sun Position Heading & Ray
         const azRad = ((azimuthDeg - 90) * Math.PI) / 180.0;
-        const altRatio = Math.max(0.05, Math.min(1.0, (90.0 - altitudeDeg) / 90.0));
+        const altRatio = Math.max(0.08, Math.min(0.95, (90.0 - altitudeDeg) / 90.0));
         const sunRadius = radius * altRatio;
         const sunX = centerX + Math.cos(azRad) * sunRadius;
         const sunY = centerY + Math.sin(azRad) * sunRadius;
 
-        // Line to Sun
+        // Solar Vector Line
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
         ctx.lineTo(sunX, sunY);
-        ctx.strokeStyle = 'rgba(245, 158, 11, 0.6)';
+        ctx.strokeStyle = 'rgba(245, 158, 11, 0.65)';
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Glowing Sun Orb
+        // Animated Sun Orb & Corona
+        const t = timeSec || (Date.now() / 1000);
+        const sunPulse = 1.0 + Math.sin(t * 4.0) * 0.18;
+
         ctx.save();
         ctx.shadowColor = '#f59e0b';
-        ctx.shadowBlur = 12;
+        ctx.shadowBlur = 16 * sunPulse;
         ctx.beginPath();
-        ctx.arc(sunX, sunY, 8, 0, Math.PI * 2);
+        ctx.arc(sunX, sunY, 8 * sunPulse, 0, Math.PI * 2);
         ctx.fillStyle = '#f59e0b';
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
@@ -364,9 +393,9 @@ export class SolarEngine {
         ctx.stroke();
         ctx.restore();
 
-        // 3. Center Crosshair
+        // 3. Center Zenith Crosshair
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, 3.5, 0, Math.PI * 2);
         ctx.fillStyle = '#38bdf8';
         ctx.fill();
     }

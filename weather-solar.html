@@ -659,8 +659,8 @@
             // 3. Start Live 1-Second Wind Stream & Solar Background Load
             loadLocationAll(26.9157, 70.9083, 'Thar Desert (Jaisalmer)');
 
-            // 4. Continuous 60fps Anemometer Canvas Animation Loop
-            startAnemometerAnimLoop();
+            // 4. Continuous 60fps Observatory Canvas Animation Loop (Wind & Solar)
+            startObservatoryAnimationLoops();
 
             // 5. District Region Filter Pills
             document.querySelectorAll('[data-district-filter]').forEach(btn => {
@@ -924,13 +924,36 @@
             }
         }
 
-        function startAnemometerAnimLoop() {
+        function startObservatoryAnimationLoops() {
             function loop() {
+                const nowSec = Date.now() / 1000;
+
                 if (activeTab === 'wind') {
                     const canvasCup = document.getElementById('canvas-cup-anemometer');
                     if (canvasCup) {
                         const speed = (currentWindData && currentWindData.telemetry) ? currentWindData.telemetry.speedMps : 4.5;
                         windEngine.renderAnemometerCanvas(canvasCup, speed);
+                    }
+                    const canvasSpeedo = document.getElementById('canvas-wind-speedometer');
+                    if (canvasSpeedo && currentWindData && currentWindData.telemetry) {
+                        windEngine.renderSpeedometerGaugeCanvas(canvasSpeedo, currentWindData.telemetry.speedMps, currentWindData.telemetry.gustMps, 25);
+                    }
+                    const canvasVane = document.getElementById('canvas-windvane-compass');
+                    if (canvasVane && currentWindData && currentWindData.telemetry) {
+                        windEngine.renderWindVaneCanvas(canvasVane, currentWindData.telemetry.directionDeg, currentWindData.telemetry.cardinalDirection);
+                    }
+                } else if (activeTab === 'solar') {
+                    const canvasGauge = document.getElementById('canvas-solar-gauge');
+                    if (canvasGauge) {
+                        const ghi = (currentSolarData && currentSolarData.telemetry) ? currentSolarData.telemetry.ghi : 850;
+                        const dni = (currentSolarData && currentSolarData.telemetry) ? currentSolarData.telemetry.dni : 875;
+                        solarEngine.renderSolarGaugeCanvas(canvasGauge, ghi, dni, 1200, nowSec);
+                    }
+                    const canvasCompass = document.getElementById('canvas-sun-compass');
+                    if (canvasCompass) {
+                        const alt = (currentSolarData && currentSolarData.solarGeometry) ? currentSolarData.solarGeometry.solarAltitudeDeg : 49.5;
+                        const az = (currentSolarData && currentSolarData.solarGeometry) ? currentSolarData.solarGeometry.solarAzimuthDeg : 174.2;
+                        solarEngine.renderSunCompassCanvas(canvasCompass, alt, az, nowSec);
                     }
                 }
                 requestAnimationFrame(loop);
@@ -939,45 +962,58 @@
         }
 
         function updateSolarDisplay(data) {
+            if (!data) return;
             currentSolarData = data;
             const { telemetry, solarGeometry, energyAndArchitecture, hourlyProfile } = data;
 
-            document.getElementById('stat-solar-dni').textContent = `${Math.round(telemetry.dni)} W/m²`;
-            document.getElementById('stat-solar-ghi').textContent = `${Math.round(telemetry.ghi)} W/m²`;
-            document.getElementById('stat-solar-uv').textContent = `${telemetry.uvIndex.toFixed(1)}`;
-            document.getElementById('stat-solar-uv-desc').textContent = `${telemetry.uvRiskLevel} Risk`;
-            document.getElementById('stat-solar-daily-yield').textContent = `${energyAndArchitecture.dailyInsolationKwhPerM2} kWh/m²`;
+            if (telemetry) {
+                document.getElementById('stat-solar-dni').textContent = `${Math.round(telemetry.dni)} W/m²`;
+                document.getElementById('stat-solar-ghi').textContent = `${Math.round(telemetry.ghi)} W/m²`;
+                document.getElementById('stat-solar-uv').textContent = `${telemetry.uvIndex.toFixed(1)}`;
+                document.getElementById('stat-solar-uv-desc').textContent = `${telemetry.uvRiskLevel} Risk`;
+                document.getElementById('card-dni-val').textContent = `${Math.round(telemetry.dni)} W/m²`;
+                document.getElementById('card-dhi-val').textContent = `${Math.round(telemetry.dhi)} W/m²`;
+                document.getElementById('val-solar-temp').textContent = `${telemetry.ambientTempC}°C`;
 
-            const riskBadge = document.getElementById('badge-radiation-risk');
-            if (telemetry.ghi > 950) {
-                riskBadge.style.background = 'rgba(239, 68, 68, 0.2)';
-                riskBadge.style.color = '#ef4444';
-                riskBadge.textContent = 'EXTREME PEAK SOLAR';
-            } else if (telemetry.ghi > 650) {
-                riskBadge.style.background = 'rgba(245, 158, 11, 0.2)';
-                riskBadge.style.color = '#f59e0b';
-                riskBadge.textContent = 'HIGH IRRADIANCE';
-            } else {
-                riskBadge.style.background = 'rgba(16, 185, 129, 0.2)';
-                riskBadge.style.color = '#10b981';
-                riskBadge.textContent = 'MODERATE / DIFFUSE';
+                const riskBadge = document.getElementById('badge-radiation-risk');
+                if (riskBadge) {
+                    if (telemetry.ghi > 950) {
+                        riskBadge.style.background = 'rgba(239, 68, 68, 0.2)';
+                        riskBadge.style.color = '#ef4444';
+                        riskBadge.textContent = 'EXTREME PEAK SOLAR';
+                    } else if (telemetry.ghi > 650) {
+                        riskBadge.style.background = 'rgba(245, 158, 11, 0.2)';
+                        riskBadge.style.color = '#f59e0b';
+                        riskBadge.textContent = 'HIGH IRRADIANCE';
+                    } else {
+                        riskBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+                        riskBadge.style.color = '#10b981';
+                        riskBadge.textContent = 'MODERATE / DIFFUSE';
+                    }
+                }
             }
 
-            document.getElementById('card-dni-val').textContent = `${Math.round(telemetry.dni)} W/m²`;
-            document.getElementById('card-dhi-val').textContent = `${Math.round(telemetry.dhi)} W/m²`;
-            document.getElementById('card-altitude-val').textContent = `${solarGeometry.solarAltitudeDeg.toFixed(1)}°`;
-            document.getElementById('badge-solar-zenith').textContent = `ZENITH: ${solarGeometry.solarZenithDeg.toFixed(1)}°`;
-            document.getElementById('card-azimuth-val').textContent = `${solarGeometry.solarAzimuthDeg.toFixed(1)}° (${solarGeometry.optimalOrientation})`;
-            document.getElementById('card-airmass-val').textContent = `${solarGeometry.airMass.toFixed(2)}`;
+            if (energyAndArchitecture) {
+                document.getElementById('stat-solar-daily-yield').textContent = `${energyAndArchitecture.dailyInsolationKwhPerM2} kWh/m²`;
+            }
 
-            document.getElementById('val-solar-pitch').textContent = `${solarGeometry.optimalPvTiltDeg}°`;
-            document.getElementById('val-solar-temp').textContent = `${telemetry.ambientTempC}°C`;
+            if (solarGeometry) {
+                document.getElementById('card-altitude-val').textContent = `${solarGeometry.solarAltitudeDeg.toFixed(1)}°`;
+                document.getElementById('badge-solar-zenith').textContent = `ZENITH: ${solarGeometry.solarZenithDeg.toFixed(1)}°`;
+                document.getElementById('card-azimuth-val').textContent = `${solarGeometry.solarAzimuthDeg.toFixed(1)}° (${solarGeometry.optimalOrientation})`;
+                document.getElementById('card-airmass-val').textContent = `${solarGeometry.airMass.toFixed(2)}`;
+                document.getElementById('val-solar-pitch').textContent = `${solarGeometry.optimalPvTiltDeg}°`;
+            }
 
             const canvasGauge = document.getElementById('canvas-solar-gauge');
-            solarEngine.renderSolarGaugeCanvas(canvasGauge, telemetry.ghi, telemetry.dni, 1200);
+            if (canvasGauge && telemetry) {
+                solarEngine.renderSolarGaugeCanvas(canvasGauge, telemetry.ghi, telemetry.dni, 1200);
+            }
 
             const canvasCompass = document.getElementById('canvas-sun-compass');
-            solarEngine.renderSunCompassCanvas(canvasCompass, solarGeometry.solarAltitudeDeg, solarGeometry.solarAzimuthDeg);
+            if (canvasCompass && solarGeometry) {
+                solarEngine.renderSunCompassCanvas(canvasCompass, solarGeometry.solarAltitudeDeg, solarGeometry.solarAzimuthDeg);
+            }
 
             if (hourlyProfile && activeTab === 'solar') {
                 renderSolarHourlyChart(hourlyProfile);
