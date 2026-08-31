@@ -56,6 +56,7 @@ SCRIPTS = [
     "js/materialDatabase.js",
     "js/recommendationEngine.js",
     "js/thermalSolver.js",
+    "js/shelterBlueprintEngine.js",
     "js/themeManager.js",
     "styles/main.css",
     "css/style.css",

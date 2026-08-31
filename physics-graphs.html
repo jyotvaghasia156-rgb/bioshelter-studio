@@ -3,15 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Physics Diurnal &amp; Heat Flux Analytics - BioShelter Studio</title>
+    <title>3D Shelter Blueprints, Diurnal Heatmaps & Energy Analytics - BioShelter Studio</title>
+    <meta name="description" content="State-of-the-art interactive 3D shelter blueprints, 24-hour diurnal temperature distribution heatmaps, dynamic energy requirement charts, and estimated thermal comfort scores.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Chart.js -->
+    
+    <!-- Three.js and Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
+    <style>
+        .blueprint-hero-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .hero-metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .hero-metric-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+        .score-dial-wrap {
+            position: relative;
+            width: 68px;
+            height: 68px;
+            flex-shrink: 0;
+        }
+        .score-dial-svg {
+            transform: rotate(-90deg);
+        }
+        .score-dial-val {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 14px;
+            color: #10b981;
+        }
+        .stage-split-container {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 1024px) {
+            .stage-split-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .stage-viewport-box {
+            background: #06131c;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            position: relative;
+            overflow: hidden;
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+        .viewport-top-hud {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .hud-chip-group {
+            display: flex;
+            gap: 6px;
+            pointer-events: auto;
+        }
+        .hud-chip-btn {
+            background: rgba(10, 20, 28, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--text-primary);
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .hud-chip-btn.active, .hud-chip-btn:hover {
+            background: rgba(56, 189, 248, 0.25);
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+        .node-heatmap-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .node-temp-chip {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            transition: border-color 0.2s;
+        }
+        .node-temp-chip .node-name {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .node-temp-chip .node-val {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .node-indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .diurnal-scrubber-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+        .timeline-controls-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .btn-play-sim {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            color: #ffffff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+            transition: transform 0.15s;
+        }
+        .btn-play-sim:hover {
+            transform: scale(1.08);
+        }
+        .speed-btn-group {
+            display: flex;
+            gap: 4px;
+        }
+        .btn-speed {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-speed.active {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+        .status-optimal {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .status-warning {
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .status-critical {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+        .recommendation-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 12px;
+            line-height: 1.4;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid #10b981;
+        }
+    </style>
 </head>
 <body>
     <!-- Top Navigation Header -->
@@ -24,9 +247,9 @@
                 <div class="header-title-group">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <h1 class="app-title">BioShelter Studio</h1>
-                        <span class="app-badge" style="background: rgba(56,189,248,0.2); color: var(--accent-sky);">PHYSICS LAB</span>
+                        <span class="app-badge" style="background: rgba(56,189,248,0.2); color: var(--accent-sky);">3D BLUEPRINT &amp; THERMAL LAB</span>
                     </div>
-                    <span class="app-subtitle">Multi-Physics Diurnal &amp; Heat Flux Solver Analytics</span>
+                    <span class="app-subtitle">Parametric 3D Blueprints, 24h Diurnal Heatmaps &amp; Energy Comfort Solver</span>
                 </div>
             </a>
         </div>
@@ -56,7 +279,7 @@
         <a href="hazards.html" class="global-nav-item">⚠️ Hazards &amp; Crisis Feed</a>
         <a href="nearby-bunkers.html" class="global-nav-item">🛡️ Nearby Bunkers</a>
         <a href="comfort-places.html" class="global-nav-item">🌴 Comfort Havens</a>
-        <a href="physics-graphs.html" class="global-nav-item active">📊 Multi-Physics</a>
+        <a href="physics-graphs.html" class="global-nav-item active">📊 Multi-Physics &amp; Blueprints</a>
         <a href="bioclimatic-optimizer.html" class="global-nav-item">⚡ Optimizer</a>
         <a href="soil-directory.html" class="global-nav-item">🌍 Soil Directory</a>
         <a href="materials-lab.html" class="global-nav-item">🧪 Materials Lab</a>
@@ -72,52 +295,243 @@
         <a href="reports-exports.html" class="global-nav-item">📑 Reports &amp; Exports</a>
     </nav>
 
-    <main class="page-container" style="padding: 24px; max-width: 1500px; margin: 0 auto;">
-        <div class="page-header-bar" style="margin-bottom: 20px;">
-            <div class="page-header-info">
-                <h2>Multi-Physics Thermal Energy &amp; Aerodynamic Analytics</h2>
-                <p>24-hour diurnal thermal energy balance, operative comfort curves, stacked heat flux breakdown (conduction, solar glazing, ventilation, ground exchange, internal gains), and Fanger PMV/PPD indexes.</p>
+    <main class="page-container" style="padding: 24px; max-width: 1560px; margin: 0 auto;">
+        
+        <!-- Top Hero Telemetry & Thermal Comfort Gauges -->
+        <div class="blueprint-hero-grid">
+            <div class="hero-metric-card">
+                <div class="score-dial-wrap">
+                    <svg class="score-dial-svg" width="68" height="68" viewBox="0 0 68 68">
+                        <circle cx="34" cy="34" r="28" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6"/>
+                        <circle id="comfort-dial-circle" cx="34" cy="34" r="28" fill="none" stroke="#10b981" stroke-width="6" stroke-dasharray="175.9" stroke-dashoffset="10"/>
+                    </svg>
+                    <div class="score-dial-val" id="hero-comfort-score">95%</div>
+                </div>
+                <div>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Bioclimatic Comfort</div>
+                    <div style="font-family: var(--font-heading); font-size: 16px; font-weight: 800; color: var(--text-primary);" id="hero-comfort-title">Optimal Comfort</div>
+                    <span class="status-optimal" id="hero-comfort-badge" style="font-size: 10px; padding: 2px 6px; border-radius: var(--radius-sm); font-weight: 700; display: inline-block; margin-top: 4px;">ASHRAE 55 Certified</span>
+                </div>
+            </div>
+
+            <div class="hero-metric-card">
+                <div style="font-size: 28px;">⚡</div>
+                <div>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Net-Zero Energy Balance</div>
+                    <div style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--accent-sky);" id="hero-netzero-val">174%</div>
+                    <span style="font-size: 11px; color: #10b981; font-weight: 600;">Net Energy Producer</span>
+                </div>
+            </div>
+
+            <div class="hero-metric-card">
+                <div style="font-size: 28px;">🛡️</div>
+                <div>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Thermal Damping Ratio</div>
+                    <div style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--emerald-400);" id="hero-damping-val">84.2%</div>
+                    <span style="font-size: 11px; color: var(--text-muted);">Diurnal Swing Suppressed</span>
+                </div>
+            </div>
+
+            <div class="hero-metric-card">
+                <div style="font-size: 28px;">🌱</div>
+                <div>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Passive Energy Offset</div>
+                    <div style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--accent-amber);" id="hero-offset-val">91.5%</div>
+                    <span style="font-size: 11px; color: var(--text-muted);">Saved vs Conventional</span>
+                </div>
             </div>
         </div>
 
-        <!-- Dynamic Multi-Physics Control Bar -->
-        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 20px; background: var(--bg-card); padding: 14px 18px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                <label class="control-label" style="margin: 0; font-weight: 700;">Zone:</label>
-                <select id="select-physics-zone" class="input-select" style="min-width: 170px;">
-                    <option value="hot_arid" selected>🏜️ Hot Arid (45°C Peak)</option>
-                    <option value="warm_humid">🌴 Warm Humid (34°C, 85% RH)</option>
-                    <option value="composite">🌦️ Composite / Monsoon</option>
-                    <option value="cold">🏔️ Cold / Alpine (-5°C)</option>
-                    <option value="temperate">🌲 Temperate (22°C)</option>
-                </select>
+        <!-- Parametric Design & Bioclimatic Controls Bar -->
+        <div style="background: var(--bg-card); padding: 16px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-subtle); margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+                <div style="font-family: var(--font-heading); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                    <span>⚙️ Parametric Architectural &amp; Climate Controls</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-secondary" id="btn-reset-defaults" style="padding: 4px 10px; font-size: 11px;">↺ Reset Defaults</button>
+                    <button class="btn-primary" id="btn-export-blueprint-spec" style="padding: 4px 12px; font-size: 11px;">💾 Export Spec JSON</button>
+                </div>
+            </div>
 
-                <label class="control-label" style="margin: 0 0 0 8px; font-weight: 700;">Wall Material:</label>
-                <select id="select-physics-wall" class="input-select" style="min-width: 180px;">
-                    <option value="rammed_earth_300" selected>Rammed Earth (300mm)</option>
-                    <option value="adobe_brick_350">Adobe Sun-Dried Brick (350mm)</option>
-                    <option value="compressed_earth_blocks">CSEB Stabilized Earth (250mm)</option>
-                    <option value="straw_bale_render">Straw Bale with Lime (450mm)</option>
-                    <option value="concrete_insulated">Autoclaved Aerated Concrete</option>
-                </select>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+                <div class="control-group" style="margin: 0;">
+                    <label class="control-label" style="font-size: 11px; font-weight: 700;">Climate Biome:</label>
+                    <select id="select-physics-zone" class="input-select">
+                        <option value="hot_arid" selected>🏜️ Hot Arid (45°C Peak)</option>
+                        <option value="warm_humid">🌴 Warm Humid (34°C, 85% RH)</option>
+                        <option value="composite">🌦️ Composite / Monsoon</option>
+                        <option value="cold">🏔️ Cold / Alpine (-5°C)</option>
+                        <option value="temperate">🌲 Temperate (22°C)</option>
+                    </select>
+                </div>
 
-                <label class="control-label" style="margin: 0 0 0 8px; font-weight: 700;">Vent Mode:</label>
-                <select id="select-physics-vent" class="input-select" style="min-width: 160px;">
-                    <option value="night_purge" selected>Night Flush (12 ACH)</option>
-                    <option value="continuous_cross">Continuous Cross Draft</option>
-                    <option value="wind_tower">Arid Wind-Tower Induction</option>
-                    <option value="closed">Closed Sealed Envelope</option>
-                </select>
+                <div class="control-group" style="margin: 0;">
+                    <label class="control-label" style="font-size: 11px; font-weight: 700;">Structure Typology:</label>
+                    <select id="select-physics-structure" class="input-select">
+                        <option value="geodesic" selected>🌐 Geodesic Bio-Dome (3V)</option>
+                        <option value="walipini">🏔️ Earth-Sheltered Walipini Pit</option>
+                        <option value="gothic_arch">🏛️ High-Thermal Gothic Arch</option>
+                        <option value="passive_solar_leanto">📐 Passive Solar Lean-To Ark</option>
+                    </select>
+                </div>
+
+                <div class="control-group" style="margin: 0;">
+                    <label class="control-label" style="font-size: 11px; font-weight: 700;">Thermal Mass Assembly:</label>
+                    <select id="select-physics-wall" class="input-select">
+                        <option value="rammed_earth_300" selected>Rammed Earth (300mm, U=0.42)</option>
+                        <option value="adobe_brick_350">Adobe Sun-Dried Brick (350mm)</option>
+                        <option value="compressed_earth_blocks">CSEB Stabilized Earth (250mm)</option>
+                        <option value="straw_bale_render">Straw Bale with Lime (450mm)</option>
+                        <option value="concrete_insulated">Autoclaved Aerated Concrete</option>
+                    </select>
+                </div>
+
+                <div class="control-group" style="margin: 0;">
+                    <label class="control-label" style="font-size: 11px; font-weight: 700;">Ventilation Strategy:</label>
+                    <select id="select-physics-vent" class="input-select">
+                        <option value="night_purge" selected>Night Flush Purge (12 ACH)</option>
+                        <option value="adaptive_diurnal">Adaptive Diurnal Induction</option>
+                        <option value="continuous_cross">Continuous Cross Draft</option>
+                        <option value="closed">Closed High-Infiltration Sealed</option>
+                    </select>
+                </div>
+
+                <div class="control-group" style="margin: 0;">
+                    <label class="control-label" style="font-size: 11px; font-weight: 700; display: flex; justify-content: space-between;">
+                        <span>South Glazing Ratio</span>
+                        <span id="label-glazing-ratio" style="color: var(--accent-sky);">65%</span>
+                    </label>
+                    <input type="range" id="slider-glazing-ratio" class="input-slider" min="30" max="90" value="65" step="5">
+                </div>
+
+                <div class="control-group" style="margin: 0;">
+                    <label class="control-label" style="font-size: 11px; font-weight: 700; display: flex; justify-content: space-between;">
+                        <span>Water Mass Buffer</span>
+                        <span id="label-water-mass" style="color: var(--emerald-400);">12,000 L</span>
+                    </label>
+                    <input type="range" id="slider-water-mass" class="input-slider" min="2000" max="30000" value="12000" step="1000">
+                </div>
             </div>
         </div>
 
+        <!-- 24-Hour Diurnal Timeline & Spatial Heatmap Scrubber -->
+        <div class="diurnal-scrubber-box">
+            <div class="timeline-controls-row">
+                <button class="btn-play-sim" id="btn-toggle-play" title="Play/Pause 24-Hour Time Lapse">▶</button>
+                
+                <div style="min-width: 100px;">
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Diurnal Timeline</div>
+                    <div style="font-family: var(--font-mono); font-size: 15px; font-weight: 800; color: #38bdf8;" id="scrubber-hour-label">12:00 Solar</div>
+                </div>
+
+                <div style="flex: 1; min-width: 240px;">
+                    <input type="range" id="slider-sim-hour" class="input-slider" min="0" max="23" value="12" step="1" style="width: 100%;">
+                    <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 4px; font-family: var(--font-mono);">
+                        <span>00:00 Night</span>
+                        <span>06:00 Dawn</span>
+                        <span>12:00 Solar Zenith</span>
+                        <span>18:00 Sunset</span>
+                        <span>23:00 Dusk</span>
+                    </div>
+                </div>
+
+                <div class="speed-btn-group">
+                    <button class="btn-speed active" data-speed="1">1x</button>
+                    <button class="btn-speed" data-speed="5">5x</button>
+                    <button class="btn-speed" data-speed="10">10x</button>
+                </div>
+            </div>
+
+            <!-- Spatial 8-Node Temperature Heatmap Bar -->
+            <div class="node-heatmap-bar">
+                <div class="node-temp-chip" id="chip-ambient">
+                    <span class="node-name">Outdoor Ambient</span>
+                    <span class="node-val"><span class="node-indicator-dot" id="dot-ambient"></span><span id="val-ambient">32.4°C</span></span>
+                </div>
+                <div class="node-temp-chip" id="chip-glazing">
+                    <span class="node-name">South Glazing Facade</span>
+                    <span class="node-val"><span class="node-indicator-dot" id="dot-glazing"></span><span id="val-glazing">41.8°C</span></span>
+                </div>
+                <div class="node-temp-chip" id="chip-roof">
+                    <span class="node-name">Roof Apex Strata</span>
+                    <span class="node-val"><span class="node-indicator-dot" id="dot-roof"></span><span id="val-roof">27.2°C</span></span>
+                </div>
+                <div class="node-temp-chip" id="chip-living">
+                    <span class="node-name">Living Zone Core</span>
+                    <span class="node-val"><span class="node-indicator-dot" id="dot-living"></span><span id="val-living">24.1°C</span></span>
+                </div>
+                <div class="node-temp-chip" id="chip-berm">
+                    <span class="node-name">North Earth Berm</span>
+                    <span class="node-val"><span class="node-indicator-dot" id="dot-berm"></span><span id="val-berm">19.5°C</span></span>
+                </div>
+                <div class="node-temp-chip" id="chip-slab">
+                    <span class="node-name">Geothermal Sub-Slab</span>
+                    <span class="node-val"><span class="node-indicator-dot" id="dot-slab"></span><span id="val-slab">18.2°C</span></span>
+                </div>
+                <div class="node-temp-chip" id="chip-water">
+                    <span class="node-name">Water Buffer Sink</span>
+                    <span class="node-val"><span class="node-indicator-dot" id="dot-water"></span><span id="val-water">22.0°C</span></span>
+                </div>
+                <div class="node-temp-chip" id="chip-exhaust">
+                    <span class="node-name">Ridge Exhaust Flow</span>
+                    <span class="node-val"><span class="node-indicator-dot" id="dot-exhaust"></span><span id="val-exhaust">25.8°C</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage Split: Interactive 3D CAD Blueprint & 2D Engineering Blueprint -->
+        <div class="stage-split-container">
+            
+            <!-- Left: Interactive 3D Three.js Blueprint Digital Twin -->
+            <div class="stage-viewport-box">
+                <div class="viewport-top-hud">
+                    <div class="hud-chip-group">
+                        <button class="hud-chip-btn active" id="view-3d-iso" data-camera="iso">3D Isometric</button>
+                        <button class="hud-chip-btn" id="view-3d-top" data-camera="top">Top Floorplan</button>
+                        <button class="hud-chip-btn" id="view-3d-front" data-camera="front">Front Elevation</button>
+                        <button class="hud-chip-btn" id="view-3d-section" data-camera="section">Cutaway Section</button>
+                    </div>
+
+                    <div class="hud-chip-group">
+                        <button class="hud-chip-btn" id="btn-toggle-wireframe">🕸️ Wireframe</button>
+                        <button class="hud-chip-btn active" id="btn-toggle-heatmap">🔥 Thermal Heatmap</button>
+                    </div>
+                </div>
+
+                <div id="three-blueprint-container" style="width: 100%; height: 100%;"></div>
+
+                <div style="position: absolute; bottom: 10px; left: 14px; pointer-events: none; font-family: var(--font-mono); font-size: 11px; color: var(--accent-sky); background: rgba(6, 19, 28, 0.85); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.2);">
+                    <span id="hud-3d-readout">Span: 10.4m | Height: 5.2m | Solar Azimuth: 180°</span>
+                </div>
+            </div>
+
+            <!-- Right: 2D CAD Blueprint & Temperature Distribution Contours -->
+            <div class="stage-viewport-box">
+                <div class="viewport-top-hud">
+                    <div class="hud-chip-group">
+                        <button class="hud-chip-btn active" id="cad-mode-floor" data-mode="floorplan">2D Floorplan CAD</button>
+                        <button class="hud-chip-btn" id="cad-mode-section" data-mode="elevation">2D Section Elevation</button>
+                    </div>
+
+                    <div style="font-family: var(--font-mono); font-size: 11px; color: #38bdf8; background: rgba(10,20,28,0.85); padding: 4px 8px; border-radius: var(--radius-sm); border: 1px solid rgba(56,189,248,0.3);">
+                        SCALE 1:50 METRIC
+                    </div>
+                </div>
+
+                <canvas id="blueprint-cad-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+            </div>
+        </div>
+
+        <!-- Multi-Variable Simulation & Analytics Charts Grid -->
         <div class="grid-2-cols" style="gap: 20px; margin-bottom: 24px;">
-            <!-- 1. Diurnal Temperature Cycles Chart -->
+            
+            <!-- 1. Diurnal Temperature Profile vs. ASHRAE 55 Adaptive Comfort -->
             <div class="chart-container-card">
                 <div class="chart-card-header">
                     <div class="chart-title">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
-                        24-Hour Diurnal Temperature Profile vs. Adaptive Comfort
+                        24-Hour Diurnal Temperature Profile vs. ASHRAE 55 Comfort Envelope
                     </div>
                 </div>
                 <div class="chart-canvas-wrapper" style="height: 320px;">
@@ -125,35 +539,51 @@
                 </div>
             </div>
 
-            <!-- 2. Heat Flux Breakdown Chart -->
+            <!-- 2. Energy Requirement, HVAC Loads & Solar PV Balance -->
             <div class="chart-container-card">
                 <div class="chart-card-header">
                     <div class="chart-title">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-                        Hourly Heat Flux Transfer Stack (Watts)
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        Energy Requirements: Dynamic Loads, Solar Harvest &amp; Battery SoC (%)
                     </div>
                 </div>
                 <div class="chart-canvas-wrapper" style="height: 320px;">
-                    <canvas id="heat-flux-chart"></canvas>
+                    <canvas id="energy-chart"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="grid-2-cols" style="gap: 20px;">
-            <!-- 3. Fanger PMV & Air Changes (ACH) -->
+        <div class="grid-2-cols" style="gap: 20px; margin-bottom: 24px;">
+            
+            <!-- 3. Heat Flux Transfer Stack -->
+            <div class="chart-container-card">
+                <div class="chart-card-header">
+                    <div class="chart-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                        Hourly Thermodynamic Heat Flux Transfer Breakdown (Watts)
+                    </div>
+                </div>
+                <div class="chart-canvas-wrapper" style="height: 300px;">
+                    <canvas id="heat-flux-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- 4. Fanger PMV & Airflow (ACH) -->
             <div class="chart-container-card">
                 <div class="chart-card-header">
                     <div class="chart-title">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                        Fanger Predicted Mean Vote (PMV) &amp; Airflow (ACH)
+                        Fanger PMV (Predicted Mean Vote) &amp; Convective Airflow ACH
                     </div>
                 </div>
                 <div class="chart-canvas-wrapper" style="height: 300px;">
                     <canvas id="pmv-chart"></canvas>
                 </div>
             </div>
+        </div>
 
-            <!-- 4. Optimization Comparison Table -->
+        <!-- Bioclimatic Optimization Summary & AI Recommendations -->
+        <div class="grid-2-cols" style="gap: 20px;">
             <div class="comparison-container">
                 <div class="chart-title">Bioclimatic Engineering Optimization Summary</div>
                 <table class="comparison-table">
@@ -168,30 +598,46 @@
                     <tbody id="summary-table-body">
                         <tr>
                             <td><strong>Comfort Score (%)</strong></td>
-                            <td id="td-base-score">72.4%</td>
-                            <td><strong id="td-opt-score">94.8%</strong></td>
-                            <td class="delta-badge-pos" id="td-delta-score">+22.4%</td>
+                            <td id="td-base-score">68.5%</td>
+                            <td><strong id="td-opt-score">95.2%</strong></td>
+                            <td class="delta-badge-pos" id="td-delta-score">+26.7%</td>
                         </tr>
                         <tr>
                             <td><strong>Peak Indoor Temp (°C)</strong></td>
-                            <td id="td-base-peak">38.2°C</td>
-                            <td><strong id="td-opt-peak">26.4°C</strong></td>
-                            <td class="delta-badge-pos" id="td-delta-peak">-11.8°C</td>
+                            <td id="td-base-peak">39.4°C</td>
+                            <td><strong id="td-opt-peak">25.8°C</strong></td>
+                            <td class="delta-badge-pos" id="td-delta-peak">-13.6°C</td>
                         </tr>
                         <tr>
                             <td><strong>Thermal Damping Ratio (%)</strong></td>
-                            <td id="td-base-damping">54.0%</td>
-                            <td><strong id="td-opt-damping">82.5%</strong></td>
-                            <td class="delta-badge-pos" id="td-delta-damping">+28.5%</td>
+                            <td id="td-base-damping">52.0%</td>
+                            <td><strong id="td-opt-damping">84.2%</strong></td>
+                            <td class="delta-badge-pos" id="td-delta-damping">+32.2%</td>
                         </tr>
                         <tr>
                             <td><strong>Wall U-Value (W/m²·K)</strong></td>
-                            <td id="td-base-u">1.85</td>
+                            <td id="td-base-u">1.95</td>
                             <td><strong id="td-opt-u">0.42</strong></td>
-                            <td class="delta-badge-pos" id="td-delta-u">-1.43</td>
+                            <td class="delta-badge-pos" id="td-delta-u">-1.53</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Net Energy Autonomy</strong></td>
+                            <td id="td-base-energy">32% Grid Dep.</td>
+                            <td><strong id="td-opt-energy">174% Net Zero</strong></td>
+                            <td class="delta-badge-pos" id="td-delta-energy">+142%</td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div class="comparison-container">
+                <div class="chart-title">Bioclimatic Diagnostic Guidance &amp; Recommendations</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+                    Real-time structural and thermodynamic advice computed by the BioShelter Solver Engine:
+                </div>
+                <ul class="recommendation-list" id="recommendation-list">
+                    <li class="recommendation-item">Loading recommendations...</li>
+                </ul>
             </div>
         </div>
     </main>
@@ -201,51 +647,321 @@
         import { generateDiurnalWeather } from './js/climateEngine.js';
         import { MATERIALS, ASSEMBLY_PRESETS } from './js/materialDatabase.js';
         import { runThermalSimulation } from './js/thermalSolver.js';
+        import { ShelterBlueprintEngine } from './js/shelterBlueprintEngine.js';
         import { themeManager } from './js/themeManager.js';
 
-        let chart1, chart2, chart3;
+        // 3D Three.js Blueprint Viewport Variables
+        let scene3d, camera3d, renderer3d, controls3d, structureGroup3d, sunLight3d;
+        let isWireframe3d = false;
+        let isHeatmap3d = true;
 
-        function runMultiPhysics() {
+        // Charts
+        let chartDiurnal, chartEnergy, chartHeatFlux, chartPmv;
+
+        // Current UI State
+        let currentSimHour = 12;
+        let isSimPlaying = false;
+        let simSpeed = 1;
+        let simInterval = null;
+        let cadViewMode = 'floorplan';
+
+        // 1. Initialize 3D Viewport
+        function init3DBlueprintViewport() {
+            const container = document.getElementById('three-blueprint-container');
+            if (!container || typeof THREE === 'undefined') return;
+
+            const width = container.clientWidth || 600;
+            const height = container.clientHeight || 480;
+
+            scene3d = new THREE.Scene();
+            scene3d.background = new THREE.Color(0x06131c);
+            scene3d.fog = new THREE.FogExp2(0x06131c, 0.025);
+
+            camera3d = new THREE.PerspectiveCamera(45, width / height, 0.1, 200);
+            camera3d.position.set(16, 12, 18);
+
+            renderer3d = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer3d.setSize(width, height);
+            renderer3d.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer3d.shadowMap.enabled = true;
+            renderer3d.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer3d.domElement);
+
+            if (THREE.OrbitControls) {
+                controls3d = new THREE.OrbitControls(camera3d, renderer3d.domElement);
+                controls3d.enableDamping = true;
+                controls3d.dampingFactor = 0.05;
+                controls3d.maxPolarAngle = Math.PI / 2 + 0.02;
+                controls3d.minDistance = 4;
+                controls3d.maxDistance = 60;
+                controls3d.target.set(0, 2.5, 0);
+            }
+
+            // Lighting
+            const ambient = new THREE.AmbientLight(0xdbeafe, 0.5);
+            scene3d.add(ambient);
+
+            sunLight3d = new THREE.DirectionalLight(0xfff7ed, 1.3);
+            sunLight3d.position.set(15, 25, 15);
+            sunLight3d.castShadow = true;
+            sunLight3d.shadow.mapSize.width = 1024;
+            sunLight3d.shadow.mapSize.height = 1024;
+            scene3d.add(sunLight3d);
+
+            // Ground CAD Blueprint Grid
+            const gridHelper = new THREE.GridHelper(40, 40, 0x0ea5e9, 0x0f2d3d);
+            gridHelper.position.y = -0.01;
+            scene3d.add(gridHelper);
+
+            // Structure Container
+            structureGroup3d = new THREE.Group();
+            scene3d.add(structureGroup3d);
+
+            window.addEventListener('resize', () => {
+                if (!container || !camera3d || !renderer3d) return;
+                const w = container.clientWidth;
+                const h = container.clientHeight;
+                camera3d.aspect = w / h;
+                camera3d.updateProjectionMatrix();
+                renderer3d.setSize(w, h);
+            });
+
+            function animate3D() {
+                requestAnimationFrame(animate3D);
+                if (controls3d) controls3d.update();
+                renderer3d.render(scene3d, camera3d);
+            }
+            animate3D();
+        }
+
+        // 2. Rebuild 3D Model with Blueprint Mesh & Temperature Heatmap Colors
+        function rebuild3DBlueprintModel(config, hourNodes) {
+            if (!structureGroup3d) return;
+
+            while (structureGroup3d.children.length > 0) {
+                const obj = structureGroup3d.children[0];
+                structureGroup3d.remove(obj);
+            }
+
+            const type = config.structureType || 'geodesic';
+            const radius = 5.2;
+            const height = 5.2;
+
+            const livingColor = isHeatmap3d ? parseInt(hourNodes.livingAir.color.hex.replace('#', '0x')) : 0x10b981;
+            const bermColor = isHeatmap3d ? parseInt(hourNodes.northBerm.color.hex.replace('#', '0x')) : 0x475569;
+            const glazingColor = isHeatmap3d ? parseInt(hourNodes.glazing.color.hex.replace('#', '0x')) : 0x38bdf8;
+            const waterColor = isHeatmap3d ? parseInt(hourNodes.waterMass.color.hex.replace('#', '0x')) : 0x06b6d4;
+
+            // 1. Foundation Slab
+            const slabGeo = new THREE.CylinderGeometry(radius + 0.5, radius + 0.5, 0.4, 32);
+            const slabMat = new THREE.MeshStandardMaterial({
+                color: 0x1e293b,
+                roughness: 0.8,
+                wireframe: isWireframe3d
+            });
+            const slab = new THREE.Mesh(slabGeo, slabMat);
+            slab.position.y = 0.2;
+            slab.receiveShadow = true;
+            structureGroup3d.add(slab);
+
+            // 2. North Berm Thermal Wall (Arc)
+            const bermGeo = new THREE.CylinderGeometry(radius, radius, height * 0.7, 32, 1, false, Math.PI * 0.85, Math.PI * 1.3);
+            const bermMat = new THREE.MeshStandardMaterial({
+                color: bermColor,
+                roughness: 0.9,
+                side: THREE.DoubleSide,
+                wireframe: isWireframe3d
+            });
+            const berm = new THREE.Mesh(bermGeo, bermMat);
+            berm.position.y = height * 0.35 + 0.4;
+            berm.castShadow = true;
+            structureGroup3d.add(berm);
+
+            // 3. Glazing Facade or Geodesic Dome
+            if (type === 'geodesic') {
+                const domeGeo = new THREE.IcosahedronGeometry(radius, 2);
+                const domeMat = new THREE.MeshStandardMaterial({
+                    color: glazingColor,
+                    transparent: true,
+                    opacity: isWireframe3d ? 1.0 : 0.65,
+                    wireframe: isWireframe3d,
+                    roughness: 0.1,
+                    metalness: 0.2
+                });
+                const dome = new THREE.Mesh(domeGeo, domeMat);
+                dome.position.y = 0.4;
+                dome.castShadow = true;
+                structureGroup3d.add(dome);
+
+                // Timber / Metal Structural Grid Wireframe Overlay
+                const wireGeo = new THREE.WireframeGeometry(domeGeo);
+                const wireLine = new THREE.LineSegments(wireGeo, new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 }));
+                wireLine.position.y = 0.4;
+                structureGroup3d.add(wireLine);
+            } else {
+                // Lean-to / Arch
+                const archGeo = new THREE.CylinderGeometry(radius, radius, 8, 32, 1, false, 0, Math.PI);
+                const archMat = new THREE.MeshStandardMaterial({
+                    color: glazingColor,
+                    transparent: true,
+                    opacity: 0.7,
+                    wireframe: isWireframe3d,
+                    side: THREE.DoubleSide
+                });
+                const arch = new THREE.Mesh(archGeo, archMat);
+                arch.rotation.z = Math.PI / 2;
+                arch.position.y = height * 0.5 + 0.4;
+                structureGroup3d.add(arch);
+            }
+
+            // 4. Interior Thermal Water Buffer Tanks
+            const tankGeo = new THREE.CylinderGeometry(0.7, 0.7, 2.2, 16);
+            const tankMat = new THREE.MeshStandardMaterial({
+                color: waterColor,
+                roughness: 0.3,
+                metalness: 0.4,
+                wireframe: isWireframe3d
+            });
+            const tank1 = new THREE.Mesh(tankGeo, tankMat);
+            tank1.position.set(-2.2, 1.5, -1.8);
+            tank1.castShadow = true;
+            structureGroup3d.add(tank1);
+
+            const tank2 = tank1.clone();
+            tank2.position.set(2.2, 1.5, -1.8);
+            structureGroup3d.add(tank2);
+
+            // 5. Living Core Center Marker
+            const coreGeo = new THREE.SphereGeometry(0.8, 16, 16);
+            const coreMat = new THREE.MeshStandardMaterial({
+                color: livingColor,
+                emissive: livingColor,
+                emissiveIntensity: 0.3,
+                wireframe: isWireframe3d
+            });
+            const core = new THREE.Mesh(coreGeo, coreMat);
+            core.position.set(0, 1.8, 0);
+            structureGroup3d.add(core);
+
+            // Update HUD Readout
+            document.getElementById('hud-3d-readout').textContent = 
+                `Span: ${(radius * 2).toFixed(1)}m | Height: ${height.toFixed(1)}m | Core: ${hourNodes.livingAir.temp}°C | Berm: ${hourNodes.northBerm.temp}°C`;
+        }
+
+        // 3. Render 2D CAD Blueprint Canvas
+        function update2DCadBlueprint(config, currentHour, mode) {
+            const canvas = document.getElementById('blueprint-cad-canvas');
+            if (!canvas) return;
+
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = (rect.width || 500) * dpr;
+            canvas.height = (rect.height || 480) * dpr;
+
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            ShelterBlueprintEngine.renderBlueprintToCanvas(canvas, config, currentHour, mode);
+        }
+
+        // 4. Update Simulation and Charts
+        function runFullLabSimulation() {
             const zone = document.getElementById('select-physics-zone').value;
             const wallKey = document.getElementById('select-physics-wall').value;
             const ventMode = document.getElementById('select-physics-vent').value;
+            const structureType = document.getElementById('select-physics-structure').value;
+            const glazingRatio = Number(document.getElementById('slider-glazing-ratio').value) / 100;
+            const thermalMassLiters = Number(document.getElementById('slider-water-mass').value);
+
+            document.getElementById('label-glazing-ratio').textContent = `${Math.round(glazingRatio * 100)}%`;
+            document.getElementById('label-water-mass').textContent = `${thermalMassLiters.toLocaleString()} L`;
 
             const weather = generateDiurnalWeather(zone);
             const wallAssembly = (ASSEMBLY_PRESETS && ASSEMBLY_PRESETS.walls && ASSEMBLY_PRESETS.walls[wallKey]) 
                 ? ASSEMBLY_PRESETS.walls[wallKey] 
                 : { name: 'Rammed Earth', uValue: 0.42, timeLagHours: 11.4, decrementFactor: 0.14 };
-            const roofAssembly = (ASSEMBLY_PRESETS && ASSEMBLY_PRESETS.roofs && ASSEMBLY_PRESETS.roofs.vaulted_earth_terracotta)
-                ? ASSEMBLY_PRESETS.roofs.vaulted_earth_terracotta
-                : { name: 'Vaulted Earth', uValue: 0.38 };
 
             const config = {
-                length: 6.0, width: 4.0, height: 3.0, roofPitch: 15,
-                wwr: 15, overhangDepth: 0.6, occupants: 3, ventMode,
-                foundationType: 'slab',
-                wallAssembly,
-                roofAssembly
+                length: 10.4, width: 8.0, height: 5.2, diameter: 10.4,
+                structureType,
+                glazingRatio,
+                thermalMassLiters,
+                solarPvKw: 8.5,
+                batteryKwh: 24,
+                latitude: (weather && weather.params) ? weather.params.latitude : 45,
+                ventMode,
+                wallAssembly
             };
 
-            const sim = runThermalSimulation(config, weather);
-            const hourly = sim.hourly;
-            const weatherH = weather.hourly;
-            const labels = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
+            // Diurnal Heatmap Calculation
+            const diurnalSim = ShelterBlueprintEngine.solveDiurnalHeatmap(config, weather);
+            const energySim = ShelterBlueprintEngine.solveEnergyRequirements(config, diurnalSim);
+            const comfortSim = ShelterBlueprintEngine.solveThermalComfort(config, diurnalSim);
 
-            const isDark = themeManager.isDark();
+            const hourData = diurnalSim.records[currentSimHour] || diurnalSim.records[12];
+            const nodes = hourData.nodes;
+
+            // Update Hero Gauges
+            document.getElementById('hero-comfort-score').textContent = `${comfortSim.overallComfortIndex}%`;
+            document.getElementById('hero-comfort-title').textContent = comfortSim.statusText;
+            document.getElementById('hero-comfort-badge').textContent = (comfortSim.comfortScore80Pct >= 85) ? 'ASHRAE 55 Compliant' : 'Optimization Advised';
+            document.getElementById('hero-comfort-badge').className = comfortSim.statusClass;
+
+            // Dial Circle Animation
+            const circle = document.getElementById('comfort-dial-circle');
+            if (circle) {
+                const circumference = 175.9;
+                const offset = circumference - (comfortSim.overallComfortIndex / 100) * circumference;
+                circle.style.strokeDashoffset = offset;
+                circle.style.stroke = comfortSim.statusColor;
+            }
+
+            document.getElementById('hero-netzero-val').textContent = `${energySim.totals.netZeroIndex}%`;
+            document.getElementById('hero-damping-val').textContent = `${diurnalSim.stats.thermalDampingPercent}%`;
+            document.getElementById('hero-offset-val').textContent = `${energySim.totals.passiveOffsetRatio}%`;
+
+            // Update Scrubber Hour Chip & Node Chips
+            document.getElementById('scrubber-hour-label').textContent = `${hourData.hourLabel} Solar`;
+            
+            // Nodes chip update
+            const updateChip = (idPrefix, node) => {
+                const valEl = document.getElementById(`val-${idPrefix}`);
+                const dotEl = document.getElementById(`dot-${idPrefix}`);
+                if (valEl) valEl.textContent = `${node.temp}°C`;
+                if (dotEl) dotEl.style.backgroundColor = node.color.hex;
+            };
+
+            updateChip('ambient', nodes.ambient);
+            updateChip('glazing', nodes.glazing);
+            updateChip('roof', nodes.roofApex);
+            updateChip('living', nodes.livingAir);
+            updateChip('berm', nodes.northBerm);
+            updateChip('slab', nodes.groundSlab);
+            updateChip('water', nodes.waterMass);
+            updateChip('exhaust', nodes.exhaust);
+
+            // Rebuild 3D Model & 2D CAD
+            rebuild3DBlueprintModel(config, nodes);
+            update2DCadBlueprint(config, currentSimHour, cadViewMode);
+
+            // Build Charts
+            const isDark = themeManager ? themeManager.isDark() : true;
             const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.08)';
             const textColor = isDark ? '#94a3b8' : '#475569';
+            const labels = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
 
-            // 1. Diurnal Temp
-            if (chart1) chart1.destroy();
-            chart1 = new Chart(document.getElementById('diurnal-temp-chart'), {
+            // 1. Diurnal Temp Chart
+            if (chartDiurnal) chartDiurnal.destroy();
+            chartDiurnal = new Chart(document.getElementById('diurnal-temp-chart'), {
                 type: 'line',
                 data: {
                     labels,
                     datasets: [
-                        { label: 'Ambient Outdoor Temp (°C)', data: weatherH.map(w => w.ambientTemp), borderColor: '#f59e0b', borderWidth: 2, tension: 0.3 },
-                        { label: 'Shelter Indoor Temp (°C)', data: hourly.map(s => s.indoorTemp), borderColor: '#38bdf8', borderWidth: 2.5, tension: 0.3 },
-                        { label: 'Operative Comfort Temp (°C)', data: hourly.map(s => s.operativeTemp), borderColor: '#10b981', borderWidth: 3, tension: 0.3, fill: true, backgroundColor: 'rgba(16,185,129,0.1)' },
-                        { label: 'Adaptive Upper Limit (80%)', data: hourly.map(s => s.adaptiveUpper80), borderColor: 'rgba(244,63,94,0.5)', borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0 }
+                        { label: 'Outdoor Ambient (°C)', data: diurnalSim.records.map(r => r.ambientTemp), borderColor: '#f59e0b', borderWidth: 2, tension: 0.35, pointRadius: 2 },
+                        { label: 'Living Zone Core (°C)', data: diurnalSim.records.map(r => r.indoorTemp), borderColor: '#38bdf8', borderWidth: 3, tension: 0.35, pointRadius: 3 },
+                        { label: 'Operative Comfort Temp (°C)', data: comfortSim.records.map(r => r.operativeTemp), borderColor: '#10b981', borderWidth: 2.5, tension: 0.35, fill: true, backgroundColor: 'rgba(16,185,129,0.1)' },
+                        { label: 'Adaptive Upper Limit (80%)', data: comfortSim.records.map(r => r.adaptiveUpper80), borderColor: 'rgba(244,63,94,0.6)', borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0 },
+                        { label: 'Adaptive Lower Limit (80%)', data: comfortSim.records.map(r => r.adaptiveLower80), borderColor: 'rgba(56,189,248,0.6)', borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0 }
                     ]
                 },
                 options: {
@@ -255,21 +971,55 @@
                         x: { grid: { color: gridColor }, ticks: { color: textColor } },
                         y: { grid: { color: gridColor }, ticks: { color: textColor } }
                     },
-                    plugins: { legend: { labels: { color: textColor } } }
+                    plugins: { legend: { labels: { color: textColor, font: { family: 'Inter', size: 11 } } } }
                 }
             });
 
-            // 2. Heat Flux
-            if (chart2) chart2.destroy();
-            chart2 = new Chart(document.getElementById('heat-flux-chart'), {
+            // 2. Energy Chart
+            if (chartEnergy) chartEnergy.destroy();
+            chartEnergy = new Chart(document.getElementById('energy-chart'), {
                 type: 'bar',
                 data: {
                     labels,
                     datasets: [
-                        { label: 'Envelope Conduction (W)', data: hourly.map(s => s.heatFluxes.conduction), backgroundColor: '#f97316' },
-                        { label: 'Glazing Solar Gain (W)', data: hourly.map(s => s.heatFluxes.solarGlazing), backgroundColor: '#eab308' },
-                        { label: 'Ventilation Flux (W)', data: hourly.map(s => s.heatFluxes.ventilation), backgroundColor: '#06b6d4' },
-                        { label: 'Ground Exchange (W)', data: hourly.map(s => s.heatFluxes.ground), backgroundColor: '#8b5cf6' }
+                        { type: 'line', label: 'Battery Storage SoC (%)', data: energySim.hourly.map(e => e.batterySocPct), borderColor: '#c084fc', borderWidth: 2.5, yAxisID: 'y1', pointRadius: 2 },
+                        { type: 'bar', label: 'Solar PV Harvest (kW)', data: energySim.hourly.map(e => e.pvGenerationKw), backgroundColor: 'rgba(245, 158, 11, 0.85)', yAxisID: 'y' },
+                        { type: 'bar', label: 'Passive Reduction (kW)', data: energySim.hourly.map(e => e.passiveSavingsKw), backgroundColor: 'rgba(16, 185, 129, 0.75)', yAxisID: 'y' },
+                        { type: 'bar', label: 'HVAC Heating Demand (kW)', data: energySim.hourly.map(e => e.heatingDemandKw), backgroundColor: 'rgba(239, 68, 68, 0.85)', yAxisID: 'y' },
+                        { type: 'bar', label: 'HVAC Cooling Demand (kW)', data: energySim.hourly.map(e => e.coolingDemandKw), backgroundColor: 'rgba(6, 182, 212, 0.85)', yAxisID: 'y' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { color: gridColor }, ticks: { color: textColor } },
+                        y: { stacked: true, position: 'left', grid: { color: gridColor }, ticks: { color: textColor }, title: { display: true, text: 'Power (kW)', color: textColor } },
+                        y1: { position: 'right', min: 0, max: 100, grid: { display: false }, ticks: { color: '#c084fc' }, title: { display: true, text: 'Battery SoC %', color: '#c084fc' } }
+                    },
+                    plugins: { legend: { labels: { color: textColor, font: { family: 'Inter', size: 11 } } } }
+                }
+            });
+
+            // 3. Heat Flux Breakdown Chart
+            const thermalSim = runThermalSimulation({
+                length: 6.0, width: 4.0, height: 3.0, roofPitch: 15,
+                wwr: glazingRatio * 20, overhangDepth: 0.6, occupants: 3, ventMode,
+                foundationType: 'slab',
+                wallAssembly,
+                roofAssembly: ASSEMBLY_PRESETS.roofs.vaulted_earth_terracotta
+            }, weather);
+
+            if (chartHeatFlux) chartHeatFlux.destroy();
+            chartHeatFlux = new Chart(document.getElementById('heat-flux-chart'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Envelope Conduction (W)', data: thermalSim.hourly.map(s => s.heatFluxes.conduction), backgroundColor: '#f97316' },
+                        { label: 'Glazing Solar Gain (W)', data: thermalSim.hourly.map(s => s.heatFluxes.solarGlazing), backgroundColor: '#eab308' },
+                        { label: 'Ventilation Flux (W)', data: thermalSim.hourly.map(s => s.heatFluxes.ventilation), backgroundColor: '#06b6d4' },
+                        { label: 'Ground Exchange (W)', data: thermalSim.hourly.map(s => s.heatFluxes.ground), backgroundColor: '#8b5cf6' }
                     ]
                 },
                 options: {
@@ -279,19 +1029,21 @@
                         x: { stacked: true, grid: { color: gridColor }, ticks: { color: textColor } },
                         y: { stacked: true, grid: { color: gridColor }, ticks: { color: textColor } }
                     },
-                    plugins: { legend: { labels: { color: textColor } } }
+                    plugins: { legend: { labels: { color: textColor, font: { family: 'Inter', size: 11 } } } }
                 }
             });
 
-            // 3. PMV Chart
-            if (chart3) chart3.destroy();
-            chart3 = new Chart(document.getElementById('pmv-chart'), {
+            // 4. PMV Chart
+            if (chartPmv) chartPmv.destroy();
+            chartPmv = new Chart(document.getElementById('pmv-chart'), {
                 type: 'line',
                 data: {
                     labels,
                     datasets: [
-                        { label: 'Fanger PMV Index', data: hourly.map(s => s.pmv), borderColor: '#c084fc', borderWidth: 2.5, tension: 0.3 },
-                        { label: 'Ventilation ACH (Air Changes/hr)', data: hourly.map(s => s.ach), borderColor: '#38bdf8', borderDash: [4, 4], borderWidth: 2 }
+                        { label: 'Fanger PMV Index', data: comfortSim.records.map(s => s.pmv), borderColor: '#c084fc', borderWidth: 2.5, tension: 0.3 },
+                        { label: 'Comfort Zone (+0.5)', data: Array(24).fill(0.5), borderColor: 'rgba(16,185,129,0.5)', borderDash: [3, 3], pointRadius: 0 },
+                        { label: 'Comfort Zone (-0.5)', data: Array(24).fill(-0.5), borderColor: 'rgba(16,185,129,0.5)', borderDash: [3, 3], pointRadius: 0 },
+                        { label: 'Ventilation ACH (Air Changes/hr)', data: diurnalSim.records.map(s => s.ventilationAch), borderColor: '#38bdf8', borderDash: [4, 4], borderWidth: 1.5, yAxisID: 'y1' }
                     ]
                 },
                 options: {
@@ -299,33 +1051,178 @@
                     maintainAspectRatio: false,
                     scales: {
                         x: { grid: { color: gridColor }, ticks: { color: textColor } },
-                        y: { grid: { color: gridColor }, ticks: { color: textColor } }
+                        y: { min: -3, max: 3, grid: { color: gridColor }, ticks: { color: textColor }, title: { display: true, text: 'PMV (-3 Cold to +3 Hot)', color: textColor } },
+                        y1: { position: 'right', grid: { display: false }, ticks: { color: '#38bdf8' }, title: { display: true, text: 'Airflow (ACH)', color: '#38bdf8' } }
                     },
-                    plugins: { legend: { labels: { color: textColor } } }
+                    plugins: { legend: { labels: { color: textColor, font: { family: 'Inter', size: 11 } } } }
                 }
             });
 
-            // Summary Table
-            const outdoorMax = Math.max(...weatherH.map(w => w.ambientTemp));
-            const indoorMax = Math.max(...hourly.map(s => s.indoorTemp));
+            // Optimization Comparison Table
+            const outdoorMax = diurnalSim.stats.maxOutdoor;
+            const indoorMax = diurnalSim.stats.maxIndoor;
             const deltaMax = (outdoorMax - indoorMax).toFixed(1);
             const uVal = wallAssembly.uValue ? wallAssembly.uValue.toFixed(2) : '0.42';
 
+            document.getElementById('td-opt-score').textContent = `${comfortSim.overallComfortIndex}%`;
+            document.getElementById('td-delta-score').textContent = `+${Math.max(0, comfortSim.overallComfortIndex - 68.5).toFixed(1)}%`;
             document.getElementById('td-base-peak').textContent = `${outdoorMax.toFixed(1)}°C`;
             document.getElementById('td-opt-peak').textContent = `${indoorMax.toFixed(1)}°C`;
             document.getElementById('td-delta-peak').textContent = `-${deltaMax}°C`;
+            document.getElementById('td-opt-damping').textContent = `${diurnalSim.stats.thermalDampingPercent}%`;
+            document.getElementById('td-delta-damping').textContent = `+${Math.max(0, diurnalSim.stats.thermalDampingPercent - 52)}%`;
             document.getElementById('td-opt-u').textContent = `${uVal}`;
-            document.getElementById('td-opt-damping').textContent = `${Math.min(92, Math.round((1 - indoorMax/outdoorMax)*100 + 40))}%`;
+            document.getElementById('td-opt-energy').textContent = `${energySim.totals.netZeroIndex}% Net Zero`;
+
+            // Recommendations
+            const recList = document.getElementById('recommendation-list');
+            if (recList) {
+                recList.innerHTML = '';
+                comfortSim.recommendations.forEach(rec => {
+                    const li = document.createElement('li');
+                    li.className = 'recommendation-item';
+                    li.innerHTML = `<span>💡</span><span>${rec}</span>`;
+                    recList.appendChild(li);
+                });
+            }
         }
 
+        // Timeline Playback
+        function toggleSimulationPlay() {
+            isSimPlaying = !isSimPlaying;
+            const btn = document.getElementById('btn-toggle-play');
+            if (btn) btn.textContent = isSimPlaying ? '⏸' : '▶';
+
+            if (isSimPlaying) {
+                if (simInterval) clearInterval(simInterval);
+                simInterval = setInterval(() => {
+                    currentSimHour = (currentSimHour + 1) % 24;
+                    document.getElementById('slider-sim-hour').value = currentSimHour;
+                    runFullLabSimulation();
+                }, 1000 / simSpeed);
+            } else {
+                if (simInterval) clearInterval(simInterval);
+                simInterval = null;
+            }
+        }
+
+        // Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
-            runMultiPhysics();
+            init3DBlueprintViewport();
+            runFullLabSimulation();
 
-            document.getElementById('select-physics-zone').addEventListener('change', runMultiPhysics);
-            document.getElementById('select-physics-wall').addEventListener('change', runMultiPhysics);
-            document.getElementById('select-physics-vent').addEventListener('change', runMultiPhysics);
+            // Controls
+            document.getElementById('select-physics-zone').addEventListener('change', runFullLabSimulation);
+            document.getElementById('select-physics-structure').addEventListener('change', runFullLabSimulation);
+            document.getElementById('select-physics-wall').addEventListener('change', runFullLabSimulation);
+            document.getElementById('select-physics-vent').addEventListener('change', runFullLabSimulation);
+            document.getElementById('slider-glazing-ratio').addEventListener('input', runFullLabSimulation);
+            document.getElementById('slider-water-mass').addEventListener('input', runFullLabSimulation);
 
-            window.addEventListener('bioshelter-theme-changed', runMultiPhysics);
+            // Scrubber
+            document.getElementById('slider-sim-hour').addEventListener('input', (e) => {
+                currentSimHour = parseInt(e.target.value, 10);
+                runFullLabSimulation();
+            });
+
+            document.getElementById('btn-toggle-play').addEventListener('click', toggleSimulationPlay);
+
+            // Speed Buttons
+            document.querySelectorAll('.btn-speed').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.btn-speed').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    simSpeed = parseInt(btn.dataset.speed, 10);
+                    if (isSimPlaying) {
+                        toggleSimulationPlay();
+                        toggleSimulationPlay();
+                    }
+                });
+            });
+
+            // 3D View Controls
+            document.querySelectorAll('[data-camera]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-camera]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const mode = btn.dataset.camera;
+                    if (!camera3d || !controls3d) return;
+
+                    if (mode === 'iso') {
+                        camera3d.position.set(16, 12, 18);
+                    } else if (mode === 'top') {
+                        camera3d.position.set(0, 24, 0.1);
+                    } else if (mode === 'front') {
+                        camera3d.position.set(0, 5, 20);
+                    } else if (mode === 'section') {
+                        camera3d.position.set(-18, 6, 0);
+                    }
+                    controls3d.target.set(0, 2.5, 0);
+                });
+            });
+
+            document.getElementById('btn-toggle-wireframe').addEventListener('click', (e) => {
+                isWireframe3d = !isWireframe3d;
+                e.target.classList.toggle('active', isWireframe3d);
+                runFullLabSimulation();
+            });
+
+            document.getElementById('btn-toggle-heatmap').addEventListener('click', (e) => {
+                isHeatmap3d = !isHeatmap3d;
+                e.target.classList.toggle('active', isHeatmap3d);
+                runFullLabSimulation();
+            });
+
+            // 2D CAD Buttons
+            document.getElementById('cad-mode-floor').addEventListener('click', (e) => {
+                cadViewMode = 'floorplan';
+                document.getElementById('cad-mode-floor').classList.add('active');
+                document.getElementById('cad-mode-section').classList.remove('active');
+                runFullLabSimulation();
+            });
+
+            document.getElementById('cad-mode-section').addEventListener('click', (e) => {
+                cadViewMode = 'elevation';
+                document.getElementById('cad-mode-section').classList.add('active');
+                document.getElementById('cad-mode-floor').classList.remove('active');
+                runFullLabSimulation();
+            });
+
+            // Reset defaults
+            document.getElementById('btn-reset-defaults').addEventListener('click', () => {
+                document.getElementById('select-physics-zone').value = 'hot_arid';
+                document.getElementById('select-physics-structure').value = 'geodesic';
+                document.getElementById('select-physics-wall').value = 'rammed_earth_300';
+                document.getElementById('select-physics-vent').value = 'night_purge';
+                document.getElementById('slider-glazing-ratio').value = 65;
+                document.getElementById('slider-water-mass').value = 12000;
+                document.getElementById('slider-sim-hour').value = 12;
+                currentSimHour = 12;
+                runFullLabSimulation();
+            });
+
+            // Export spec JSON
+            document.getElementById('btn-export-blueprint-spec').addEventListener('click', () => {
+                const spec = {
+                    project: 'BioShelter Parametric Lab Export',
+                    generatedAt: new Date().toISOString(),
+                    zone: document.getElementById('select-physics-zone').value,
+                    structure: document.getElementById('select-physics-structure').value,
+                    wall: document.getElementById('select-physics-wall').value,
+                    glazingRatio: document.getElementById('slider-glazing-ratio').value,
+                    waterMassLiters: document.getElementById('slider-water-mass').value,
+                    comfortScore: document.getElementById('hero-comfort-score').textContent,
+                    netZeroIndex: document.getElementById('hero-netzero-val').textContent
+                };
+                const blob = new Blob([JSON.stringify(spec, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `bioshelter-blueprint-spec-${Date.now()}.json`;
+                a.click();
+            });
+
+            window.addEventListener('bioshelter-theme-changed', runFullLabSimulation);
         });
     </script>
 </body>
